@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Grid system -->
+    <dimen name="screen_width">390dp</dimen>
+    <dimen name="screen_height">844dp</dimen>
+    <dimen name="margin_default">20dp</dimen>
+    <dimen name="column_width">16dp</dimen>
+</resources>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Headings -->
+    <style name="Heading1">
+        <item name="android:textSize">40sp</item>
+        <item name="android:lineSpacingExtra">20sp</item>
+        <item name="android:fontFamily">@font/bold</item>
+    </style>
+
+    <style name="Heading2">
+        <item name="android:textSize">32sp</item>
+        <item name="android:lineSpacingExtra">16sp</item>
+        <item name="android:fontFamily">@font/bold</item>
+
+    </style>
+
+    <style name="Heading3">
+        <item name="android:textSize">28sp</item>
+        <item name="android:lineSpacingExtra">14sp</item>
+        <item name="android:fontFamily">@font/bold</item>
+
+    </style>
+
+    <style name="Heading4">
+        <item name="android:textSize">24sp</item>
+        <item name="android:lineSpacingExtra">12sp</item>
+        <item name="android:fontFamily">@font/bold</item>
+
+    </style>
+
+    <style name="Heading5">
+        <item name="android:textSize">20sp</item>
+        <item name="android:lineSpacingExtra">10sp</item>
+        <item name="android:fontFamily">@font/bold</item>
+
+    </style>
+
+    <!-- Body text -->
+    <style name="Body1">
+        <item name="android:textSize">16sp</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+        <item name="android:fontFamily">@font/medium</item>
+
+    </style>
+
+    <style name="Body2">
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingExtra">7sp</item>
+        <item name="android:fontFamily">@font/regular</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="Caption1">
+        <item name="android:textSize">12sp</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+        <item name="android:fontFamily">@font/regular</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+</resources>
