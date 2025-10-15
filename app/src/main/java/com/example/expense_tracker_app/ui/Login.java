@@ -1,12 +1,11 @@
-package com.example.expense_tracker_app;
+package com.example.expense_tracker_app.ui;
 
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
+import com.example.expense_tracker_app.R;
 
 public class Login extends AppCompatActivity {
 

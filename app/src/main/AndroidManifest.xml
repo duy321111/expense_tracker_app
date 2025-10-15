@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Expensetrackerapp">
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
 
             android:exported="true">
             <intent-filter>
@@ -23,7 +23,7 @@
         </activity>
 
         <activity
-            android:name=".Login"
+            android:name=".ui.Login"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
