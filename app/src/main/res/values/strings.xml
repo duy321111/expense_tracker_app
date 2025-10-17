@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Expense-tracker-app</string>
+    <string name="login_link"><u>Đăng nhập</u></string>
+
 </resources>
