@@ -1,6 +1,9 @@
 package com.example.expense_tracker_app.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,5 +17,22 @@ public class ResetPassword extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.reset_password);
+
+        TextView tvLogin = findViewById(R.id.tvLoginRedirect);
+        tvLogin.setOnClickListener(v -> {
+            Intent intent = new Intent(ResetPassword.this, Login.class);
+            startActivity(intent);
+        });
+
+
+        Button btnResetPassword = findViewById(R.id.btnResetPassword);
+        btnResetPassword.setOnClickListener(v -> {
+            Intent intent = new Intent(ResetPassword.this, Login.class);
+            startActivity(intent);
+        });
+
+
     }
+
+
 }
