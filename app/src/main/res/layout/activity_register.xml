@@ -135,7 +135,7 @@
             android:layout_marginTop="16dp"
             android:text="Đăng ký"
             android:textColor="@color/white"
-            style="@style/Body1"
+            style="@style/Body2"
             android:backgroundTint="@color/primary_1"
             app:cornerRadius="12dp" />
 
@@ -151,8 +151,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Đã có tài khoản? "
-                android:fontFamily="@font/regular"
-                android:textSize="14sp"
+                style="@style/Body2"
                 android:textColor="@color/neutral_700" />
 
             <TextView

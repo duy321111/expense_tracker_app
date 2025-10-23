@@ -74,11 +74,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Nhập mã OTP 4 chữ số đã gửi đến email "
-            android:textSize="14sp"
             android:textColor="@color/neutral_700"
             android:layout_marginBottom="16dp"
             android:layout_marginStart="28dp"
-            android:fontFamily="@font/regular" />
+            style="@style/Body2" />
 
         <!-- OTP 4 ô -->
         <LinearLayout
@@ -96,7 +95,7 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:gravity="center"
-                android:textSize="24sp"
+                style="@style/Heading4"
                 android:inputType="number"
                 android:maxLength="1"
                 android:background="@drawable/otp_box"
@@ -108,11 +107,10 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:gravity="center"
-                android:textSize="24sp"
+                style="@style/Heading4"
                 android:inputType="number"
                 android:maxLength="1"
                 android:background="@drawable/otp_box"
-                android:fontFamily="@font/regular"
                 android:layout_margin="4dp" />
 
             <EditText
@@ -120,11 +118,10 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:gravity="center"
-                android:textSize="24sp"
                 android:inputType="number"
                 android:maxLength="1"
                 android:background="@drawable/otp_box"
-                android:fontFamily="@font/regular"
+                style="@style/Heading4"
                 android:layout_margin="4dp" />
 
             <EditText
@@ -132,11 +129,10 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:gravity="center"
-                android:textSize="24sp"
+                style="@style/Heading4"
                 android:inputType="number"
                 android:maxLength="1"
                 android:background="@drawable/otp_box"
-                android:fontFamily="@font/regular"
                 android:layout_margin="4dp" />
         </LinearLayout>
 
@@ -185,7 +181,7 @@
                 android:id="@+id/tvLoginRedirect"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Đăng nhập"
+                android:text="@string/login_link"
                 android:textSize="14sp"
                 android:textColor="@color/primary_1"
                 android:fontFamily="@font/bold"

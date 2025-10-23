@@ -106,6 +106,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:paddingTop="8dp"
+            style="@style/Body2"
             android:text="Quên mật khẩu?"
             android:textColor="@color/primary_1" />
 
@@ -150,10 +151,9 @@
                 android:layout_height="wrap_content"
                 android:text="Hoặc đăng nhập với"
                 android:textColor="@color/neutral_700"
-                android:textSize="14sp"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
-                android:fontFamily="@font/medium" />
+                style="@style/Body2" />
 
             <View
                 android:layout_width="0dp"
