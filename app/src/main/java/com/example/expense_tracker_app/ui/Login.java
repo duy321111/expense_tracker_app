@@ -25,6 +25,12 @@ public class Login extends AppCompatActivity {
             startActivity(intent);
         });
 
+        Button btnLogin = findViewById(R.id.btnLogin);
+        btnLogin.setOnClickListener(v -> {
+            Intent intent = new Intent(Login.this, AddWalletActivity.class);
+            startActivity(intent);
+        });
+
         // TextView quên mật khẩu
         TextView tvForgotPassword = findViewById(R.id.tvForgotPassword);
         tvForgotPassword.setOnClickListener(v -> {

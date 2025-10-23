@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="currencies">
+        <item>🇻🇳 Việt Nam Đồng (VND)</item>
+        <item>🇺🇸 Đô la Mỹ (USD)</item>
+        <item>🇪🇺 Euro (EUR)</item>
+        <item>🇯🇵 Yên Nhật (JPY)</item>
+        <item>Khác...</item>
+    </string-array>
+</resources>
