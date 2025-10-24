@@ -44,6 +44,8 @@ public class DonutChartView extends View {
         invalidate();
     }
 
+    public void setColors(int[] cs){ /* lưu cs và invalidate() */ }
+
     @Override protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 

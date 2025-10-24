@@ -31,6 +31,7 @@
 
             <!-- SECTION: Tổng đã chi -->
             <LinearLayout
+                android:id="@+id/sectionTotal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -58,6 +59,7 @@
 
                 <!-- Tổng đã chi -->
                 <LinearLayout
+                    android:id="@+id/rowTotal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -65,17 +67,20 @@
                     android:gravity="center_vertical">
 
                     <TextView
+                        android:id="@+id/tvTotalLabel"
                         style="@style/Body2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Tổng đã chi"/>
 
                     <View
+                        android:id="@+id/dividerTotal"
                         android:layout_width="0dp"
                         android:layout_height="1dp"
                         android:layout_weight="1"/>
 
                     <TextView
+                        android:id="@+id/tvTotalAmount"
                         style="@style/Heading5"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -85,6 +90,7 @@
 
                 <!-- Donut chart -->
                 <FrameLayout
+                    android:id="@+id/donutContainer"
                     android:layout_width="match_parent"
                     android:layout_height="220dp"
                     android:layout_marginTop="8dp"
@@ -98,6 +104,7 @@
                         android:layout_gravity="center"/>
 
                     <LinearLayout
+                        android:id="@+id/donutCenterTexts"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
@@ -105,6 +112,7 @@
                         android:layout_gravity="center">
 
                         <TextView
+                            android:id="@+id/tvCenterTop"
                             style="@style/Heading5"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -112,6 +120,7 @@
                             android:textColor="@color/black"/>
 
                         <TextView
+                            android:id="@+id/tvCenterBottom"
                             style="@style/Caption1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -124,6 +133,7 @@
 
             <!-- SECTION: Ngày 04 tháng 03 2023 -->
             <LinearLayout
+                android:id="@+id/sectionDay_2023_03_04"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -132,6 +142,7 @@
                 android:layout_marginTop="8dp">
 
                 <TextView
+                    android:id="@+id/tvDayHeader_2023_03_04"
                     style="@style/Body2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -140,6 +151,7 @@
 
                 <!-- Item (1) -->
                 <LinearLayout
+                    android:id="@+id/item1_2023_03_04"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
@@ -149,11 +161,13 @@
                     android:gravity="center_vertical">
 
                     <FrameLayout
+                        android:id="@+id/item1IconWrap"
                         android:layout_width="36dp"
                         android:layout_height="36dp"
                         android:background="@drawable/bg_icon_round_accent_1">
 
                         <ImageView
+                            android:id="@+id/item1Icon"
                             android:layout_width="18dp"
                             android:layout_height="18dp"
                             android:layout_gravity="center"
@@ -162,6 +176,7 @@
                     </FrameLayout>
 
                     <LinearLayout
+                        android:id="@+id/item1Info"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -169,6 +184,7 @@
                         android:paddingStart="12dp">
 
                         <TextView
+                            android:id="@+id/item1Title"
                             style="@style/Body1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -176,6 +192,7 @@
                             android:textColor="@color/black" />
 
                         <TextView
+                            android:id="@+id/item1Method"
                             style="@style/Caption1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -184,6 +201,7 @@
                     </LinearLayout>
 
                     <TextView
+                        android:id="@+id/item1Amount"
                         style="@style/Body1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -193,6 +211,7 @@
 
                 <!-- Item (2) -->
                 <LinearLayout
+                    android:id="@+id/item2_2023_03_04"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -202,11 +221,13 @@
                     android:gravity="center_vertical">
 
                     <FrameLayout
+                        android:id="@+id/item2IconWrap"
                         android:layout_width="36dp"
                         android:layout_height="36dp"
                         android:background="@drawable/bg_icon_round_primary_1">
 
                         <ImageView
+                            android:id="@+id/item2Icon"
                             android:layout_width="18dp"
                             android:layout_height="18dp"
                             android:layout_gravity="center"
@@ -215,6 +236,7 @@
                     </FrameLayout>
 
                     <LinearLayout
+                        android:id="@+id/item2Info"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -222,6 +244,7 @@
                         android:paddingStart="12dp">
 
                         <TextView
+                            android:id="@+id/item2Title"
                             style="@style/Body1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -229,6 +252,7 @@
                             android:textColor="@color/black" />
 
                         <TextView
+                            android:id="@+id/item2Method"
                             style="@style/Caption1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -237,6 +261,7 @@
                     </LinearLayout>
 
                     <TextView
+                        android:id="@+id/item2Amount"
                         style="@style/Body1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -246,6 +271,7 @@
 
                 <!-- Item (3) -->
                 <LinearLayout
+                    android:id="@+id/item3_2023_03_04"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -255,11 +281,13 @@
                     android:gravity="center_vertical">
 
                     <FrameLayout
+                        android:id="@+id/item3IconWrap"
                         android:layout_width="36dp"
                         android:layout_height="36dp"
                         android:background="@drawable/bg_icon_round_primary_2">
 
                         <ImageView
+                            android:id="@+id/item3Icon"
                             android:layout_width="18dp"
                             android:layout_height="18dp"
                             android:layout_gravity="center"
@@ -268,6 +296,7 @@
                     </FrameLayout>
 
                     <LinearLayout
+                        android:id="@+id/item3Info"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -275,6 +304,7 @@
                         android:paddingStart="12dp">
 
                         <TextView
+                            android:id="@+id/item3Title"
                             style="@style/Body1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -282,6 +312,7 @@
                             android:textColor="@color/black" />
 
                         <TextView
+                            android:id="@+id/item3Method"
                             style="@style/Caption1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -290,6 +321,7 @@
                     </LinearLayout>
 
                     <TextView
+                        android:id="@+id/item3Amount"
                         style="@style/Body1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -300,6 +332,7 @@
 
             <!-- SECTION: Ngày 03 tháng 03 2023 -->
             <LinearLayout
+                android:id="@+id/sectionDay_2023_03_03"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -308,6 +341,7 @@
                 android:layout_marginTop="8dp">
 
                 <TextView
+                    android:id="@+id/tvDayHeader_2023_03_03"
                     style="@style/Body2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -315,6 +349,7 @@
                     android:textColor="@color/neutral_800"/>
 
                 <LinearLayout
+                    android:id="@+id/itemEmpty_2023_03_03"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
@@ -324,6 +359,7 @@
                     android:gravity="center_vertical">
 
                     <TextView
+                        android:id="@+id/tvEmpty_2023_03_03"
                         style="@style/Caption1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
