@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:background="@color/background_white">
+
+    <LinearLayout
+        android:orientation="vertical" android:padding="16dp"
+        android:layout_width="match_parent" android:layout_height="wrap_content">
+
+        <TextView android:text="Chọn danh mục" android:textStyle="bold"
+            android:textColor="@color/text_primary" android:textSize="16sp"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+        <!-- Chi tiêu hằng ngày -->
+        <TextView android:text="Chi tiêu hằng ngày" android:textColor="@color/text_secondary"
+            android:layout_marginTop="12dp"/>
+        <GridLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:columnCount="4" android:rowCount="1" android:useDefaultMargins="true" android:layout_marginTop="6dp">
+
+            <LinearLayout android:id="@+id/cat_food" style="@style/Chip.Category" android:background="@drawable/bg_card">
+                <ImageView android:src="@drawable/ic_cat_food" android:tint="@color/orange_main"
+                    android:layout_width="20dp" android:layout_height="20dp"/>
+                <TextView android:text="Ăn uống" style="@style/Chip.Text"/>
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/cat_coffee" style="@style/Chip.Category" android:background="@drawable/bg_card">
+                <ImageView android:src="@drawable/ic_cat_coffee" android:tint="@color/orange_main"
+                    android:layout_width="20dp" android:layout_height="20dp"/>
+                <TextView android:text="Cà phê" style="@style/Chip.Text"/>
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/cat_groceries" style="@style/Chip.Category" android:background="@drawable/bg_card">
+                <ImageView android:src="@drawable/ic_cat_groceries" android:tint="@color/orange_main"
+                    android:layout_width="20dp" android:layout_height="20dp"/>
+                <TextView android:text="Đi chợ" style="@style/Chip.Text"/>
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/cat_market" style="@style/Chip.Category" android:background="@drawable/bg_card">
+                <ImageView android:src="@drawable/ic_cat_market" android:tint="@color/orange_main"
+                    android:layout_width="20dp" android:layout_height="20dp"/>
+                <TextView android:text="Siêu thị" style="@style/Chip.Text"/>
+            </LinearLayout>
+        </GridLayout>
+
+        <!-- Chi tiêu hằng tháng -->
+        <TextView android:text="Chi tiêu hằng tháng" android:textColor="@color/text_secondary"
+            android:layout_marginTop="12dp"/>
+        <GridLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:columnCount="4" android:useDefaultMargins="true" android:layout_marginTop="6dp">
+
+            <LinearLayout android:id="@+id/cat_electric" style="@style/Chip.Category" android:background="@drawable/bg_card">
+                <ImageView android:src="@drawable/ic_cat_electric" android:tint="@color/green_main"
+                    android:layout_width="20dp" android:layout_height="20dp"/>
+                <TextView android:text="Điện" style="@style/Chip.Text"/>
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/cat_water" style="@style/Chip.Category" android:background="@drawable/bg_card">
+                <ImageView android:src="@drawable/ic_cat_water" android:tint="@color/green_main"
+                    android:layout_width="20dp" android:layout_height="20dp"/>
+                <TextView android:text="Nước" style="@style/Chip.Text"/>
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/cat_internet" style="@style/Chip.Category" android:background="@drawable/bg_card">
+                <ImageView android:src="@drawable/ic_cat_internet" android:tint="@color/green_main"
+                    android:layout_width="20dp" android:layout_height="20dp"/>
+                <TextView android:text="Internet" style="@style/Chip.Text"/>
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/cat_transport" style="@style/Chip.Category" android:background="@drawable/bg_card">
+                <ImageView android:src="@drawable/ic_cat_transport" android:tint="@color/green_main"
+                    android:layout_width="20dp" android:layout_height="20dp"/>
+                <TextView android:text="Di chuyển" style="@style/Chip.Text"/>
+            </LinearLayout>
+        </GridLayout>
+
+        <!-- Thu nhập -->
+        <TextView android:text="Thu nhập" android:textColor="@color/text_secondary"
+            android:layout_marginTop="12dp"/>
+        <GridLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:columnCount="4" android:useDefaultMargins="true" android:layout_marginTop="6dp">
+            <LinearLayout android:id="@+id/cat_salary" style="@style/Chip.Category" android:background="@drawable/bg_card">
+                <ImageView android:src="@drawable/ic_cat_salary" android:tint="@color/green_main"
+                    android:layout_width="20dp" android:layout_height="20dp"/>
+                <TextView android:text="Lương" style="@style/Chip.Text"/>
+            </LinearLayout>
+            <LinearLayout android:id="@+id/cat_sale" style="@style/Chip.Category" android:background="@drawable/bg_card">
+                <ImageView android:src="@drawable/ic_cat_sale" android:tint="@color/green_main"
+                    android:layout_width="20dp" android:layout_height="20dp"/>
+                <TextView android:text="Bán hàng" style="@style/Chip.Text"/>
+            </LinearLayout>
+            <LinearLayout android:id="@+id/cat_debt_return" style="@style/Chip.Category" android:background="@drawable/bg_card">
+                <ImageView android:src="@drawable/ic_cat_debt_return" android:tint="@color/green_main"
+                    android:layout_width="20dp" android:layout_height="20dp"/>
+                <TextView android:text="Được trả nợ" style="@style/Chip.Text"/>
+            </LinearLayout>
+        </GridLayout>
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:padding="12dp"
+    android:background="@drawable/bg_card"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp">
+    <TextView android:id="@+id/tvCat" android:text="Danh mục"
+        android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2"
+        android:textColor="@color/text_primary"/>
+    <TextView android:id="@+id/tvMethod" android:text="Hình thức"
+        android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+        android:textColor="@color/text_secondary"/>
+    <TextView android:id="@+id/tvAmount" android:text="+0 đ"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:textStyle="bold" android:textColor="@color/text_primary"/>
+</LinearLayout>
+

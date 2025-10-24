@@ -1,37 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 🎨 Màu chính -->
-    <color name="primary_1">#7C47D2</color>
-    <color name="primary_2">#A06AF9</color>
-    <color name="primary_3">#C19BFF</color>
-    <color name="primary_4">#D5BBFF</color>
-    <color name="primary_5">#E6D9FC</color>
 
-    <!-- 🟠 Màu phụ -->
-    <color name="accent_1">#F46616</color>
-    <color name="accent_2">#FF843F</color>
-    <color name="accent_3">#FFA572</color>
-    <color name="accent_4">#FFBA93</color>
-    <color name="accent_5">#FFD3BA</color>
+    <!-- 🎨 MÀU CHỦ ĐẠO -->
+    <color name="purple_main">#7C47D2</color>          <!-- tím chính -->
+    <color name="purple_light">#A06AF9</color>
+    <color name="purple_soft">#C19BFF</color>
+    <color name="purple_extra_light">#D5BBFF</color>
+    <color name="purple_background">#E6D9FC</color>
 
-    <color name="success_1">#00CE21</color>
-    <color name="success_2">#31DD4D</color>
-    <color name="success_3">#58F271</color>
-    <color name="success_4">#84FF98</color>
-    <color name="success_5">#A3FFB2</color>
+    <color name="orange_main">#F46616</color>
+    <color name="orange_light">#FF843F</color>
+    <color name="orange_soft">#FFA572</color>
+    <color name="orange_extra_light">#FFBA93</color>
+    <color name="orange_background">#FFD3BA</color>
 
-    <!-- ⚪ Màu trung tính -->
-    <color name="neutral_900">#282828</color>
-    <color name="neutral_800">#444444</color>
-    <color name="neutral_700">#5D5D5D</color>
-    <color name="neutral_600">#777777</color>
-    <color name="neutral_500">#8D8D8D</color>
-    <color name="neutral_400">#A4A4A4</color>
-    <color name="neutral_300">#B6B6B6</color>
-    <color name="neutral_200">#CCCCCC</color>
-    <color name="neutral_100">#DADADA</color>
-    <color name="neutral_50">#F4F2F6</color>
+    <color name="green_main">#00CE21</color>
+    <color name="green_light">#31DD4D</color>
+    <color name="green_soft">#58F271</color>
+    <color name="green_extra_light">#84FF98</color>
+    <color name="green_background">#A3FFB2</color>
 
-    <color name="white">#FFFFFF</color>
+    <color name="text_primary">#282828</color>          <!-- chữ chính -->
+    <color name="text_secondary">#777777</color>        <!-- chữ phụ -->
+    <color name="text_disabled">#A4A4A4</color>         <!-- chữ mờ -->
+
+    <color name="divider">#CCCCCC</color>               <!-- viền ngăn -->
+    <color name="background_light">#F4F2F6</color>      <!-- nền sáng -->
+    <color name="background_white">#FFFFFF</color>      <!-- nền trắng -->
+    <color name="background_dark">#444444</color>       <!-- nền tối -->
+
+    <!-- 🖤 MÀU CƠ BẢN -->
     <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+
+    <selector xmlns:android="http://schemas.android.com/apk/res/android">
+        <item android:color="@color/purple_main" android:state_checked="true"/>
+        <item android:color="@color/text_secondary"/>
+    </selector>
+
 </resources>

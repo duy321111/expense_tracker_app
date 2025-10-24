@@ -1,26 +1,35 @@
 package com.example.expense_tracker_app.ui;
 
 import android.os.Bundle;
-
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
 import com.example.expense_tracker_app.R;
+import com.example.expense_tracker_app.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
+    private ActivityMainBinding b;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+    @Override protected void onCreate(Bundle s){
+        super.onCreate(s);
+        b = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(b.getRoot());
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container, new StatsFragment()).commit();
+
+        b.bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_stats) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, new StatsFragment()).commit();
+                return true;
+            }
+            return false;
         });
+
+        b.fabAdd.setOnClickListener(v ->
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, new AddTransactionFragment())
+                        .addToBackStack(null).commit()
+        );
     }
 }

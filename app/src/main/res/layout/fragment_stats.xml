@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background_light" android:padding="12dp">
+
+    <TextView android:id="@+id/tvTitle" android:text="Thống kê"
+        android:textSize="20sp" android:textStyle="bold" android:textColor="@color/text_primary"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
+        <LinearLayout android:id="@+id/llMonths" android:orientation="horizontal"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    </HorizontalScrollView>
+
+    <com.example.expense_tracker_app.ui.BarChartView
+        android:id="@+id/barChart" android:layout_width="match_parent" android:layout_height="200dp"
+        android:layout_marginTop="8dp" />
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:layout_marginTop="8dp">
+        <LinearLayout android:id="@+id/cardIncome" android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:background="@drawable/bg_card" android:padding="12dp" android:layout_marginEnd="6dp">
+            <ImageView android:src="@drawable/ic_income" android:tint="@color/green_main"
+                android:layout_width="24dp" android:layout_height="24dp"/>
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:orientation="vertical" android:layout_marginStart="8dp">
+                <TextView android:text="Thu nhập" android:textColor="@color/text_secondary"/>
+                <TextView android:id="@+id/tvIncome" android:text="0 đ" android:textStyle="bold" android:textColor="@color/text_primary"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/cardExpense" android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:background="@drawable/bg_card" android:padding="12dp" android:layout_marginStart="6dp">
+            <ImageView android:src="@drawable/ic_expense" android:tint="@color/orange_main"
+                android:layout_width="24dp" android:layout_height="24dp"/>
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:orientation="vertical" android:layout_marginStart="8dp">
+                <TextView android:text="Chi tiêu" android:textColor="@color/text_secondary"/>
+                <TextView android:id="@+id/tvExpense" android:text="0 đ" android:textStyle="bold" android:textColor="@color/text_primary"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvTx" android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1" android:layout_marginTop="8dp" />
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:gravity="end" android:layout_marginTop="6dp">
+        <ImageButton android:id="@+id/btnMore" android:src="@drawable/ic_more"
+            android:background="@android:color/transparent"/>
+    </LinearLayout>
+</LinearLayout>
+
