@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Expensetrackerapp">
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.Home"
 
             android:exported="true">
             <intent-filter>

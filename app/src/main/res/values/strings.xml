@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Expense-tracker-app</string>
+    <string name="cd_open_notifications">Mở trang thông báo</string>
+    <string name="cd_reload">Làm mới</string>
+    <string name="cd_add_transaction">Thêm giao dịch mới</string>
+    <string name="cd_spending_icon">Xem chi tiêu</string>
 </resources>
