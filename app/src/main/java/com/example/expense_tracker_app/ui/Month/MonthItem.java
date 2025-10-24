@@ -1,4 +1,4 @@
-package com.example.expense_tracker_app.ui;
+package com.example.expense_tracker_app.ui.Month;
 
 public class MonthItem {
     public final int year;

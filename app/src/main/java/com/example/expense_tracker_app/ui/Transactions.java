@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,7 +13,8 @@ import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.expense_tracker_app.R;
-import com.example.expense_tracker_app.ui.view.DonutChartView;
+import com.example.expense_tracker_app.ui.Month.MonthAdapter;
+import com.example.expense_tracker_app.ui.Month.MonthItem;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -23,7 +25,8 @@ public class Transactions extends AppCompatActivity {
     private DonutChartView donutChart;
     private TextView tvTotalAmount, tvCenterTop;
 
-    @Override protected void onCreate(@Nullable Bundle savedInstanceState){
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.transactions);
 
@@ -58,12 +61,13 @@ public class Transactions extends AppCompatActivity {
         });
 
         rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override public void onScrollStateChanged(@NonNull RecyclerView r, int state){
-                if (state == RecyclerView.SCROLL_STATE_IDLE){
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView r, int state) {
+                if (state == RecyclerView.SCROLL_STATE_IDLE) {
                     View v = snap.findSnapView(lm);
                     if (v == null) return;
                     int idx = lm.getPosition(v);
-                    if (idx != RecyclerView.NO_POSITION && idx != adapter.selected){
+                    if (idx != RecyclerView.NO_POSITION && idx != adapter.selected) {
                         adapter.selected = idx;
                         adapter.notifyDataSetChanged();
                         MonthItem cur = months.get(idx);
@@ -92,10 +96,14 @@ public class Transactions extends AppCompatActivity {
     static class CatSum {
         String name;
         float amount;
-        CatSum(String n, float a){name=n; amount=a;}
+
+        CatSum(String n, float a) {
+            name = n;
+            amount = a;
+        }
     }
 
-    private void initMockData(){
+    private void initMockData() {
         monthlyData.put("2025-03", Arrays.asList(
                 new CatSum("Ăn uống", 1900000f),
                 new CatSum("Cà phê", 450000f),
@@ -115,50 +123,50 @@ public class Transactions extends AppCompatActivity {
         ));
     }
 
-    private void onMonthSelected(int year, int month){
+    private void onMonthSelected(int year, int month) {
         String key = String.format(Locale.US, "%04d-%02d", year, month);
         List<CatSum> cats = monthlyData.getOrDefault(key, Collections.emptyList());
 
         float total = 0f;
-        for (CatSum c: cats) total += c.amount;
+        for (CatSum c : cats) total += c.amount;
 
         // --- update total text ---
         tvTotalAmount.setText(formatVND(total));
         tvCenterTop.setText(total == 0 ? "0 đ" : formatVND(total));
 
         // --- update donut ---
-        if (total <= 0f){
+        if (total <= 0f) {
             donutChart.setValues(new float[]{0f});
             return;
         }
         float[] vals = new float[cats.size()];
-        for (int i=0;i<cats.size();i++) vals[i] = cats.get(i).amount;
+        for (int i = 0; i < cats.size(); i++) vals[i] = cats.get(i).amount;
         donutChart.setValues(vals);
     }
 
-    private String formatVND(float v){
-        java.text.NumberFormat f = java.text.NumberFormat.getInstance(new Locale("vi","VN"));
+    private String formatVND(float v) {
+        java.text.NumberFormat f = java.text.NumberFormat.getInstance(new Locale("vi", "VN"));
         return f.format(Math.round(v)) + " đ";
     }
 
     // ---------------- UTIL ----------------
-    private static List<MonthItem> buildMonths(int centerMonths){
+    private static List<MonthItem> buildMonths(int centerMonths) {
         LocalDate now = LocalDate.now();
         LocalDate start = now.minusMonths(centerMonths);
         List<MonthItem> list = new ArrayList<>();
-        for(int i=0;i<=centerMonths*2;i++){
+        for (int i = 0; i <= centerMonths * 2; i++) {
             LocalDate d = start.plusMonths(i);
             list.add(new MonthItem(d.getYear(), d.getMonthValue()));
         }
         return list;
     }
 
-    private static int findCurrentIndex(List<MonthItem> list){
+    private static int findCurrentIndex(List<MonthItem> list) {
         LocalDate now = LocalDate.now();
-        for (int i=0;i<list.size();i++){
+        for (int i = 0; i < list.size(); i++) {
             MonthItem it = list.get(i);
-            if (it.year==now.getYear() && it.month==now.getMonthValue()) return i;
+            if (it.year == now.getYear() && it.month == now.getMonthValue()) return i;
         }
-        return list.size()/2;
+        return list.size() / 2;
     }
 }

@@ -1,4 +1,4 @@
-package com.example.expense_tracker_app.ui.view;
+package com.example.expense_tracker_app.ui;
 
 import android.content.Context;
 import android.graphics.Canvas;
