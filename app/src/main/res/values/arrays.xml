@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="month_options">
+        <item>Tháng này</item>
+        <item>Tháng trước</item>
+        <item>2 tháng trước</item>
+        <item>3 tháng trước</item>
+        <item>Tuỳ chọn…</item>
+    </string-array>
+</resources>
