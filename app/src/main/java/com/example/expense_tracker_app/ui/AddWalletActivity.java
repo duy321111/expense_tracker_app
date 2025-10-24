@@ -8,6 +8,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.expense_tracker_app.R;
+import com.google.android.material.appbar.MaterialToolbar;
 
 public class AddWalletActivity extends AppCompatActivity {
 
@@ -27,6 +28,8 @@ public class AddWalletActivity extends AppCompatActivity {
         );
         adapter.setDropDownViewResource(R.layout.spinner_dropdown_item); // layout khi xổ ra
         spinnerCurrency.setAdapter(adapter);
+        MaterialToolbar toolbar = findViewById(R.id.toolbar_add_wallet);
+        toolbar.setNavigationOnClickListener(v -> finish());
 
         //  Khởi tạo các View khác
         Button btnCreateWallet = findViewById(R.id.btn_create_wallet);

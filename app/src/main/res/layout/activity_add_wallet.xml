@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
     android:background="@color/white">
 
-    <!-- Tiêu đề -->
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- Toolbar với nút back -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar_add_wallet"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Thêm ví mới"
-        android:layout_gravity="center"
-        style="@style/Heading1"
-        android:textColor="@color/primary_1"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="24dp"/>
+        android:background="@color/white"
+        app:titleTextAppearance="@style/Heading4"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:title="Thêm ví mới"
+        app:navigationIconTint="@color/primary_1"
+        app:titleTextColor="@color/primary_1"
+        app:titleCentered="true"
+        android:elevation="0dp" />
 
     <!-- Hình minh họa ví -->
     <ImageView
@@ -25,7 +29,8 @@
         android:layout_gravity="center"
         android:contentDescription="Wallet Illustration"
         android:scaleType="fitCenter"
-        android:layout_marginBottom="24dp"/>
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp" />
 
     <!-- Mô tả -->
     <TextView
@@ -36,7 +41,7 @@
         android:textColor="@color/black"
         android:layout_gravity="center"
         style="@style/Body1"
-        android:layout_marginBottom="24dp"/>
+        android:layout_marginBottom="24dp" />
 
     <!-- Spinner cho tiền tệ với icon -->
     <LinearLayout
@@ -52,8 +57,7 @@
             android:layout_height="24dp"
             android:layout_marginTop="10dp"
             android:layout_marginStart="3dp"
-            android:src="@drawable/ic_currency"
-       />
+            android:src="@drawable/ic_currency" />
 
         <Spinner
             android:id="@+id/spinner_currency"
@@ -72,7 +76,7 @@
         android:hint="Nhập tên ví..."
         android:padding="12dp"
         android:background="@drawable/edittext_border"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp" />
 
     <!-- Ô nhập số dư -->
     <EditText
@@ -84,7 +88,7 @@
         android:inputType="numberDecimal"
         android:padding="12dp"
         android:background="@drawable/edittext_border"
-        android:layout_marginBottom="24dp"/>
+        android:layout_marginBottom="24dp" />
 
     <!-- Nút Tạo ví -->
     <Button
@@ -96,5 +100,6 @@
         android:backgroundTint="@color/primary_1"
         android:textColor="#FFFFFF"
         style="@style/Body1"
-        android:padding="12dp"/>
+        android:padding="12dp" />
+
 </LinearLayout>
