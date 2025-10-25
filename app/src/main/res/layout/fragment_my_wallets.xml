@@ -61,7 +61,7 @@
             android:textColor="@color/white"
             android:textSize="24sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="parsent"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.cardview.widget.CardView>
