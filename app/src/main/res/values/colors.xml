@@ -14,11 +14,33 @@
     <color name="accent_4">#FFBA93</color>
     <color name="accent_5">#FFD3BA</color>
 
+    <!-- ✅ Màu thành công -->
     <color name="success_1">#00CE21</color>
     <color name="success_2">#31DD4D</color>
     <color name="success_3">#58F271</color>
     <color name="success_4">#84FF98</color>
     <color name="success_5">#A3FFB2</color>
+
+    <!-- ⚠️ Màu cảnh báo -->
+    <color name="warning_1">#EAB308</color>
+    <color name="warning_2">#FACC15</color>
+    <color name="warning_3">#FDE047</color>
+    <color name="warning_4">#FEF08A</color>
+    <color name="warning_5">#FEF9C3</color>
+
+    <!-- ❌ Màu lỗi -->
+    <color name="error_1">#DC2626</color>
+    <color name="error_2">#EF4444</color>
+    <color name="error_3">#F87171</color>
+    <color name="error_4">#FCA5A5</color>
+    <color name="error_5">#FECACA</color>
+
+    <!-- ℹ️ Màu thông tin -->
+    <color name="info_1">#0284C7</color>
+    <color name="info_2">#0EA5E9</color>
+    <color name="info_3">#38BDF8</color>
+    <color name="info_4">#7DD3FC</color>
+    <color name="info_5">#BAE6FD</color>
 
     <!-- ⚪ Màu trung tính -->
     <color name="neutral_900">#282828</color>
@@ -32,6 +54,26 @@
     <color name="neutral_100">#DADADA</color>
     <color name="neutral_50">#F4F2F6</color>
 
+    <!-- 🌈 Màu nền -->
+    <color name="background_light">#FAFAFA</color>
+    <color name="background_dark">#121212</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="overlay">#1F1F1F</color>
+
+    <!-- 🩵 Màu khác -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+
+
+    <!-- Custom colors -->
+    <color name="background_gray">#F5F5F5</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_hint">#9E9E9E</color>
+
+    <color name="notification_blue">#2196F3</color>
+    <color name="notification_orange">#FF9800</color>
+    <color name="notification_purple">#9C27B0</color>
+    <color name="notification_green">#4CAF50</color>
 </resources>

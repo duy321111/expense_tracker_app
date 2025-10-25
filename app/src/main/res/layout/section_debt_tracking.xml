@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginTop="16dp">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            style="@style/Heading5"
+            android:text="Theo dõi vay nợ"
+            android:textColor="@color/black"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:id="@+id/tvDebtDetail"
+            style="@style/Body2"
+            android:text="Chi tiết"
+            android:textColor="@color/neutral_800"
+            android:drawableEnd="@drawable/ic_drop_down"
+            android:drawablePadding="4dp"
+            android:padding="4dp"
+            android:clickable="true"
+            android:focusable="true"/>
+    </LinearLayout>
+
+    <!-- Meta -->
+    <TextView
+        android:id="@+id/tvDebtMeta"
+        style="@style/Caption1"
+        android:text="Đi vay - Home Credit"
+        android:textColor="@color/accent_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"/>
+
+    <!-- Card -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_card_primary_5">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvDebtLabel"
+                style="@style/Caption1"
+                android:text="Đã trả"
+                android:textColor="@color/neutral_800"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/tvDebtRatio"
+                style="@style/Body1"
+                android:text="0/0"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/pbDebt"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_marginTop="8dp"
+            android:indeterminate="false"
+            android:progressDrawable="@drawable/progress_rounded"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="6dp">
+
+            <TextView
+                android:id="@+id/tvDebtStart"
+                style="@style/Caption1"
+                android:text="01/03"
+                android:textColor="@color/neutral_800"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/tvDebtEnd"
+                style="@style/Caption1"
+                android:text="31/03"
+                android:textColor="@color/neutral_800"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

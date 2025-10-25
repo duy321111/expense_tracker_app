@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.expense_tracker_app.R;
+import com.example.expense_tracker_app.ui.Notification.NotificationActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.text.DecimalFormat;
@@ -39,7 +40,7 @@ public class Home extends AppCompatActivity {
 
         // Notification
         findViewById(R.id.btnNotification).setOnClickListener(v ->
-                startActivity(new Intent(Home.this, Notifications.class)));
+                startActivity(new Intent(Home.this, NotificationActivity.class)));
 
         // --- Biểu đồ thu chi ---
         View barIncome = findViewById(R.id.barIncome);

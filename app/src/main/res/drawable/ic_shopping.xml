@@ -1,29 +1,5 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="800dp"
-    android:height="800dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
-  <path
-      android:pathData="M5.605,11.442C5.793,13.134 5.887,13.981 6.456,14.49C7.026,15 7.877,15 9.58,15H9.706H13.471H14.827C16,15 16.587,15 17.063,14.713C17.539,14.427 17.813,13.908 18.362,12.872L20.83,8.209C21.361,7.207 20.634,6 19.5,6V6H9.706H9.469C7.383,6 6.341,6 5.744,6.666C5.148,7.332 5.263,8.369 5.494,10.442L5.605,11.442Z"
-      android:strokeLineJoin="round"
-      android:strokeWidth="2"
-      android:fillColor="#00000000"
-      android:strokeColor="#323232"/>
-  <path
-      android:pathData="M3,3H3.5V3C4.164,3 4.722,3.499 4.796,4.16L5.556,11"
-      android:strokeLineJoin="round"
-      android:strokeWidth="2"
-      android:fillColor="#00000000"
-      android:strokeColor="#323232"
-      android:strokeLineCap="round"/>
-  <path
-      android:pathData="M9,19.5C9,20.328 8.328,21 7.5,21C6.672,21 6,20.328 6,19.5C6,18.672 6.672,18 7.5,18C8.328,18 9,18.672 9,19.5Z"
-      android:strokeWidth="2"
-      android:fillColor="#00000000"
-      android:strokeColor="#323232"/>
-  <path
-      android:pathData="M18,19.5C18,20.328 17.328,21 16.5,21C15.672,21 15,20.328 15,19.5C15,18.672 15.672,18 16.5,18C17.328,18 18,18.672 18,19.5Z"
-      android:strokeWidth="2"
-      android:fillColor="#00000000"
-      android:strokeColor="#323232"/>
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="24dp" android:tint="#000000" android:viewportHeight="960" android:viewportWidth="960" android:width="24dp">
+      
+    <path android:fillColor="@android:color/white" android:pathData="M240,880Q207,880 183.5,856.5Q160,833 160,800L160,320Q160,287 183.5,263.5Q207,240 240,240L320,240L320,240Q320,174 367,127Q414,80 480,80Q546,80 593,127Q640,174 640,240L640,240L720,240Q753,240 776.5,263.5Q800,287 800,320L800,800Q800,833 776.5,856.5Q753,880 720,880L240,880ZM240,800L720,800Q720,800 720,800Q720,800 720,800L720,320Q720,320 720,320Q720,320 720,320L640,320L640,400Q640,417 628.5,428.5Q617,440 600,440Q583,440 571.5,428.5Q560,417 560,400L560,320L400,320L400,400Q400,417 388.5,428.5Q377,440 360,440Q343,440 331.5,428.5Q320,417 320,400L320,320L240,320Q240,320 240,320Q240,320 240,320L240,800Q240,800 240,800Q240,800 240,800ZM400,240L560,240L560,240Q560,207 536.5,183.5Q513,160 480,160Q447,160 423.5,183.5Q400,207 400,240ZM240,800L240,800Q240,800 240,800Q240,800 240,800L240,320Q240,320 240,320Q240,320 240,320L240,320Q240,320 240,320Q240,320 240,320L240,800Q240,800 240,800Q240,800 240,800Z"/>
+    
 </vector>
