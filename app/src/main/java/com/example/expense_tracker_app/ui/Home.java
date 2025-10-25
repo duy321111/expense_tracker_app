@@ -3,9 +3,13 @@ package com.example.expense_tracker_app.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -24,7 +28,7 @@ public class Home extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
 
-        // attach Toolbar SAU setContentView
+        // attach Toolbar
         MaterialToolbar tb = findViewById(R.id.toolbar);
         setSupportActionBar(tb);
         if (getSupportActionBar() != null) {
@@ -134,6 +138,27 @@ public class Home extends AppCompatActivity {
                 .setText(two(start.get(Calendar.DAY_OF_MONTH)) + "/" + two(m + 1));
         ((TextView) findViewById(R.id.tvDebtEnd))
                 .setText(two(end.get(Calendar.DAY_OF_MONTH)) + "/" + two(m + 1));
+
+        // --- Spinner chọn ví ---
+        Spinner spinnerWallet = findViewById(R.id.spinner_wallet);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                this,
+                R.array.wallet_array,
+                android.R.layout.simple_spinner_item
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerWallet.setAdapter(adapter);
+
+        spinnerWallet.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedWallet = parent.getItemAtPosition(position).toString();
+                Toast.makeText(Home.this, "Đã chọn: " + selectedWallet, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
     }
 
     // helpers

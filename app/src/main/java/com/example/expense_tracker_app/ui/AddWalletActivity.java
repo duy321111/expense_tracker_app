@@ -1,11 +1,14 @@
 package com.example.expense_tracker_app.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.expense_tracker_app.R;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -36,7 +39,7 @@ public class AddWalletActivity extends AppCompatActivity {
         EditText etWalletName = findViewById(R.id.et_wallet_name);
         EditText etInitialBalance = findViewById(R.id.et_initial_balance);
 
-        // Xử lý khi nhấn nút "Tạo ví"
+
         // Xử lý khi nhấn nút "Tạo ví"
         btnCreateWallet.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,8 +64,12 @@ public class AddWalletActivity extends AppCompatActivity {
                 }
 
                 // TODO: Lưu thông tin ví (walletName, initialBalance, selectedCurrency)
-                // Hiện tại chỉ đóng Activity sau khi tạo
-                finish();
+
+                TextView btn_create_wallet = findViewById(R.id.btn_create_wallet);
+
+                    Intent intent = new Intent(AddWalletActivity.this, Home.class);
+                    startActivity(intent);
+
             }
         });
     }
