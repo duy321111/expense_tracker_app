@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <!--
+      Màu success_5 (#A3FFB2) là màu xanh lá nhạt
+      từ file colors.xml của bạn (image_6cb61c.png)
+    -->
+    <solid android:color="@color/success_5"/>
+</shape>

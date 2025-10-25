@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Expense-tracker-app</string>
+    <string name="login_link"><u>Đăng nhập</u></string>
+
     <string name="cd_open_notifications">Mở trang thông báo</string>
     <string name="cd_reload">Làm mới</string>
     <string name="cd_add_transaction">Thêm giao dịch mới</string>
@@ -12,17 +14,57 @@
     <string name="detail">Chi tiết</string>
     <string name="limit_budget">Hạn mức chi tiêu</string>
     <string name="spent">Đã chi</string>
-    <string name="back">Quay lại</string>
-    <string name="edit">Chỉnh sửa</string>
-    <string name="budget_limit">Hạn mức chi tiêu</string>
-    <string name="expense_details">Chi tiết khoản chi</string>
-    <string name="actual_spending">Thực tế đã chi</string>
-    <string name="recommended_spending">Nên chi</string>
-    <string name="estimated_spending">Dự kiến chi tiêu</string>
-    <string name="transfer_next_period">Chuyển kì tiếp</string>
-    <string name="transfer_description">Số dư còn lại sẽ tự động chuyển sang kì tiếp theo</string>
-    <string name="add_budget">Thêm hạn mức</string>
-    <string name="per_day">/ngày</string>
-    <string name="per_month">/tháng</string>
-    <string name="currency_symbol">đ</string>
+    <string name="cd_back_button">Quay lại</string>
+    <string name="wallets_title">Ví của bạn</string>
+    <string name="wallets_total_balance">Tổng cộng</string>
+    <string name="wallets_list">Các ví</string>
+
+    <!-- 5 CHUỖI MỚI CHẮC CHẮN CÒN THIẾU -->
+    <string name="wallets_total_balance_value">0 ₫</string>
+    <string name="wallets_basic_name">Ví cơ bản</string>
+    <string name="wallets_basic_balance">11.458.000 ₫</string>
+    <string name="wallets_tdbank_name">TDbank</string>
+    <string name="wallets_tdbank_balance">12.432.876 ₫</string>
+
+
+    <string name="change_pass_old_hint">Mật khẩu cũ</string>
+    <string name="change_pass_new_hint">Mật khẩu mới</string>
+    <string name="change_pass_confirm_hint">Xác nhận mật khẩu</string>
+
+    <!-- CÁC CHUỖI CHO MÀN HÌNH THÔNG TIN TÀI KHOẢN -->
+    <string name="account_info_title">Thông tin tài khoản</string>
+    <string name="cd_user_avatar">Ảnh đại diện người dùng</string>
+    <string name="account_info_change_avatar">Thay ảnh</string>
+    <string name="account_info_fullname">Họ và tên</string>
+    <string name="account_info_fullname_hint">Nguyễn Thế Anh</string>
+    <string name="account_info_email">Email đăng nhập</string>
+    <string name="account_info_email_hint">sousa2201@gmail.com</string>
+    <string name="account_info_password">Mật khẩu</string>
+    <string name="account_info_password_hint">************</string>
+    <string name="account_info_change_password">Đổi mật khẩu</string>
+    <string name="account_info_save">Lưu thông tin</string>
+
+
+    <string name="profile_user_name">Nguyễn Hồng Nhật Long</string>
+    <string name="profile_account">Tài khoản</string>
+    <string name="profile_settings_general">Cài đặt chung</string>
+    <string name="profile_transaction_history">Lịch sử giao dịch</string>
+    <string name="profile_my_wallets">Ví của bạn</string>
+    <string name="profile_security">Bảo mật</string>
+    <string name="profile_passcode">Mã bảo vệ</string>
+    <string name="profile_face_id">Face ID</string>
+    <string name="profile_other">Khác</string>
+    <string name="profile_rate_app">Đánh giá ứng dụng</string>
+    <string name="profile_refer_friend">Giới thiệu bạn bè</string>
+    <string name="profile_help">Hướng dẫn sử dụng</string>
+    <string name="profile_terms">Điều khoản và bảo mật</string>
+    <string name="profile_logout">Đăng xuất</string>
+
+    <string name="transaction_history_title">Lịch sử giao dịch</string>
+    <string name="month_1">Tháng 1</string>
+    <string name="month_2">Tháng 2</string>
+    <string name="month_3">Tháng 3</string>
+    <string name="month_4">Tháng 4</string>
+    <string name="month_5">Tháng 5</string>
+    <string name="cd_transaction_icon">Biểu tượng danh mục giao dịch</string>
 </resources>
