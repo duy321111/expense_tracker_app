@@ -1,7 +1,17 @@
 <resources>
     <string name="app_name">Expense-tracker-app</string>
+    <string name="login_link"><u>Đăng nhập</u></string>
+
     <string name="cd_open_notifications">Mở trang thông báo</string>
     <string name="cd_reload">Làm mới</string>
     <string name="cd_add_transaction">Thêm giao dịch mới</string>
     <string name="cd_spending_icon">Xem chi tiêu</string>
+    <string name="notifications">Thông báo</string>
+    <string name="back_button">Quay lại</string>
+    <string name="mark_all_read">Đánh dấu tất cả đã đọc</string>
+    <string name="no_notifications">Chưa có thông báo</string>
+    <string name="empty_notifications">Không có thông báo</string>
+    <string name="detail">Chi tiết</string>
+    <string name="limit_budget">Hạn mức chi tiêu</string>
+    <string name="spent">Đã chi</string>
 </resources>

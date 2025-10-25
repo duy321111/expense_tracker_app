@@ -481,7 +481,7 @@
                             android:layout_width="18dp"
                             android:layout_height="18dp"
                             android:layout_gravity="center"
-                            android:src="@drawable/ic_home"
+                            android:src="@drawable/ic_rent_house"
                             app:tint="@color/white"/>
                     </FrameLayout>
 

@@ -1,0 +1,29 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:layout_marginHorizontal="6dp">
+
+    <TextView
+        android:id="@+id/tvYear"
+        style="@style/Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2025" />
+
+    <com.google.android.material.chip.Chip
+        android:id="@+id/chipMonth"
+        style="@style/Widget.MaterialComponents.Chip.Choice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tháng 3"
+        android:checkable="true"
+        android:textColor="@color/chip_month_text_color"
+        app:checkedIconVisible="false"
+        app:chipBackgroundColor="@color/chip_month_selector"
+        app:chipCornerRadius="8dp"
+        app:chipMinHeight="60dp"
+        app:rippleColor="@android:color/transparent" />
+</LinearLayout>
