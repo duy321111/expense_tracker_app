@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_card_neutral_50"
+    android:padding="12dp">
+
+    <!-- Hàng chính -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- Icon bên trái -->
+        <FrameLayout
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_icon_round_white">
+
+            <ImageView
+                android:id="@+id/leftIcon"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_report"
+                app:tint="@color/neutral_800" />
+        </FrameLayout>
+
+        <!-- Nội dung -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingStart="12dp">
+
+            <TextView
+                android:id="@+id/tvTitle"
+                style="@style/Body1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Không tính vào báo cáo"
+                android:textColor="@color/black" />
+        </LinearLayout>
+
+        <!-- Nút switch bên phải -->
+        <Switch
+            android:id="@+id/swExclude"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false" />
+    </LinearLayout>
+
+    <!-- Ghi chú mô tả bên dưới -->
+    <TextView
+        android:id="@+id/tvExcludeHint"
+        style="@style/Caption1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="Giao dịch sẽ được tính vào báo cáo."
+        android:textColor="@color/neutral_800" />
+
+</LinearLayout>

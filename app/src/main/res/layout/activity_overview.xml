@@ -1,0 +1,50 @@
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Danh sách giao dịch -->
+            <include layout="@layout/item_transaction"/>
+
+            <!-- Hạn mức chi tiêu -->
+            <include layout="@layout/section_budget_limit"/>
+
+            <!-- Theo dõi vay nợ -->
+            <include layout="@layout/section_debt_tracking"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Footer sticky -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/footerBar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="@color/neutral_50">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            app:fabSize="mini"
+            app:fabCustomSize="40dp"
+            app:maxImageSize="36dp"
+            app:backgroundTint="@color/primary_1"
+            app:tint="@android:color/white"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_add"
+            android:contentDescription="@string/cd_add_transaction"/>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,0 +1,814 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <!-- Header -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@android:color/transparent"
+        app:contentInsetStartWithNavigation="0dp"
+        app:contentInsetStart="0dp"
+        app:contentInsetLeft="0dp"
+        app:contentInsetEnd="0dp"
+        app:layout_scrollFlags="scroll|enterAlways">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/imgAvatar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/user"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/CircleImage"
+                android:contentDescription="@string/app_name"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingStart="12dp">
+
+                <TextView
+                    style="@style/Heading5"
+                    android:text="Chào buổi tối !"
+                    android:textColor="@color/black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    style="@style/Body2"
+                    android:text="Nguyễn Thế Anh"
+                    android:textColor="@color/neutral_800"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/btnReload"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_reload"
+                android:contentDescription="@string/cd_reload"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <ImageButton
+                android:id="@+id/btnNotification"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_notification"
+                android:contentDescription="@string/cd_open_notifications"
+                android:clickable="true"
+                android:focusable="true"/>
+        </LinearLayout>
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <!-- Nội dung cuộn -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:paddingTop="72dp"
+        android:paddingBottom="60dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Thẻ ngân hàng -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="240dp"
+                app:cardCornerRadius="18dp"
+                app:cardUseCompatPadding="true"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="#6A39FF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        style="@style/Heading5"
+                        android:text="TD Bank"
+                        android:textColor="#FFFFFF"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        style="@style/Body2"
+                        android:text="Nguyen The Anh"
+                        android:textColor="#FFFFFF"
+                        android:layout_marginTop="4dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"/>
+
+                    <!-- Giữ kích cỡ riêng của số dư -->
+                    <TextView
+                        android:text="12.432.876 VND"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:textSize="22sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        style="@style/Body2"
+                        android:text="VISA"
+                        android:textColor="#FFFFFF"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ====== TÌNH HÌNH THU CHI ====== -->
+
+            <!-- Header: tiêu đề + chọn tháng -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    style="@style/Heading5"
+                    android:text="Tình hình thu chi"
+                    android:textColor="@color/black"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+
+                <Spinner
+                    android:id="@+id/spnMonth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:paddingHorizontal="8dp"
+                    android:background="@drawable/bg_spinner_outline"
+                    android:popupTheme="@style/ThemeOverlay.Material3.MaterialAlertDialog"
+                    android:entries="@array/month_options"/>
+            </LinearLayout>
+
+            <!-- Biểu đồ 2 cột + trục Y -->
+            <RelativeLayout
+                android:id="@+id/chartArea"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="8dp">
+
+                <!-- Cột nhãn trục Y -->
+                <LinearLayout
+                    android:id="@+id/yAxis"
+                    android:layout_width="44dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:orientation="vertical"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"
+                    android:gravity="bottom">
+
+                    <TextView android:id="@+id/tvY100" style="@style/TextYTick"/>
+                    <Space android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1"/>
+                    <TextView android:id="@+id/tvY75"  style="@style/TextYTick"/>
+                    <Space android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1"/>
+                    <TextView android:id="@+id/tvY50"  style="@style/TextYTick"/>
+                    <Space android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1"/>
+                    <TextView android:id="@+id/tvY25"  style="@style/TextYTick"/>
+                    <Space android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1"/>
+                    <TextView android:id="@+id/tvY0"   style="@style/TextYTick"/>
+                </LinearLayout>
+
+                <!-- Khu vẽ cột và vạch ngang -->
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_toEndOf="@id/yAxis"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="bottom">
+
+                        <View style="@style/DashedLine"/>
+                        <Space android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1"/>
+                        <View style="@style/DashedLine"/>
+                        <Space android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1"/>
+                        <View style="@style/DashedLine"/>
+                        <Space android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1"/>
+                        <View style="@style/DashedLine"/>
+                    </LinearLayout>
+
+                    <!-- Hai cột -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="bottom|center_horizontal"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:id="@+id/barIncome"
+                            android:layout_width="120dp"
+                            android:layout_height="0dp"
+                            android:layout_marginEnd="32dp"
+                            android:background="@drawable/bg_bar_orange"/>
+
+                        <View
+                            android:id="@+id/barSpending"
+                            android:layout_width="120dp"
+                            android:layout_height="0dp"
+                            android:background="@drawable/bg_bar_purple"/>
+                    </LinearLayout>
+                </FrameLayout>
+            </RelativeLayout>
+
+            <!-- Thẻ thông tin Thu/Chi -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="8dp">
+
+                <!-- Thẻ thông tin Thu -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="64dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp"
+                    app:cardBackgroundColor="@color/neutral_50">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="12dp">
+
+                        <FrameLayout
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:background="@drawable/bg_circle_purple">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_income"
+                                app:tint="@color/white"/>
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:paddingStart="8dp">
+
+                            <TextView
+                                style="@style/Caption1"
+                                android:text="Thu nhập"
+                                android:textColor="@color/neutral_800"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+
+                            <TextView
+                                style="@style/Body1"
+                                android:text="17.000.000 đ"
+                                android:textColor="@color/black"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Thẻ thông tin Chi -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="64dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp"
+                    app:cardBackgroundColor="@color/neutral_50">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="12dp">
+
+                        <FrameLayout
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:background="@drawable/bg_circle_orange">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_spending"
+                                app:tint="@color/white"
+                                android:contentDescription="@string/cd_spending_icon"/>
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:paddingStart="8dp">
+
+                            <TextView
+                                style="@style/Caption1"
+                                android:text="Chi tiêu"
+                                android:textColor="@color/neutral_800"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+
+                            <TextView
+                                style="@style/Body1"
+                                android:text="7.845.000 đ"
+                                android:textColor="@color/black"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <!-- Header: Giao dịch gần đây + Xem tất cả -->
+            <LinearLayout
+                android:id="@+id/section_recent_transactions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:id="@+id/tvRecentTitle"
+                    style="@style/Heading5"
+                    android:text="Giao dịch gần đây"
+                    android:textColor="@color/black"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+
+                <TextView
+                    android:id="@+id/tvSeeAll"
+                    style="@style/Body2"
+                    android:text="Xem tất cả"
+                    android:textColor="@color/neutral_800"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:drawableEnd="@drawable/ic_drop_down"
+                    android:drawablePadding="4dp"
+                    android:clickable="true"
+                    android:focusable="true"/>
+            </LinearLayout>
+
+            <!-- ===== Danh sách 3 giao dịch gần đây ===== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp">
+
+                <!-- item 1 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="12dp"
+                    android:background="@drawable/bg_card_neutral_50"
+                    android:layout_marginBottom="8dp">
+
+                    <!-- Nền bo tròn chứa icon -->
+                    <FrameLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_rounded_accent_1">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_food"
+                            app:tint="@color/white"/>
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:paddingStart="12dp">
+
+                        <TextView
+                            style="@style/Body1"
+                            android:text="Ăn uống"
+                            android:textColor="@color/black"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            style="@style/Caption1"
+                            android:text="16/02"
+                            android:textColor="@color/neutral_800"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <TextView
+                        style="@style/Body1"
+                        android:text="-99.000 đ"
+                        android:textColor="@color/black"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+
+                <!-- item 2 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="12dp"
+                    android:background="@drawable/bg_card_neutral_50"
+                    android:layout_marginBottom="8dp">
+
+                    <FrameLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_rounded_primary_1">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_rent_house"
+                            app:tint="@color/white"/>
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:paddingStart="12dp">
+
+                        <TextView
+                            style="@style/Body1"
+                            android:text="Thuê nhà"
+                            android:textColor="@color/black"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            style="@style/Caption1"
+                            android:text="10/02"
+                            android:textColor="@color/neutral_800"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <TextView
+                        style="@style/Body1"
+                        android:text="-1.500.000 đ"
+                        android:textColor="@color/black"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+
+                <!-- item 3 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="12dp"
+                    android:background="@drawable/bg_card_neutral_50">
+
+                    <FrameLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_rounded_primary_2">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_money_bag"
+                            app:tint="@color/white"/>
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:paddingStart="12dp">
+
+                        <TextView
+                            style="@style/Body1"
+                            android:text="Tiền lương"
+                            android:textColor="@color/black"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            style="@style/Caption1"
+                            android:text="10/01"
+                            android:textColor="@color/neutral_800"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <TextView
+                        style="@style/Body1"
+                        android:text="+15.000.000 đ"
+                        android:textColor="@color/black"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Header: Hạn mức chi tiêu + nút Chi tiết -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    style="@style/Heading5"
+                    android:text="Hạn mức chi tiêu"
+                    android:textColor="@color/black"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+
+                <TextView
+                    android:id="@+id/tvDetailLimit"
+                    style="@style/Body2"
+                    android:text="Chi tiết"
+                    android:textColor="@color/neutral_800"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableEnd="@drawable/ic_drop_down"
+                    android:drawablePadding="4dp"
+                    android:padding="4dp"
+                    android:clickable="true"
+                    android:focusable="true"/>
+            </LinearLayout>
+
+            <!-- Card hiển thị tiến độ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_card_primary_5">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/tvSpentLabel"
+                        style="@style/Caption1"
+                        android:text="Đã chi"
+                        android:textColor="@color/neutral_800"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:id="@+id/tvSpentRatio"
+                        style="@style/Body1"
+                        android:text="0/0"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <ProgressBar
+                    android:id="@+id/pbBudget"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    android:layout_marginTop="8dp"
+                    android:indeterminate="false"
+                    android:progressDrawable="@drawable/progress_rounded"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="6dp">
+
+                    <TextView
+                        android:id="@+id/tvMonthStart"
+                        style="@style/Caption1"
+                        android:text="01/01"
+                        android:textColor="@color/neutral_800"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:id="@+id/tvMonthEnd"
+                        style="@style/Caption1"
+                        android:text="31/01"
+                        android:textColor="@color/neutral_800"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Theo dõi vay nợ -->
+            <!-- Header: Theo dõi vay nợ + nút Chi tiết -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    style="@style/Heading5"
+                    android:text="Theo dõi vay nợ"
+                    android:textColor="@color/black"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+
+                <TextView
+                    android:id="@+id/tvDebtDetail"
+                    style="@style/Body2"
+                    android:text="Chi tiết"
+                    android:textColor="@color/neutral_800"
+                    android:drawableEnd="@drawable/ic_drop_down"
+                    android:drawablePadding="4dp"
+                    android:padding="4dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+            <!-- Dòng mô tả: Hình thức - Người -->
+            <TextView
+                android:id="@+id/tvDebtMeta"
+                style="@style/Caption1"
+                android:text="Đi vay - Home Credit"
+                android:textColor="@color/accent_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"/>
+
+            <!-- Card tiến độ vay nợ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_card_primary_5">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/tvDebtLabel"
+                        style="@style/Caption1"
+                        android:text="Đã trả"
+                        android:textColor="@color/neutral_800"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:id="@+id/tvDebtRatio"
+                        style="@style/Body1"
+                        android:text="0/0"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <ProgressBar
+                    android:id="@+id/pbDebt"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    android:layout_marginTop="8dp"
+                    android:indeterminate="false"
+                    android:progressDrawable="@drawable/progress_rounded"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="6dp">
+
+                    <TextView
+                        android:id="@+id/tvDebtStart"
+                        style="@style/Caption1"
+                        android:text="01/03"
+                        android:textColor="@color/neutral_800"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:id="@+id/tvDebtEnd"
+                        style="@style/Caption1"
+                        android:text="31/03"
+                        android:textColor="@color/neutral_800"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Nền xám đáy = 1/2 FAB -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:layout_gravity="bottom"
+        android:background="#F6F6F8"/>
+
+    <!-- FAB sticky -->
+    <!-- Footer sticky + nút thêm -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/footerBar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="@color/neutral_50">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:fabSize="mini"
+            app:fabCustomSize="40dp"
+            app:maxImageSize="36dp"
+            app:backgroundTint="@color/primary_1"
+            app:tint="@android:color/white"
+            app:useCompatPadding="false"
+            app:layout_dodgeInsetEdges="bottom"
+            android:src="@drawable/ic_add"
+            android:contentDescription="@string/cd_add_transaction"/>
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

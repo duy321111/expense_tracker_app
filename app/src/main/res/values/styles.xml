@@ -58,4 +58,27 @@
         <item name="android:textStyle">normal</item>
     </style>
 
+
+
+    <style name="CircleImage" parent="">
+        <item name="cornerSize">50%</item>
+    </style>
+    <style name="RoundedXL" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">18dp</item>
+    </style>
+
+    <style name="TextYTick">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">#8D8D8D</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="DashedLine">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@drawable/dash_line</item>
+    </style>
+
 </resources>
