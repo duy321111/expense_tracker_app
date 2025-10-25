@@ -67,4 +67,7 @@
     <string name="month_4">Tháng 4</string>
     <string name="month_5">Tháng 5</string>
     <string name="cd_transaction_icon">Biểu tượng danh mục giao dịch</string>
+    <string name="back">Back</string>
+    <string name="edit">Edit</string>
+
 </resources>

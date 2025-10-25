@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/white">
+
+    <!-- Toolbar với nút back -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar_add_wallet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:titleTextAppearance="@style/Heading4"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:title="Thêm ví mới"
+        app:navigationIconTint="@color/primary_1"
+        app:titleTextColor="@color/primary_1"
+        app:titleCentered="true"
+        android:elevation="0dp" />
+
+    <!-- Hình minh họa ví -->
+    <ImageView
+        android:layout_width="220dp"
+        android:layout_height="220dp"
+        android:src="@drawable/wallet"
+        android:layout_gravity="center"
+        android:contentDescription="Wallet Illustration"
+        android:scaleType="fitCenter"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Mô tả -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chọn đơn vị tiền tệ bạn sẽ sử dụng"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:layout_gravity="center"
+        style="@style/Body1"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Spinner cho tiền tệ với icon -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/border_background"
+        android:layout_marginBottom="16dp"
+        style="@style/Body2">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="3dp"
+            android:src="@drawable/ic_currency" />
+
+        <Spinner
+            android:id="@+id/spinner_currency"
+            style="@style/Body2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/currencies" />
+    </LinearLayout>
+
+    <!-- Ô nhập tên ví -->
+    <EditText
+        android:id="@+id/et_wallet_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Body2"
+        android:hint="Nhập tên ví..."
+        android:padding="12dp"
+        android:background="@drawable/edittext_border"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Ô nhập số dư -->
+    <EditText
+        android:id="@+id/et_initial_balance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Body2"
+        android:hint="Số dư ban đầu"
+        android:inputType="numberDecimal"
+        android:padding="12dp"
+        android:background="@drawable/edittext_border"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Nút Tạo ví -->
+    <Button
+        android:id="@+id/btn_create_wallet"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Tạo ví"
+        android:layout_gravity="center_horizontal"
+        android:backgroundTint="@color/primary_1"
+        android:textColor="#FFFFFF"
+        style="@style/Body1"
+        android:padding="12dp" />
+
+</LinearLayout>

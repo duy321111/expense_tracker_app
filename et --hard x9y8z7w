@@ -1,0 +1,14 @@
+[33m15c46d9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Add files via upload
+[33m58adc5c[m Add files via upload
+[33m085dbcd[m Add files via upload
+[33m7090e6c[m Add files via upload
+[33m11eddc4[m Create menu
+[33mdc4d635[m Delete app/src/main/res/menu
+[33mc057dd1[m Create menu
+[33macc47ed[m  fix: home padding
+[33m2a61f5d[m Merge pull request #1 from duy321111/haiha
+[33m432534a[m giao diện tổng quan của trang home
+[33mfd84437[m Add files via upload
+[33m760521d[m chore: add .gitkeep files to preserve folder structure
+[33m45cd366[m chore(structure): initialize MVVM project structure
+[33m864c832[m Push project mới, ghi đè toàn bộ repo cũ
