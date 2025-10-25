@@ -1,0 +1,115 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/neutral_50"
+    tools:context=".ProfileFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="16dp">
+
+            <ImageView
+                android:id="@+id/img_avatar"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/ic_launcher_background" /> <TextView
+            android:id="@+id/tv_user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Nguyễn Hồng Nhật Long"
+            android:textColor="@color/neutral_900"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Tài khoản"
+            android:textColor="@color/neutral_700"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/btn_account_info"
+            style="@style/SettingsItem"
+            android:text="Cài đặt chung" />
+
+        <TextView
+            android:id="@+id/btn_transaction_history"
+            style="@style/SettingsItem"
+            android:text="Lịch sử giao dịch" />
+
+        <TextView
+            android:id="@+id/btn_my_wallets"
+            style="@style/SettingsItem"
+            android:text="Ví của bạn" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Bảo mật"
+            android:textColor="@color/neutral_700"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/btn_passcode"
+            style="@style/SettingsItem"
+            android:text="Mã bảo vệ" />
+
+        <TextView
+            android:id="@+id/btn_face_id"
+            style="@style/SettingsItem"
+            android:text="Face ID" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Khác"
+            android:textColor="@color/neutral_700"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/btn_rate_app"
+            style="@style/SettingsItem"
+
+            android:text="Đánh giá ứng dụng" />
+
+        <TextView
+            android:id="@+id/btn_refer_friend"
+            style="@style/SettingsItem"
+            android:text="Giới thiệu bạn bè" />
+
+        <TextView
+            android:id="@+id/btn_help"
+            style="@style/SettingsItem"
+            android:text="Hướng dẫn sử dụng" />
+
+        <TextView
+            android:id="@+id/btn_terms"
+            style="@style/SettingsItem"
+            android:text="Điều khoản và bảo mật" />
+
+        <TextView
+            android:id="@+id/btn_logout"
+            style="@style/SettingsItem"
+            android:text="Đăng xuất"
+            android:textColor="@color/accent_3" />
+
+    </LinearLayout>
+</ScrollView>
