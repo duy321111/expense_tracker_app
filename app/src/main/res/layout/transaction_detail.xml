@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/neutral_50"
+    tools:context=".ui.TransactionDetail">
+
+    <!-- Toolbar -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/white"
+        app:navigationIcon="@drawable/ic_back"
+        app:titleCentered="true"
+        app:titleTextAppearance="@style/Heading3"
+        app:title="Chi tiết giao dịch" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="56dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="0dp">
+
+            <!-- ========== SECTION 1: Số tiền ========== -->
+            <LinearLayout
+                android:id="@+id/sectionAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/white"
+                android:padding="9dp"
+                android:layout_marginBottom="6dp">
+
+                <!-- Card: Số tiền -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_card_neutral_50"
+                    android:padding="9dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <FrameLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_icon_round_white">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_wallet"
+                            app:tint="@color/neutral_800" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:paddingStart="12dp">
+
+                        <TextView
+                            android:id="@+id/labelAmount"
+                            style="@style/Caption1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Số tiền"
+                            android:textColor="@color/neutral_800"/>
+
+                        <TextView
+                            android:id="@+id/tvAmount"
+                            style="@style/Body1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/black"
+                            tools:text="99.000 đ"/>
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/btnEditAmount"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_edit"
+                        app:tint="@color/neutral_800" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ========== SECTION 2: Danh mục, Ghi chú, Ngày, Hình thức ========== -->
+            <LinearLayout
+                android:id="@+id/sectionInfo1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/white"
+                android:padding="9dp"
+                android:layout_marginBottom="6dp">
+
+                <!-- Danh mục -->
+                <include
+                    android:id="@+id/rowCategory"
+                    layout="@layout/row_detail_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"/>
+                <!-- Ghi chú -->
+                <include
+                    android:id="@+id/rowNote"
+                    layout="@layout/row_detail_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"/>
+                <!-- Ngày -->
+                <include
+                    android:id="@+id/rowDate"
+                    layout="@layout/row_detail_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"/>
+                <!-- Hình thức -->
+                <include
+                    android:id="@+id/rowMethod"
+                    layout="@layout/row_detail_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+            <!-- ========== SECTION 3: Địa điểm, Thêm hình ảnh, Không tính vào báo cáo ========== -->
+            <LinearLayout
+                android:id="@+id/sectionInfo2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/white"
+                android:padding="9dp">
+
+                <!-- Địa điểm -->
+                <include
+                    android:id="@+id/rowLocation"
+                    layout="@layout/row_detail_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"/>
+                <!-- Thêm hình ảnh -->
+                <include
+                    android:id="@+id/rowPhoto"
+                    layout="@layout/row_detail_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"/>
+                <!-- Không tính vào báo cáo (switch) -->
+                <include
+                    android:id="@+id/rowExclude"
+                    layout="@layout/row_detail_switch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
