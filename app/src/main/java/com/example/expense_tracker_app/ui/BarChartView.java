@@ -1,5 +1,6 @@
 package com.example.expense_tracker_app.ui;
 
+import com.example.expense_tracker_app.R;
 import android.content.Context;
 import android.graphics.*;
 import android.util.AttributeSet;
@@ -13,12 +14,18 @@ public class BarChartView extends View {
     private final Paint pIncome = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint pExpense = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint pAxis = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pLabel = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF rect = new RectF();
+    private final float LBL_SPACE = 30f;
 
-    public BarChartView(Context c, AttributeSet a){ super(c,a);
-        pIncome.setColor(Color.parseColor("#00CE21"));
-        pExpense.setColor(Color.parseColor("#F46616"));
-        pAxis.setColor(Color.parseColor("#CCCCCC")); pAxis.setStrokeWidth(2f);
+    public BarChartView(Context c, AttributeSet a){
+        super(c,a);
+            // Lấy màu từ R.color
+            pIncome.setColor(androidx.core.content.ContextCompat.getColor(c, R.color.success_1));
+            pExpense.setColor(androidx.core.content.ContextCompat.getColor(c, R.color.accent_1));
+            pAxis.setColor(androidx.core.content.ContextCompat.getColor(c, R.color.neutral_200));
+            pLabel.setColor(androidx.core.content.ContextCompat.getColor(c, R.color.neutral_600));
+            // ...
     }
     public void setData(List<Bar> bars){ data.clear(); data.addAll(bars); invalidate(); }
 
@@ -26,7 +33,8 @@ public class BarChartView extends View {
         super.onDraw(c);
         if(data.isEmpty()) return;
         float w = getWidth(), h = getHeight(), padding=40f, gap=30f;
-        float left = padding, right = w - padding, bottom = h - padding, top = padding;
+        float left = padding, right = w - padding, bottom = h - LBL_SPACE, top = padding;
+
         c.drawLine(left, bottom, right, bottom, pAxis);
 
         float max = 0f;
@@ -35,6 +43,7 @@ public class BarChartView extends View {
 
         float slot = (right - left) / data.size();
         float barW = (slot - gap) / 2f;
+        float barPadding = 6f;
 
         for(int i=0;i<data.size();i++){
             Bar b = data.get(i);
@@ -45,8 +54,10 @@ public class BarChartView extends View {
             rect.set(x0, bottom-hIncome, x0+barW, bottom);
             c.drawRoundRect(rect, 8,8, pIncome);
 
-            rect.set(x0+barW+6, bottom-hExpense, x0+2*barW+6, bottom);
+            rect.set(x0+barW+barPadding, bottom-hExpense, x0+2*barW+barPadding, bottom);
             c.drawRoundRect(rect, 8,8, pExpense);
+
+            c.drawText(b.label, x0 + barW + barPadding/2f, bottom + LBL_SPACE * 0.75f, pLabel);
         }
     }
 }

@@ -58,7 +58,7 @@
         <item name="android:textStyle">normal</item>
     </style>
 
-    <style name="Chip.Category">
+    <style name="Chip_Category">
         <item name="android:orientation">vertical</item>
         <item name="android:gravity">center</item>
         <item name="android:padding">10dp</item>
@@ -68,8 +68,8 @@
         <item name="android:background">@drawable/bg_card</item>
     </style>
 
-    <style name="Chip.Text">
-        <item name="android:textColor">@color/text_primary</item>
+    <style name="Chip_Text">
+        <item name="android:textColor">@color/neutral_900</item>
         <item name="android:textSize">12sp</item>
         <item name="android:layout_marginTop">6dp</item>
     </style>

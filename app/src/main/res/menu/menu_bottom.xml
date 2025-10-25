@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-<item android:id="@+id/nav_stats" android:icon="@drawable/ic_nav_stats" android:title="Thống kê"/>
-<item android:id="@+id/nav_dummy_center" android:enabled="false" android:title="" android:icon="@drawable/ic_transparent"/>
+    <item android:id="@+id/nav_overview" android:icon="@drawable/ic_home" android:title="Tổng quan"/>
+    <item android:id="@+id/nav_stats" android:icon="@drawable/ic_nav_stats" android:title="Thống kê"/>
+    <item android:id="@+id/nav_dummy_center" android:enabled="false" android:title="" android:icon="@drawable/ic_transparent"/>
+    <item android:id="@+id/nav_budget" android:icon="@drawable/ic_cat_salary" android:title="Ngân sách"/>
+    <item android:id="@+id/nav_profile" android:icon="@drawable/ic_more" android:title="Cá nhân"/>
 </menu>

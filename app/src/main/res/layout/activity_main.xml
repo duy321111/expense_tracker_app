@@ -2,20 +2,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="@color/background_light">
-
-    <FrameLayout
-        android:id="@+id/container" android:layout_width="match_parent" android:layout_height="match_parent"/>
+    android:background="@color/neutral_50"> <FrameLayout
+    android:id="@+id/container" android:layout_width="match_parent" android:layout_height="match_parent"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAdd" android:layout_width="64dp" android:layout_height="64dp"
         android:layout_gravity="bottom|center" android:layout_marginBottom="64dp"
-        app:backgroundTint="@color/purple_main" app:srcCompat="@drawable/ic_add" app:tint="@color/white"/>
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
+        app:backgroundTint="@color/primary_1" app:srcCompat="@drawable/ic_add" app:tint="@color/white"/> <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav" android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:layout_gravity="bottom" android:background="@color/background_white"
+        android:layout_gravity="bottom" android:background="@color/white"
         app:itemIconTint="@color/nav_item_selector" app:itemTextColor="@color/nav_item_selector"
-        app:menu="@menu/menu_bottom"/>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
-
+        app:menu="@menu/menu_bottom"/> </androidx.coordinatorlayout.widget.CoordinatorLayout>

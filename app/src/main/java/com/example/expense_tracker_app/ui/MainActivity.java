@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
                         .replace(R.id.container, new StatsFragment()).commit();
                 return true;
             }
+            // Thêm các item menu khác nếu có
             return false;
         });
 
