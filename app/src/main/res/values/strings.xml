@@ -59,4 +59,12 @@
     <string name="profile_help">Hướng dẫn sử dụng</string>
     <string name="profile_terms">Điều khoản và bảo mật</string>
     <string name="profile_logout">Đăng xuất</string>
+
+    <string name="transaction_history_title">Lịch sử giao dịch</string>
+    <string name="month_1">Tháng 1</string>
+    <string name="month_2">Tháng 2</string>
+    <string name="month_3">Tháng 3</string>
+    <string name="month_4">Tháng 4</string>
+    <string name="month_5">Tháng 5</string>
+    <string name="cd_transaction_icon">Biểu tượng danh mục giao dịch</string>
 </resources>

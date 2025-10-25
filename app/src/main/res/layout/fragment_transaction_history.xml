@@ -17,6 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_arrow_left"
+            android:contentDescription="@string/cd_back_button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -25,7 +26,7 @@
             android:id="@+id/tv_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Lịch sử giao dịch"
+            android:text="@string/transaction_history_title"
             android:textColor="@color/neutral_900"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -49,19 +50,19 @@
 
             <TextView
                 style="@style/MonthChip"
-                android:text="Tháng 1" />
+                android:text="@string/month_1" />
             <TextView
                 style="@style/MonthChip"
-                android:text="Tháng 2" />
+                android:text="@string/month_2" />
             <TextView
                 style="@style/MonthChip.Selected"
-                android:text="Tháng 3" />
+                android:text="@string/month_3" />
             <TextView
                 style="@style/MonthChip"
-                android:text="Tháng 4" />
+                android:text="@string/month_4" />
             <TextView
                 style="@style/MonthChip"
-                android:text="Tháng 5" />
+                android:text="@string/month_5" />
         </LinearLayout>
     </HorizontalScrollView>
 
