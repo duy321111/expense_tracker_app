@@ -20,10 +20,6 @@ import androidx.fragment.app.Fragment;
 
 import com.example.expense_tracker_app.R;
 import com.example.expense_tracker_app.ui.Notification.NotificationActivity;
-import com.example.expense_tracker_app.ui.SpendingLimit;
-import com.example.expense_tracker_app.ui.Transactions;
-import com.example.expense_tracker_app.ui.DebtTracking;
-import com.example.expense_tracker_app.ui.ProfileActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.text.DecimalFormat;
@@ -53,7 +49,7 @@ public class Home extends Fragment {
 
         // --- Avatar ---
         view.findViewById(R.id.imgAvatar).setOnClickListener(v ->
-                startActivity(new Intent(getActivity(), ProfileActivity.class)));
+                startActivity(new Intent(getActivity(), ProfileFragment.class)));
 
         // --- Reload ---
         view.findViewById(R.id.btnReload).setOnClickListener(v -> {

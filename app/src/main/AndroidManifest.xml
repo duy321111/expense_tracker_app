@@ -30,10 +30,9 @@
         <activity android:name=".ui.OTPVerification" android:exported="true"/>
         <activity android:name=".ui.ResetPassword" android:exported="true"/>
         <activity android:name=".ui.AddWalletActivity" android:exported="true"/>
-
-        <activity
-            android:name=".ui.ProfileActivity"
-            android:exported="false" />
+        <activity android:name=".ui.MyWalletsFragment" android:exported="true"/>
+        <activity android:name=".ui.TransactionHistoryFragment" android:exported="true"/>
+        <activity android:name=".ui.AccountInfoFragment" android:exported="true"/>
 
     </application>
 </manifest>

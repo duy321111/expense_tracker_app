@@ -173,6 +173,16 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddWallet"
+            style="@style/Body2"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/primary_1"
+            android:text="Thêm ví mới"
+            android:textColor="@color/white"
+            app:cornerRadius="12dp" />
     </LinearLayout>
 
 </LinearLayout>
