@@ -17,7 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.expense_tracker_app.R;
-import com.example.expense_tracker_app.ui.adapter.TypePickerAdapter;
+import com.example.expense_tracker_app.adapter.TypePickerAdapter;
 import com.example.expense_tracker_app.data.model.Category;
 import com.example.expense_tracker_app.data.model.TxType;
 import com.example.expense_tracker_app.databinding.FragmentAddBinding;

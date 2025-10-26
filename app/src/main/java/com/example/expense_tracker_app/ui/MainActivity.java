@@ -2,18 +2,30 @@ package com.example.expense_tracker_app.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.view.animation.AnimationSet;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.ScaleAnimation;
-import android.widget.ImageView;
-
 import androidx.appcompat.app.AppCompatActivity;
-
+import androidx.fragment.app.Fragment;
 import com.example.expense_tracker_app.R;
+import com.example.expense_tracker_app.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
+    private ActivityMainBinding b;
+
+    @Override protected void onCreate(Bundle s){
+        super.onCreate(s);
+        b = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(b.getRoot());
+
+        // Mặc định mở màn Thêm giao dịch
+        replace(new AddTransactionFragment());
+
+        b.bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.nav_home) {
+                // TODO: thay bằng HomeFragment khi có
+                replace(new AddTransactionFragment());
+                return true;
+            }
 
     private static final int SPLASH_DELAY = 2000; // 2 giây
 
