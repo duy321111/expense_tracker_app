@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:padding="12dp">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:gravity="center_vertical">
+        <TextView android:id="@+id/tvTitle" android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="Chọn thời gian" android:textStyle="bold"
+            android:textSize="16sp"/>
+        <ImageView android:id="@+id/btnClose" android:layout_width="24dp" android:layout_height="24dp"
+            android:src="@drawable/ic_close"/>
+    </LinearLayout>
+
+    <!-- Tabs chế độ -->
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:paddingTop="8dp" android:paddingBottom="8dp">
+        <TextView android:id="@+id/tabDay" android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="Theo ngày" android:gravity="center"/>
+        <TextView android:id="@+id/tabWeek" android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="Theo tuần" android:gravity="center"/>
+        <TextView android:id="@+id/tabMonth" android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="Theo tháng" android:gravity="center"/>
+        <TextView android:id="@+id/tabQuarter" android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="Theo quý" android:gravity="center"/>
+        <TextView android:id="@+id/tabYear" android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="Theo năm" android:gravity="center"/>
+    </LinearLayout>
+
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/neutral_200"/>
+
+    <!-- Container render nội dung -->
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:id="@+id/container" android:orientation="vertical"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    </ScrollView>
+
+    <!-- Thay thế phần nút ÁP DỤNG cũ bằng phần dưới đây -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="16dp">
+
+        <Button
+            android:id="@+id/btnClear"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="BỎ CHỌN"
+            android:textAllCaps="true"
+            android:textColor="@color/primary_1"
+            android:backgroundTint="@color/white"
+            android:background="@drawable/bg_outline_button" />
+
+        <Space
+            android:layout_width="12dp"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/btnApply"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="ÁP DỤNG"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/primary_1"/>
+    </LinearLayout>
+
+</LinearLayout>
