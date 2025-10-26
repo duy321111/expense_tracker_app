@@ -36,7 +36,7 @@
     <string name="cd_user_avatar">Ảnh đại diện người dùng</string>
     <string name="account_info_change_avatar">Thay ảnh</string>
     <string name="account_info_fullname">Họ và tên</string>
-    <string name="account_info_fullname_hint">Nguyễn Thế Anh</string>
+    <string name="account_info_fullname_hint">Nguyễn Văn A</string>
     <string name="account_info_email">Email đăng nhập</string>
     <string name="account_info_email_hint">sousa2201@gmail.com</string>
     <string name="account_info_password">Mật khẩu</string>
@@ -45,7 +45,7 @@
     <string name="account_info_save">Lưu thông tin</string>
 
 
-    <string name="profile_user_name">Nguyễn Hồng Nhật Long</string>
+    <string name="profile_user_name">Nguyễn Văn A</string>
     <string name="profile_account">Tài khoản</string>
     <string name="profile_settings_general">Cài đặt chung</string>
     <string name="profile_transaction_history">Lịch sử giao dịch</string>

@@ -3,7 +3,7 @@
     android:shape="rectangle">
 
     <!-- Màu nền ô input -->
-    <solid android:color="@color/neutral_700" />
+    <solid android:color="@color/neutral_50" />
 
     <!-- Viền -->
     <stroke
