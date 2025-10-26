@@ -1,5 +1,6 @@
 package com.example.expense_tracker_app.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -21,7 +22,8 @@ public class TransactionDetail extends AppCompatActivity {
         // Toolbar back
         MaterialToolbar tb = findViewById(R.id.toolbar);
         setSupportActionBar(tb);
-        tb.setNavigationOnClickListener(v -> onBackPressed());
+        tb.setNavigationOnClickListener(v -> onBackPressed()); // hoặc finish()
+
 
         // ---- dữ liệu demo nhận từ Intent (có thể null) ----
         String amount   = getIntent().getStringExtra("amount");

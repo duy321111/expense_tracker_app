@@ -1,9 +1,7 @@
-// LoanTrackingActivity.java
 package com.example.expense_tracker_app.ui.Loan;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,6 +15,7 @@ import com.example.expense_tracker_app.model.DailyLoanSection;
 import com.example.expense_tracker_app.model.LoanTransaction;
 import com.example.expense_tracker_app.ui.Month.MonthAdapter;
 import com.example.expense_tracker_app.ui.Month.MonthItem;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -29,7 +28,7 @@ import java.util.List;
 public class LoanTrackingActivity extends AppCompatActivity
         implements DailySectionAdapter.OnTransactionClickListener {
 
-    private ImageView ivBack;
+    private MaterialToolbar toolbar;
     private RecyclerView rvMonths, rvDailySections;
     private BottomNavigationView bottomNavigation;
     private FloatingActionButton fabAdd;
@@ -48,6 +47,7 @@ public class LoanTrackingActivity extends AppCompatActivity
         setContentView(R.layout.activity_loan_tracking);
 
         initViews();
+        setupToolbarBack();
         initCalendar();
         setupMonthStrip();
         setupDailySectionList();
@@ -56,11 +56,20 @@ public class LoanTrackingActivity extends AppCompatActivity
     }
 
     private void initViews() {
-        ivBack = findViewById(R.id.ivBack);
+        toolbar = findViewById(R.id.toolbar);
         rvMonths = findViewById(R.id.rvMonths);
         rvDailySections = findViewById(R.id.rvDailySections);
         bottomNavigation = findViewById(R.id.bottomNavigation);
         fabAdd = findViewById(R.id.fabAdd);
+    }
+
+    private void setupToolbarBack() {
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+            toolbar.setNavigationOnClickListener(v ->
+                    getOnBackPressedDispatcher().onBackPressed()
+            );
+        }
     }
 
     private void initCalendar() {
@@ -117,8 +126,6 @@ public class LoanTrackingActivity extends AppCompatActivity
     }
 
     private void setupClicks() {
-        ivBack.setOnClickListener(v -> finish());
-
         fabAdd.setOnClickListener(v ->
                 Toast.makeText(this, "Thêm giao dịch mới", Toast.LENGTH_SHORT).show());
 
@@ -160,10 +167,7 @@ public class LoanTrackingActivity extends AppCompatActivity
 
     private void loadDataForSelectedMonth() {
         List<DailyLoanSection> sections = generateMockData(selectedMonth, selectedYear);
-
-        // Sắp xếp giảm dần theo ngày: mới nhất ở trên
         Collections.sort(sections, (a, b) -> b.getDate().compareTo(a.getDate()));
-
         dailySectionAdapter.setSections(sections);
         rvDailySections.scrollToPosition(0);
     }
