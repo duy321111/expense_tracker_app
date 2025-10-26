@@ -14,7 +14,8 @@
         android:background="@color/white"
         app:navigationIcon="@drawable/ic_back"
         app:titleCentered="true"
-        app:titleTextAppearance="@style/Heading3"
+        app:titleTextColor="@color/primary_1"
+        app:titleTextAppearance="@style/Heading5"
         app:title="Chi tiết ngân sách" />
 
     <!-- Nội dung -->
