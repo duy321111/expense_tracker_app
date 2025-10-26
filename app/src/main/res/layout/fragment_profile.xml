@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/neutral_50"
+    android:fitsSystemWindows="true"
     tools:context=".ui.ProfileFragment"> <!-- SỬA: Đã thêm .ui. cho đúng với file Java bạn tạo -->
 
     <LinearLayout
@@ -23,8 +24,8 @@
                 android:id="@+id/img_avatar"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:src="@drawable/ic_launcher_background"
-                android:contentDescription="@string/cd_user_avatar" />
+                android:contentDescription="@string/cd_user_avatar"
+                android:src="@drawable/ic_launcher_background" />
 
             <!-- SỬA LỖI: Đã tách TextView ra khỏi ImageView & Dùng @string -->
             <TextView
@@ -50,6 +51,7 @@
         <TextView
             android:id="@+id/btn_account_info"
             style="@style/SettingsItem"
+            app:drawableStartCompat="@drawable/ic_edit"
             android:text="@string/profile_settings_general" />
 
         <TextView
@@ -63,19 +65,6 @@
             style="@style/SettingsItem"
             app:drawableStartCompat="@drawable/ic_wallet"
             android:text="@string/profile_my_wallets" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/profile_security"
-            android:textColor="@color/neutral_700"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/btn_passcode"
-            style="@style/SettingsItem"
-            android:text="@string/profile_passcode" />
 
 
         <TextView
@@ -110,7 +99,7 @@
             android:id="@+id/btn_logout"
             style="@style/SettingsItem"
             android:text="@string/profile_logout"
-            android:textColor="@color/accent_3" />
+            android:textColor="@color/accent_1" />
 
     </LinearLayout>
 </ScrollView>
