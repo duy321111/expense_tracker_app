@@ -1,13 +1,14 @@
 package com.example.expense_tracker_app.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.example.expense_tracker_app.R;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class DashBoardActivity extends AppCompatActivity {
 
@@ -33,17 +34,16 @@ public class DashBoardActivity extends AppCompatActivity {
         btnNavProfile = findViewById(R.id.btn_nav_profile);
 
         btnNavHome.setOnClickListener(v -> switchFragment(new Home()));
+
         btnNavBudget.setOnClickListener(v -> switchFragment(new BudgetHomePage()));
         btnNavProfile.setOnClickListener(v -> switchFragment(new ProfileFragment()));
-        btnNavReport.setOnClickListener(v -> {
-            // TODO: tạo ReportFragment hoặc ReportActivity
-        });
     }
 
     private void initFAB() {
         fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
-            // TODO: thêm hành động khi bấm FAB, ví dụ mở AddTransactionActivity
+            // Ví dụ mở màn hình thêm giao dịch
+
         });
     }
 

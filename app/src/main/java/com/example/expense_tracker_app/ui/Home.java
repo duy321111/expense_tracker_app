@@ -2,62 +2,74 @@ package com.example.expense_tracker_app.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton; // SỬA: Thêm import cho ImageButton
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast; // SỬA: Thêm import cho Toast
+import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.example.expense_tracker_app.R;
 import com.example.expense_tracker_app.ui.Notification.NotificationActivity;
+import com.example.expense_tracker_app.ui.SpendingLimit;
+import com.example.expense_tracker_app.ui.Transactions;
+import com.example.expense_tracker_app.ui.DebtTracking;
+import com.example.expense_tracker_app.ui.ProfileActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Calendar;
 
-public class Home extends AppCompatActivity {
+public class Home extends Fragment {
 
-    // SỬA: Khai báo các nút nav
     private ImageButton btnNavHome, btnNavReport, btnNavBudget, btnNavProfile;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.home);
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        // Inflate layout
+        return inflater.inflate(R.layout.home, container, false);
+    }
 
-        // --- (CODE CŨ CỦA BẠN - GIỮ NGUYÊN) ---
-        // attach Toolbar
-        MaterialToolbar tb = findViewById(R.id.toolbar);
-        setSupportActionBar(tb);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-        }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        // Avatar -> UserInfor
-        findViewById(R.id.imgAvatar).setOnClickListener(v ->
-                startActivity(new Intent(Home.this, UserInfor.class)));
+        // --- Toolbar ---
+        MaterialToolbar tb = view.findViewById(R.id.toolbar);
+        // Nếu muốn Toolbar fragment quản lý, dùng: ((AppCompatActivity)getActivity()).setSupportActionBar(tb);
 
-        // Reload
-        findViewById(R.id.btnReload).setOnClickListener(v -> recreate());
+        // --- Avatar ---
+        view.findViewById(R.id.imgAvatar).setOnClickListener(v ->
+                startActivity(new Intent(getActivity(), ProfileActivity.class)));
 
-        // Notification
-        findViewById(R.id.btnNotification).setOnClickListener(v ->
-                startActivity(new Intent(Home.this, NotificationActivity.class)));
+        // --- Reload ---
+        view.findViewById(R.id.btnReload).setOnClickListener(v -> {
+            if(getActivity() != null) getActivity().recreate();
+        });
+
+        // --- Notification ---
+        view.findViewById(R.id.btnNotification).setOnClickListener(v ->
+                startActivity(new Intent(getActivity(), NotificationActivity.class)));
 
         // --- Biểu đồ thu chi ---
-        View barIncome = findViewById(R.id.barIncome);
-        View barSpending = findViewById(R.id.barSpending);
+        View barIncome = view.findViewById(R.id.barIncome);
+        View barSpending = view.findViewById(R.id.barSpending);
 
         float income = 17_000_000f;
         float spending = 7_945_000f;
-
         float maxValue = Math.max(income, spending);
         int chartMaxDp = 180;
         float density = getResources().getDisplayMetrics().density;
@@ -75,11 +87,11 @@ public class Home extends AppCompatActivity {
         lpSpending.height = spendingHeight;
         barSpending.setLayoutParams(lpSpending);
 
-        TextView y0 = findViewById(R.id.tvY0);
-        TextView y25 = findViewById(R.id.tvY25);
-        TextView y50 = findViewById(R.id.tvY50);
-        TextView y75 = findViewById(R.id.tvY75);
-        TextView y100 = findViewById(R.id.tvY100);
+        TextView y0 = view.findViewById(R.id.tvY0);
+        TextView y25 = view.findViewById(R.id.tvY25);
+        TextView y50 = view.findViewById(R.id.tvY50);
+        TextView y75 = view.findViewById(R.id.tvY75);
+        TextView y100 = view.findViewById(R.id.tvY100);
 
         float unit = 1_000_000f;
         y0.setText("0");
@@ -88,19 +100,19 @@ public class Home extends AppCompatActivity {
         y75.setText(Math.round(maxValue * 0.75f / unit) + "m");
         y100.setText(Math.round(maxValue / unit) + "m");
 
-        // Xem tất cả
-        findViewById(R.id.tvSeeAll).setOnClickListener(v ->
-                startActivity(new Intent(Home.this, Transactions.class)));
+        // --- Xem tất cả ---
+        view.findViewById(R.id.tvSeeAll).setOnClickListener(v ->
+                startActivity(new Intent(getActivity(), Transactions.class)));
 
         // --- Hạn mức chi tiêu ---
         int spent = 5_642_000;
         int limit = 12_000_000;
 
-        ProgressBar pb = findViewById(R.id.pbBudget);
+        ProgressBar pb = view.findViewById(R.id.pbBudget);
         pb.setMax(limit);
         pb.setProgress(spent);
 
-        TextView tvRatio = findViewById(R.id.tvSpentRatio);
+        TextView tvRatio = view.findViewById(R.id.tvSpentRatio);
         tvRatio.setText(formatMoney(spent) + "/" + formatMoney(limit));
 
         Calendar c = Calendar.getInstance();
@@ -109,45 +121,44 @@ public class Home extends AppCompatActivity {
 
         Calendar start = Calendar.getInstance();
         start.set(y, m, 1);
-
         Calendar end = Calendar.getInstance();
         end.set(y, m, end.getActualMaximum(Calendar.DAY_OF_MONTH));
 
-        ((TextView) findViewById(R.id.tvMonthStart))
+        ((TextView) view.findViewById(R.id.tvMonthStart))
                 .setText(two(start.get(Calendar.DAY_OF_MONTH)) + "/" + two(m + 1));
-        ((TextView) findViewById(R.id.tvMonthEnd))
+        ((TextView) view.findViewById(R.id.tvMonthEnd))
                 .setText(two(end.get(Calendar.DAY_OF_MONTH)) + "/" + two(m + 1));
 
-        findViewById(R.id.tvDetailLimit).setOnClickListener(v ->
-                startActivity(new Intent(Home.this, SpendingLimit.class)));
+        view.findViewById(R.id.tvDetailLimit).setOnClickListener(v ->
+                startActivity(new Intent(getActivity(), SpendingLimit.class)));
 
         // --- Theo dõi vay nợ ---
-        findViewById(R.id.tvDebtDetail).setOnClickListener(v ->
-                startActivity(new Intent(Home.this, DebtTracking.class)));
+        view.findViewById(R.id.tvDebtDetail).setOnClickListener(v ->
+                startActivity(new Intent(getActivity(), DebtTracking.class)));
 
         int paid = 4_500_000;
         int total = 12_000_000;
         String form = "Đi vay";
         String partner = "Home Credit";
 
-        ProgressBar pbDebt = findViewById(R.id.pbDebt);
+        ProgressBar pbDebt = view.findViewById(R.id.pbDebt);
         pbDebt.setMax(total);
         pbDebt.setProgress(paid);
 
-        ((TextView) findViewById(R.id.tvDebtRatio))
+        ((TextView) view.findViewById(R.id.tvDebtRatio))
                 .setText(formatMoney(paid) + "/" + formatMoney(total));
-        ((TextView) findViewById(R.id.tvDebtMeta))
+        ((TextView) view.findViewById(R.id.tvDebtMeta))
                 .setText(form + " - " + partner);
 
-        ((TextView) findViewById(R.id.tvDebtStart))
+        ((TextView) view.findViewById(R.id.tvDebtStart))
                 .setText(two(start.get(Calendar.DAY_OF_MONTH)) + "/" + two(m + 1));
-        ((TextView) findViewById(R.id.tvDebtEnd))
+        ((TextView) view.findViewById(R.id.tvDebtEnd))
                 .setText(two(end.get(Calendar.DAY_OF_MONTH)) + "/" + two(m + 1));
 
         // --- Spinner chọn ví ---
-        Spinner spinnerWallet = findViewById(R.id.spinner_wallet);
+        Spinner spinnerWallet = view.findViewById(R.id.spinner_wallet);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                this,
+                getActivity(),
                 R.array.wallet_array,
                 android.R.layout.simple_spinner_item
         );
@@ -156,61 +167,20 @@ public class Home extends AppCompatActivity {
 
         spinnerWallet.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemSelected(AdapterView<?> parent, View view1, int position, long id) {
                 String selectedWallet = parent.getItemAtPosition(position).toString();
-                Toast.makeText(Home.this, "Đã chọn: " + selectedWallet, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Đã chọn: " + selectedWallet, Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) { }
         });
-        // --- (KẾT THÚC CODE CŨ CỦA BẠN) ---
 
-
-        // --- SỬA: THÊM CODE MỚI CHO NAVIGATION BAR ---
-        initBottomNavigation();
+        // --- NAVIGATION BAR (nếu muốn logic ở fragment) ---
+        // Có thể không cần, vì DashboardActivity quản lý
     }
 
-    /**
-     * SỬA: Thêm hàm mới để gán logic cho thanh Navigation
-     */
-    private void initBottomNavigation() {
-        // 1. Ánh xạ các nút từ layout (đã được include)
-        btnNavHome = findViewById(R.id.btn_nav_home);
-        btnNavReport = findViewById(R.id.btn_nav_report);
-        btnNavBudget = findViewById(R.id.btn_nav_budget);
-        btnNavProfile = findViewById(R.id.btn_nav_profile);
-
-        // 2. Gán hành động (Action)
-
-        // Nút Home (Trang hiện tại)
-        btnNavHome.setOnClickListener(v -> {
-            Toast.makeText(Home.this, "Bạn đang ở Trang chủ", Toast.LENGTH_SHORT).show();
-            // Không làm gì cả vì đang ở Home
-        });
-
-        // Nút Profile -> Mở ProfileActivity (đã tạo ở Bước 3)
-        btnNavProfile.setOnClickListener(v -> {
-            Intent intent = new Intent(Home.this, ProfileActivity.class);
-            startActivity(intent);
-        });
-
-        // Nút Report (Thống kê)
-        btnNavReport.setOnClickListener(v -> {
-            // TODO: Tạo ReportActivity.class giống như cách bạn tạo ProfileActivity
-            Toast.makeText(Home.this, "Mở trang Thống kê", Toast.LENGTH_SHORT).show();
-            // Ví dụ: startActivity(new Intent(Home.this, ReportActivity.class));
-        });
-
-        // Nút Budget (Ngân sách)
-        btnNavBudget.setOnClickListener(v -> {
-            // TODO: Tạo BudgetActivity.class giống như cách bạn tạo ProfileActivity
-            Toast.makeText(Home.this, "Mở trang Ngân sách", Toast.LENGTH_SHORT).show();
-            // Ví dụ: startActivity(new Intent(Home.this, BudgetActivity.class));
-        });
-    }
-
-    // --- (CÁC HÀM HELPER CŨ CỦA BẠN - GIỮ NGUYÊN) ---
+    // --- HELPER ---
     private String two(int n) { return (n < 10 ? "0" : "") + n; }
 
     private String formatMoney(int value) {
@@ -219,4 +189,3 @@ public class Home extends AppCompatActivity {
         return new DecimalFormat("#,###", symbols).format(value);
     }
 }
-
