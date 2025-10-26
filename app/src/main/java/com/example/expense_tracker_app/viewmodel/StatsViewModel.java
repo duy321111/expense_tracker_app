@@ -74,5 +74,6 @@ public class StatsViewModel extends ViewModel {
                 .collect(Collectors.toList());
 
         chart.setValue(bars);
+
     }
 }

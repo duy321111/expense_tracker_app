@@ -47,7 +47,8 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel:2.8.6")
     implementation("androidx.lifecycle:lifecycle-livedata:2.8.6")
-    implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0") // nếu dùng CoordinatorLayout
+    implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
+    implementation(libs.firebase.inappmessaging) // nếu dùng CoordinatorLayout
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")

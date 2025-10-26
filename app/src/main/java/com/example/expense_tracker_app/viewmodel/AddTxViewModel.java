@@ -1,16 +1,16 @@
 package com.example.expense_tracker_app.viewmodel;
-
+import com.example.expense_tracker_app.data.repository.Repository;
+import com.example.expense_tracker_app.data.repository.InMemoryRepo;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import com.example.expense_tracker_app.data.model.*;
-import com.example.expense_tracker_app.data.repository.InMemoryRepo;
-import com.example.expense_tracker_app.data.repository.Repository;
 
 import java.time.LocalDate;
 import java.util.*;
 
 public class AddTxViewModel extends ViewModel {
-    private final Repository repo = new InMemoryRepo();
+    private final
+    Repository repo = new InMemoryRepo();
 
     public final MutableLiveData<TxType> type = new MutableLiveData<>(TxType.EXPENSE);
     public final MutableLiveData<Category> category = new MutableLiveData<>();

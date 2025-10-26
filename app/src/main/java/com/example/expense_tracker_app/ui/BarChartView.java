@@ -20,12 +20,12 @@ public class BarChartView extends View {
 
     public BarChartView(Context c, AttributeSet a){
         super(c,a);
-            // Lấy màu từ R.color
-            pIncome.setColor(androidx.core.content.ContextCompat.getColor(c, R.color.success_1));
-            pExpense.setColor(androidx.core.content.ContextCompat.getColor(c, R.color.accent_1));
-            pAxis.setColor(androidx.core.content.ContextCompat.getColor(c, R.color.neutral_200));
-            pLabel.setColor(androidx.core.content.ContextCompat.getColor(c, R.color.neutral_600));
-            // ...
+        // Lấy màu từ R.color
+        pIncome.setColor(androidx.core.content.ContextCompat.getColor(c, R.color.success_1));
+        pExpense.setColor(androidx.core.content.ContextCompat.getColor(c, R.color.accent_1));
+        pAxis.setColor(androidx.core.content.ContextCompat.getColor(c, R.color.neutral_200));
+        pLabel.setColor(androidx.core.content.ContextCompat.getColor(c, R.color.neutral_600));
+        // ...
     }
     public void setData(List<Bar> bars){ data.clear(); data.addAll(bars); invalidate(); }
 

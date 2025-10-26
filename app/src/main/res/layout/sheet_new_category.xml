@@ -1,41 +1,230 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:padding="16dp"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/white">
 
-    <TextView style="@style/Heading5" android:text="Tạo danh mục mới"
-        android:textColor="@color/neutral_900"/>
+    <TextView
+        style="@style/Heading5"
+        android:text="Tạo danh mục mới"
+        android:textColor="@color/neutral_900" />
 
     <EditText
-        android:id="@+id/etName" android:layout_width="match_parent"
-        android:layout_height="48dp" android:layout_marginTop="12dp"
-        android:hint="Tên danh mục" android:background="@drawable/bg_input"
-        android:paddingHorizontal="12dp"/>
+        android:id="@+id/etName"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:hint="Tên danh mục"
+        android:background="@drawable/bg_input"
+        android:paddingHorizontal="12dp" />
 
-    <!-- chọn màu -->
-    <LinearLayout android:id="@+id/rowColors"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="horizontal" android:layout_marginTop="12dp">
-        <View android:id="@+id/c1" android:layout_width="32dp" android:layout_height="32dp"
-            android:background="@drawable/bg_icon_round_primary_1" android:layout_marginEnd="8dp"/>
-        <View android:id="@+id/c2" android:layout_width="32dp" android:layout_height="32dp"
-            android:background="@drawable/bg_icon_round_accent_1" android:layout_marginEnd="8dp"/>
-        <View android:id="@+id/c3" android:layout_width="32dp" android:layout_height="32dp"
-            android:background="@drawable/bg_icon_round_success_1"/>
+
+    <!-- chọn loại -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Loại danh mục"
+        style="@style/Body2"
+        android:textColor="@color/neutral_600"
+        android:layout_marginTop="12dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="8dp">
+
+        <RadioGroup
+            android:id="@+id/groupType1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rDaily"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Chi tiêu hằng ngày"
+                android:checked="true" />
+
+            <RadioButton
+                android:id="@+id/rMonthly"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Chi tiêu hằng tháng" />
+        </RadioGroup>
+
+        <RadioGroup
+            android:id="@+id/groupType2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <RadioButton
+                android:id="@+id/rEssential"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Chi tiêu cần thiết" />
+
+            <RadioButton
+                android:id="@+id/rEntertainment"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Vui chơi giải trí" />
+        </RadioGroup>
     </LinearLayout>
 
-    <!-- chọn icon đơn giản -->
-    <LinearLayout android:id="@+id/rowIcons"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="horizontal" android:layout_marginTop="12dp">
-        <ImageView android:id="@+id/i1" android:layout_width="40dp" android:layout_height="40dp"
-            android:src="@drawable/ic_cat_food"/>
-        <ImageView android:id="@+id/i2" android:layout_width="40dp" android:layout_height="40dp"
-            android:src="@drawable/ic_cat_coffee" android:layout_marginStart="12dp"/>
-        <ImageView android:id="@+id/i3" android:layout_width="40dp" android:layout_height="40dp"
-            android:src="@drawable/ic_cat_groceries" android:layout_marginStart="12dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Màu hiển thị"
+        style="@style/Body2"
+        android:textColor="@color/neutral_600"
+        android:layout_marginTop="12dp" />
+
+    <LinearLayout
+        android:id="@+id/rowColors"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
+        <View
+            android:id="@+id/c1"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_icon_round_primary_1"
+            android:layout_marginEnd="15dp" />
+
+        <View
+            android:id="@+id/c2"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_icon_round_accent_1"
+            android:layout_marginEnd="15dp" />
+
+        <View
+            android:id="@+id/c3"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_icon_round_success_1"
+            android:layout_marginEnd="15dp" />/>
+
+        <View
+            android:id="@+id/c4"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_icon_round_primary_2"
+            android:layout_marginEnd="15dp" />/>
+
+        <View
+            android:id="@+id/c5"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_icon_round_neutral_50"
+            android:layout_marginEnd="15dp" />/>
+
+        <View
+            android:id="@+id/c6"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_icon_round_primary_3"
+            android:layout_marginEnd="15dp" />/>
     </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Biểu tượng"
+        style="@style/Body2"
+        android:textColor="@color/neutral_600"
+        android:layout_marginTop="12dp" />
+
+    <LinearLayout
+        android:id="@+id/rowIconsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="8dp">
+
+        <!-- Hàng 1 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/i1"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_cat_food"
+                app:tint="@color/primary_1" />
+            <ImageView android:id="@+id/i2" android:layout_width="40dp" android:layout_height="40dp"
+                android:layout_marginStart="12dp" android:src="@drawable/ic_cat_coffee"
+                app:tint="@color/primary_1" />
+            <ImageView android:id="@+id/i3" android:layout_width="40dp" android:layout_height="40dp"
+                android:layout_marginStart="12dp" android:src="@drawable/ic_cat_groceries"
+                app:tint="@color/primary_1" />
+            <ImageView android:id="@+id/i4" android:layout_width="40dp" android:layout_height="40dp"
+                android:layout_marginStart="12dp" android:src="@drawable/ic_cat_food"
+                app:tint="@color/primary_1" />
+            <ImageView android:id="@+id/i5" android:layout_width="40dp" android:layout_height="40dp"
+                android:layout_marginStart="12dp" android:src="@drawable/ic_cat_tv"
+                app:tint="@color/primary_1" />
+            <ImageView android:id="@+id/i6" android:layout_width="40dp" android:layout_height="40dp"
+                android:layout_marginStart="12dp" android:src="@drawable/ic_cat_gas"
+                app:tint="@color/primary_1" />
+            <ImageView android:id="@+id/i7" android:layout_width="40dp" android:layout_height="40dp"
+                android:layout_marginStart="12dp" android:src="@drawable/ic_cat_phone"
+                app:tint="@color/primary_1" />
+        </LinearLayout>
+
+        <!-- Hàng 2 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp">
+
+            <ImageView
+                android:id="@+id/i8"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_cat_sport"
+                app:tint="@color/primary_1" />
+
+            <ImageView android:id="@+id/i9" android:layout_width="40dp" android:layout_height="40dp"
+                android:layout_marginStart="12dp" android:src="@drawable/ic_cat_home"
+                app:tint="@color/primary_1" />
+            <ImageView android:id="@+id/i10" android:layout_width="40dp" android:layout_height="40dp"
+                android:layout_marginStart="12dp" android:src="@drawable/ic_cat_lend"
+                app:tint="@color/primary_1" />
+            <ImageView android:id="@+id/i11" android:layout_width="40dp" android:layout_height="40dp"
+                android:layout_marginStart="12dp" android:src="@drawable/ic_cat_sale"
+                app:tint="@color/primary_1" />
+            <ImageView android:id="@+id/i12" android:layout_width="40dp" android:layout_height="40dp"
+                android:layout_marginStart="12dp" android:src="@drawable/ic_cat_salary"
+                app:tint="@color/primary_1" />
+            <ImageView android:id="@+id/i13" android:layout_width="40dp" android:layout_height="40dp"
+                android:layout_marginStart="12dp" android:src="@drawable/ic_cat_transport"
+                app:tint="@color/primary_1" />
+            <ImageView android:id="@+id/i14" android:layout_width="40dp" android:layout_height="40dp"
+                android:layout_marginStart="12dp" android:src="@drawable/ic_cat_travel"
+                app:tint="@color/primary_1" />
+        </LinearLayout>
+    </LinearLayout>
+
+
 
     <Button android:id="@+id/btnCreate"
         android:layout_width="match_parent" android:layout_height="48dp"

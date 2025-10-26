@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Expense-tracker-app</string>
+    <string name="add_transaction">Thêm giao dịch</string>
+    <string name="nav_home">Tổng quan</string>
+    <string name="nav_reports">Thống kê</string>
+    <string name="nav_budget">Ngân sách</string>
+    <string name="nav_profile">Cá nhân</string>
+
 </resources>
