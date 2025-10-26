@@ -14,11 +14,11 @@
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/footerBar"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="60dp"
         android:layout_gravity="bottom"
+        app:cardBackgroundColor="@color/neutral_50"
         app:cardCornerRadius="0dp"
-        app:cardElevation="8dp"
-        app:cardBackgroundColor="@color/neutral_50">
+        app:cardElevation="8dp">
 
         <include layout="@layout/layout_bottom_nav_content" />
 
@@ -27,13 +27,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            app:fabSize="mini"
-            app:fabCustomSize="40dp"
-            app:maxImageSize="36dp"
-            app:backgroundTint="@color/primary_1"
-            app:tint="@android:color/white"
+            android:contentDescription="@string/cd_add_transaction"
             android:src="@drawable/ic_add"
-            android:contentDescription="@string/cd_add_transaction"/>
+            app:backgroundTint="@color/primary_1"
+            app:fabCustomSize="40dp"
+            app:fabSize="mini"
+            app:maxImageSize="36dp"
+            app:tint="@android:color/white" />
     </com.google.android.material.card.MaterialCardView>
 
 </FrameLayout>

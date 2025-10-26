@@ -47,15 +47,7 @@ public class AddTransactionFragment extends Fragment {
                 requireActivity().getSupportFragmentManager().popBackStack());
 
         // menu "Clear"
-        b.toolbar.inflateMenu(R.menu.menu_add_tx);
-        b.toolbar.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.action_clear) {
-                resetForm();
-                Toast.makeText(requireContext(), "Đã xoá thông tin", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-            return false;
-        });
+
 
         // mở chọn loại
         View.OnClickListener openType = v -> openTypeSheet();

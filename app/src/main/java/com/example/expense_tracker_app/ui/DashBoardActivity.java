@@ -3,12 +3,12 @@ package com.example.expense_tracker_app.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageButton;
+
+import com.example.expense_tracker_app.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-
-import com.example.expense_tracker_app.R;
 
 public class DashBoardActivity extends AppCompatActivity {
 
@@ -34,7 +34,7 @@ public class DashBoardActivity extends AppCompatActivity {
         btnNavProfile = findViewById(R.id.btn_nav_profile);
 
         btnNavHome.setOnClickListener(v -> switchFragment(new Home()));
-
+        //btnNavReport.setOnClickListener(v -> switchFragment(new ReportFragment()));
         btnNavBudget.setOnClickListener(v -> switchFragment(new BudgetHomePage()));
         btnNavProfile.setOnClickListener(v -> switchFragment(new ProfileFragment()));
     }
@@ -42,8 +42,12 @@ public class DashBoardActivity extends AppCompatActivity {
     private void initFAB() {
         fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
-            // Ví dụ mở màn hình thêm giao dịch
-
+            // Mở màn hình thêm giao dịch
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragmentContainer, new AddTransactionFragment())
+                    .addToBackStack(null) // để nhấn back trở lại dashboard
+                    .commit();
         });
     }
 
