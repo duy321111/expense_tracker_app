@@ -50,6 +50,7 @@
 
             <!-- CARD: Ngân sách Ăn uống -->
             <LinearLayout
+                android:id="@+id/BudgetCardHome"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
@@ -103,6 +104,54 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
+                android:background="@drawable/modal_bg"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/Body1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="Ngân sách Đi lại"
+                    android:textColor="@color/neutral_900" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/Body2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Đã chi"
+                        android:textColor="@color/neutral_700" />
+
+                    <TextView
+                        style="@style/Body2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="600.000 / 1.000.000"
+                        android:textColor="@color/neutral_900"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <ProgressBar
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="18dp"
+                    android:layout_marginTop="8dp"
+                    android:indeterminate="false"
+                    android:max="100"
+                    android:progress="60"
+                    android:progressDrawable="@drawable/progress_rounded" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
                 android:orientation="vertical"
                 android:background="@drawable/modal_bg">
 
@@ -151,17 +200,21 @@
             <!-- Nút thêm ngân sách -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddBudget"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Body2"
+                android:layout_width="wrap_content"
+                android:layout_height="54dp"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:backgroundTint="@color/primary_1"
                 android:text="Thêm ngân sách mới"
-                android:textColor="@color/primary_1"
-                android:icon="@drawable/ic_add"
-                android:iconTint="@color/primary_1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/modal_bg"
-                android:layout_marginBottom="16dp"
+                android:textColor="@color/white"
+                app:cornerRadius="12dp"
                 app:iconGravity="textStart"
-                app:strokeColor="@color/primary_1" />
+                app:iconTint="@color/white"
+                app:iconPadding="8dp"/>
+
+
         </LinearLayout>
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -14,6 +14,10 @@ import com.example.expense_tracker_app.ui.Month.MonthItem;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import android.content.Intent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 public class BudgetHomePage extends AppCompatActivity {
 
@@ -24,6 +28,27 @@ public class BudgetHomePage extends AppCompatActivity {
 
         RecyclerView rvMonths = findViewById(R.id.rvMonths);
         setupMonthRecycler(rvMonths);
+        LinearLayout budgetCardHome = findViewById(R.id.BudgetCardHome);
+        budgetCardHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Chuyển sang Activity chi tiết ngân sách
+                Intent intent = new Intent(BudgetHomePage.this, BudgetDetail.class);
+                startActivity(intent);
+            }
+
+        });
+
+
+        Button btnAddBudget = findViewById(R.id.btnAddBudget);
+        btnAddBudget.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Chuyển sang AddBudgetActivity
+                Intent intent = new Intent(BudgetHomePage.this, AddBudget.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void setupMonthRecycler(RecyclerView rv) {
@@ -34,6 +59,7 @@ public class BudgetHomePage extends AppCompatActivity {
         MonthAdapter adapter = new MonthAdapter(months);
         rv.setAdapter(adapter);
     }
+
 
     private static List<MonthItem> buildMonths(int centerMonths) {
         LocalDate now = LocalDate.now();
