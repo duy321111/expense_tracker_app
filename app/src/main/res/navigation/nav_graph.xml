@@ -4,20 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/profileFragment">
-    <!--
-      FIX 1: Đã thêm 'xmlns:tools'.
-      FIX 2: Đã thêm 'app:startDestination'.
-             Hãy thay @id/profileFragment bằng ID của màn hình chính
-             (ví dụ: @id/homeFragment) nếu đây không phải màn hình đầu tiên.
-    -->
 
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.example.expense_tracker_app.ProfileFragment"
+        android:name="com.example.expense_tracker_app.ui.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" >
 
-        <!-- Các action điều hướng đi từ Profile -->
         <action
             android:id="@+id/action_profileFragment_to_accountInfoFragment"
             app:destination="@id/accountInfoFragment" />
@@ -29,13 +22,11 @@
             app:destination="@id/myWalletsFragment" />
     </fragment>
 
-    <!-- Các fragment mới trong package 'ui' -->
     <fragment
         android:id="@+id/accountInfoFragment"
         android:name="com.example.expense_tracker_app.ui.AccountInfoFragment"
         android:label="fragment_account_info"
         tools:layout="@layout/fragment_account_info" >
-        <!-- Action đi từ AccountInfo -> ChangePassword -->
         <action
             android:id="@+id/action_accountInfoFragment_to_changePasswordFragment"
             app:destination="@id/changePasswordFragment" />
