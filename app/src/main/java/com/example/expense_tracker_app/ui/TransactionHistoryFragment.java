@@ -13,9 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.expense_tracker_app.R;
 
-// TODO: Bạn cần tạo TransactionAdapter.java và TransactionItem.java (model)
-// import com.example.expense_tracker_app.data.TransactionAdapter;
-// import com.example.expense_tracker_app.model.TransactionItem;
+// SỬA: Thêm các import mới
+import com.example.expense_tracker_app.data.model.TransactionItem;
+import com.example.expense_tracker_app.ui.adapter.TransactionAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,12 +24,11 @@ public class TransactionHistoryFragment extends Fragment {
 
     private RecyclerView rvTransactions;
     private ImageView btnBack;
-    // private TransactionAdapter adapter; // Bỏ comment khi bạn tạo Adapter
+    private TransactionAdapter adapter; // Bỏ comment và sử dụng adapter thật
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Gắn layout XML vào file logic này
         return inflater.inflate(R.layout.fragment_transaction_history, container, false);
     }
 
@@ -52,29 +51,34 @@ public class TransactionHistoryFragment extends Fragment {
         // TODO: Thêm logic xử lý sự kiện cho các TextView chip Tháng (Tháng 1, Tháng 2...)
     }
 
-    /**
-     * Khởi tạo RecyclerView và gán Adapter giả lập
-     */
     private void setupRecyclerView() {
         rvTransactions.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Tạm thời sử dụng một List trống hoặc List giả lập
-        List<String> dummyData = createDummyData();
+        // SỬA: Lấy dữ liệu giả lập là List<TransactionItem>
+        List<TransactionItem> transactionList = createDummyData();
 
-        // TODO: Thay thế bằng Adapter và Model thật của bạn
-        // adapter = new TransactionAdapter(dummyData);
-        // rvTransactions.setAdapter(adapter);
+        // SỬA: Khởi tạo và gán Adapter thật
+        adapter = new TransactionAdapter(requireContext(), transactionList);
+        rvTransactions.setAdapter(adapter);
     }
 
-    // Hàm tạo dữ liệu giả lập cho RecyclerView
-    private List<String> createDummyData() {
-        List<String> data = new ArrayList<>();
-        data.add("Điện - 250.000 đ");
-        data.add("Nước - 100.000 đ");
-        data.add("Internet - 165.000 đ");
-        data.add("Ăn uống - 50.000 đ");
-        data.add("GAS - 120.000 đ");
-        data.add("Thuê nhà - 1.500.000 đ");
+    // SỬA: Hàm tạo dữ liệu giả lập phải trả về List<TransactionItem>
+    private List<TransactionItem> createDummyData() {
+        List<TransactionItem> data = new ArrayList<>();
+
+        // Dữ liệu giả lập (Giống hình ảnh bạn cung cấp)
+        // Tham chiếu R.drawable.ic_... phải là tên file icon chính xác của bạn
+        data.add(new TransactionItem("Điện", "Tiền mặt", "-250.000 đ", R.drawable.ic_settings, true));
+        data.add(new TransactionItem("Nước", "Tiền mặt", "-100.000 đ", R.drawable.ic_close, true));
+        data.add(new TransactionItem("Internet", "Chuyển khoản", "-165.000 đ", R.drawable.ic_notification, true));
+        data.add(new TransactionItem("Ăn uống", "Tiền mặt", "-50.000 đ", R.drawable.ic_food, true));
+
+        // Thêm một giao dịch thu nhập để kiểm tra màu sắc
+        data.add(new TransactionItem("Lương", "Ngân hàng", "+15.000.000 đ", R.drawable.ic_money_bag, false));
+
+        data.add(new TransactionItem("GAS", "Tiền mặt", "-120.000 đ", R.drawable.ic_fooddrinks, true));
+        data.add(new TransactionItem("Thuê nhà", "Chuyển khoản", "-1.500.000 đ", R.drawable.ic_rent_house, true));
+
         return data;
     }
 }
