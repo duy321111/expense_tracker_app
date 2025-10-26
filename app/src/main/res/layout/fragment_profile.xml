@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/neutral_50"
-    tools:context=".ProfileFragment">
+    tools:context=".ui.ProfileFragment"> <!-- SỬA: Đã thêm .ui. cho đúng với file Java bạn tạo -->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,87 +23,93 @@
                 android:id="@+id/img_avatar"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:src="@drawable/ic_launcher_background" /> <TextView
-            android:id="@+id/tv_user_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="Nguyễn Hồng Nhật Long"
-            android:textColor="@color/neutral_900"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+                android:src="@drawable/ic_launcher_background"
+                android:contentDescription="@string/cd_user_avatar" />
+
+            <!-- SỬA LỖI: Đã tách TextView ra khỏi ImageView & Dùng @string -->
+            <TextView
+                android:id="@+id/tv_user_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/profile_user_name"
+                android:textColor="@color/neutral_900"
+                android:textSize="20sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Tài khoản"
+            android:text="@string/profile_account"
             android:textColor="@color/neutral_700"
             android:textSize="16sp" />
 
+        <!-- SỬA: Thêm lại icon và dùng @string -->
         <TextView
             android:id="@+id/btn_account_info"
             style="@style/SettingsItem"
-            android:text="Cài đặt chung" />
+            android:text="@string/profile_settings_general" />
 
         <TextView
             android:id="@+id/btn_transaction_history"
             style="@style/SettingsItem"
-            android:text="Lịch sử giao dịch" />
+            app:drawableStartCompat="@drawable/ic_chart"
+            android:text="@string/profile_transaction_history" />
 
         <TextView
             android:id="@+id/btn_my_wallets"
             style="@style/SettingsItem"
-            android:text="Ví của bạn" />
+            app:drawableStartCompat="@drawable/ic_wallet"
+            android:text="@string/profile_my_wallets" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Bảo mật"
+            android:text="@string/profile_security"
             android:textColor="@color/neutral_700"
             android:textSize="16sp" />
 
         <TextView
             android:id="@+id/btn_passcode"
             style="@style/SettingsItem"
-            android:text="Mã bảo vệ" />
+            android:text="@string/profile_passcode" />
 
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Khác"
+            android:text="@string/profile_other"
             android:textColor="@color/neutral_700"
             android:textSize="16sp" />
 
         <TextView
             android:id="@+id/btn_rate_app"
             style="@style/SettingsItem"
-
-            android:text="Đánh giá ứng dụng" />
+            android:text="@string/profile_rate_app" />
 
         <TextView
             android:id="@+id/btn_refer_friend"
             style="@style/SettingsItem"
-            android:text="Giới thiệu bạn bè" />
+            android:text="@string/profile_refer_friend" />
 
         <TextView
             android:id="@+id/btn_help"
             style="@style/SettingsItem"
-            android:text="Hướng dẫn sử dụng" />
+            android:text="@string/profile_help" />
 
         <TextView
             android:id="@+id/btn_terms"
             style="@style/SettingsItem"
-            android:text="Điều khoản và bảo mật" />
+            android:text="@string/profile_terms" />
 
         <TextView
             android:id="@+id/btn_logout"
             style="@style/SettingsItem"
-            android:text="Đăng xuất"
+            android:text="@string/profile_logout"
             android:textColor="@color/accent_3" />
 
     </LinearLayout>

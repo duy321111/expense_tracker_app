@@ -13,7 +13,7 @@
 
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.example.expense_tracker_app.ProfileFragment"
+        android:name="com.example.expense_tracker_app.ui.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" >
 

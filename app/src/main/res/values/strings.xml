@@ -71,4 +71,55 @@
     <string name="error_password_match">Mật khẩu mới và xác nhận không khớp</string>
     <string name="error_password_length">Mật khẩu phải có ít nhất %1$d ký tự</string>
 
+
+
+    <!-- CHUỖI CHO HOME FRAGMENT -->
+    <string name="user_name_placeholder">Nguyễn Văn A</string>
+    <string name="greeting_placeholder">helo</string>
+
+
+    <string name="title_wallet_info">Thông tin ví</string>
+    <string name="wallet_owner_placeholder">Nguyen Văn A</string>
+    <string name="wallet_balance_placeholder">Số dư: 100.000.000 VND</string>
+
+    <string name="title_chart">Tình hình thu chi</string>
+    <string name="label_income">Thu nhập</string>
+    <string name="label_spending">Chi tiêu</string>
+    <string name="amount_income_placeholder">17.000.000 đ</string>
+    <string name="amount_spending_placeholder">7.845.000 đ</string>
+
+    <string name="title_recent_transactions">Giao dịch gần đây</string>
+    <string name="label_see_all">Xem tất cả</string>
+
+    <string name="title_budget_limit">Hạn mức chi tiêu</string>
+    <string name="label_detail">Chi tiết</string>
+    <string name="label_spent">Đã chi</string>
+    <string name="date_0101">01/01</string>
+    <string name="date_3101">31/01</string>
+
+    <string name="title_debt_tracking">Theo dõi vay nợ</string>
+    <string name="debt_meta_placeholder">Đi vay - Home Credit</string>
+    <string name="label_paid">Đã trả</string>
+    <string name="date_0103">01/03</string>
+    <string name="date_3103">31/03</string>
+
+    <!-- CHUỖI GIAO DỊCH GẦN ĐÂY -->
+    <string name="txn_food_name">Ăn uống</string>
+    <string name="txn_food_date">16/02</string>
+    <string name="txn_food_amount">-99.000 đ</string>
+
+    <string name="txn_rent_name">Thuê nhà</string>
+    <string name="txn_rent_date">10/02</string>
+    <string name="txn_rent_amount">-1.500.000 đ</string>
+
+    <string name="txn_salary_name">Tiền lương</string>
+    <string name="txn_salary_date">10/01</string>
+    <string name="txn_salary_amount">+15.000.000 đ</string>
+
+    <!-- CHUỖI CHO THANH NAVIGATION (Bắt buộc cho Bước 4) -->
+    <string name="nav_home_title">Trang chủ</string>
+    <string name="nav_report_title">Thống kê</string>
+    <string name="nav_budget_title">Ngân sách</string>
+    <string name="nav_profile_title">Cá nhân</string>
+
 </resources>
