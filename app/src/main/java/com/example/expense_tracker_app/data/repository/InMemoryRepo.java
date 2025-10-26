@@ -73,21 +73,4 @@ public class InMemoryRepo implements Repository {
         return result;
     }
 
-    @Override
-    public List<MonthlyStat> dailyStats(int year, int month) {
-        Map<Integer, List<Transaction>> grouped = transactionsByMonth(year, month)
-                .stream()
-                .collect(Collectors.groupingBy(t -> t.date.getDayOfMonth()));
-
-        List<MonthlyStat> result = new ArrayList<>();
-        int daysInMonth = LocalDate.of(year, month, 1).lengthOfMonth();
-
-        for (int d = 1; d <= daysInMonth; d++) {
-            List<Transaction> list = grouped.getOrDefault(d, Collections.emptyList());
-            long income = list.stream().filter(t -> t.type == TxType.INCOME).mapToLong(t -> t.amount).sum();
-            long expense = list.stream().filter(t -> t.type == TxType.EXPENSE).mapToLong(t -> t.amount).sum();
-            result.add(new MonthlyStat(d, income, expense));
-        }
-        return result;
-    }
 }

@@ -3,7 +3,6 @@ package com.example.expense_tracker_app.data.repository;
 import com.example.expense_tracker_app.data.model.Category;
 import com.example.expense_tracker_app.data.model.Transaction;
 import com.example.expense_tracker_app.data.model.TxType;
-import com.example.expense_tracker_app.data.model.MonthlyStat;
 
 import java.util.List;
 
@@ -23,6 +22,5 @@ public interface Repository {
     // Lấy danh sách giao dịch theo tháng
     List<Transaction> transactionsByMonth(int year, int month);
 
-    // ✅ Thêm thống kê theo ngày trong tháng (cho StatsViewModel)
-    List<MonthlyStat> dailyStats(int year, int month);
+
 }

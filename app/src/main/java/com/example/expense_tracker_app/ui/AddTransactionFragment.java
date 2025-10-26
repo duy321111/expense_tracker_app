@@ -75,21 +75,22 @@ public class AddTransactionFragment extends Fragment {
         // chọn ngày
         b.rowDate.setOnClickListener(v -> showDatePicker());
 
-        // ẩn chi tiết ban đầu
+        // Ẩn chi tiết mặc định
         setDetailsVisible(false);
 
-        // toggle chi tiết
+// Gán nội dung hint cho phần báo cáo
+        b.tvReportHint.setText("Không ghi giao dịch này vào báo cáo, dù có ở Tổng quan.");
+
+// Nút toggle chi tiết
         b.btnToggleDetail.setOnClickListener(v -> {
             showDetails = !showDetails;
             setDetailsVisible(showDetails);
-            if (showDetails) {
-                b.btnToggleDetail.setText("Ẩn chi tiết ⌃");
-                b.btnToggleDetail.setBackgroundResource(R.drawable.bg_card_primary_5);
-            } else {
-                b.btnToggleDetail.setText("Hiển thị chi tiết ⌄");
-                b.btnToggleDetail.setBackgroundResource(R.drawable.bg_card_neutral_50);
-            }
+            b.btnToggleDetail.setText(showDetails ? "Ẩn chi tiết ⌃" : "Hiển thị chi tiết ⌄");
+            b.btnToggleDetail.setBackgroundResource(showDetails
+                    ? R.drawable.bg_card_primary_5
+                    : R.drawable.bg_card_neutral_50);
         });
+
 
         // observe
         vm.date.observe(getViewLifecycleOwner(), d ->

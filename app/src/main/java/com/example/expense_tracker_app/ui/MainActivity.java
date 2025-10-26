@@ -14,30 +14,33 @@ public class MainActivity extends AppCompatActivity {
         b = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
 
-        // Mặc định mở Thống kê
-        replace(new StatsFragment());
-        b.bottomNav.setSelectedItemId(R.id.nav_reports);
+        // Mặc định mở màn Thêm giao dịch
+        replace(new AddTransactionFragment());
 
         b.bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
+
             if (id == R.id.nav_home) {
-                // replace(new HomeFragment()); // nếu chưa có, tạm dùng Stats
-                replace(new StatsFragment());
+                // TODO: thay bằng HomeFragment khi có
+                replace(new AddTransactionFragment());
                 return true;
-            } else if (id == R.id.nav_reports) {
-                replace(new StatsFragment());
-                return true;
-            } else if (id == R.id.nav_budget) {
-                // replace(new BudgetFragment());
-                replace(new StatsFragment());
-                return true;
-            } else if (id == R.id.nav_profile) {
-                // replace(new ProfileFragment());
-                replace(new StatsFragment());
-                return true;
-            } else if (id == R.id.nav_add_placeholder) {
-                return false; // slot cho FAB
             }
+
+            if (id == R.id.nav_budget) {
+                // TODO: thay bằng BudgetFragment khi có
+                replace(new AddTransactionFragment());
+                return true;
+            }
+
+            if (id == R.id.nav_profile) {
+                // TODO: thay bằng ProfileFragment khi có
+                replace(new AddTransactionFragment());
+                return true;
+            }
+
+            // slot cho FAB (không xử lý chọn)
+            if (id == R.id.nav_add_placeholder) return false;
+
             return false;
         });
 
