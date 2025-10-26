@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_card_neutral_50"
+    android:fitsSystemWindows="true"
     android:padding="16dp"
     android:layout_marginBottom="8dp">
 
