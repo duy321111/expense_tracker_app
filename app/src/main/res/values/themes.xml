@@ -6,4 +6,8 @@
     </style>
 
     <style name="Theme.Expensetrackerapp" parent="Base.Theme.Expensetrackerapp" />
+      <!-- Theme của ứng dụng. Lỗi xảy ra nếu thuộc tính parent không đúng -->
+    <style name="Theme.22520372_BTH3" parent="android:Theme.Light.NoTitleBar">
+        <!-- ... các thuộc tính khác ... -->
+    </style>
 </resources>

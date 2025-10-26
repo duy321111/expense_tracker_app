@@ -15,7 +15,10 @@ import android.widget.Toast; // SỬA: Thêm import cho Toast
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.expense_tracker_app.R;
+import com.example.expense_tracker_app.ui.Budget.BudgetDetailActivity;
+import com.example.expense_tracker_app.ui.Loan.LoanTrackingActivity;
 import com.example.expense_tracker_app.ui.Notification.NotificationActivity;
+import com.example.expense_tracker_app.ui.stats.StatsActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.text.DecimalFormat;
@@ -32,24 +35,23 @@ public class Home extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
 
-        // --- (CODE CŨ CỦA BẠN - GIỮ NGUYÊN) ---
-        // attach Toolbar
-        MaterialToolbar tb = findViewById(R.id.toolbar);
-        setSupportActionBar(tb);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-        }
-
         // Avatar -> UserInfor
         findViewById(R.id.imgAvatar).setOnClickListener(v ->
                 startActivity(new Intent(Home.this, UserInfor.class)));
 
-        // Reload
-        findViewById(R.id.btnReload).setOnClickListener(v -> recreate());
+        MaterialToolbar tb = findViewById(R.id.toolbar);
+        setSupportActionBar(tb);
 
-        // Notification
-        findViewById(R.id.btnNotification).setOnClickListener(v ->
-                startActivity(new Intent(Home.this, NotificationActivity.class)));
+        tb.setOnMenuItemClickListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.action_reload) { recreate(); return true; }
+            if (id == R.id.action_notification) {
+                startActivity(new Intent(Home.this, NotificationActivity.class));
+                return true;
+            }
+            return false;
+        });
+
 
         // --- Biểu đồ thu chi ---
         View barIncome = findViewById(R.id.barIncome);
@@ -89,7 +91,7 @@ public class Home extends AppCompatActivity {
         y100.setText(Math.round(maxValue / unit) + "m");
 
         // Xem tất cả
-        findViewById(R.id.tvSeeAll).setOnClickListener(v ->
+        findViewById(R.id.btnSeeAll).setOnClickListener(v ->
                 startActivity(new Intent(Home.this, Transactions.class)));
 
         // --- Hạn mức chi tiêu ---
@@ -118,12 +120,14 @@ public class Home extends AppCompatActivity {
         ((TextView) findViewById(R.id.tvMonthEnd))
                 .setText(two(end.get(Calendar.DAY_OF_MONTH)) + "/" + two(m + 1));
 
+
+        // --- Hạn muwsc chi tiêu ---
         findViewById(R.id.tvDetailLimit).setOnClickListener(v ->
-                startActivity(new Intent(Home.this, SpendingLimit.class)));
+                startActivity(new Intent(Home.this, BudgetDetailActivity.class)));
 
         // --- Theo dõi vay nợ ---
         findViewById(R.id.tvDebtDetail).setOnClickListener(v ->
-                startActivity(new Intent(Home.this, DebtTracking.class)));
+                startActivity(new Intent(Home.this, LoanTrackingActivity.class)));
 
         int paid = 4_500_000;
         int total = 12_000_000;
@@ -197,9 +201,8 @@ public class Home extends AppCompatActivity {
 
         // Nút Report (Thống kê)
         btnNavReport.setOnClickListener(v -> {
-            // TODO: Tạo ReportActivity.class giống như cách bạn tạo ProfileActivity
-            Toast.makeText(Home.this, "Mở trang Thống kê", Toast.LENGTH_SHORT).show();
-            // Ví dụ: startActivity(new Intent(Home.this, ReportActivity.class));
+            Intent intent = new Intent(Home.this, StatsActivity.class);
+            startActivity(intent);
         });
 
         // Nút Budget (Ngân sách)

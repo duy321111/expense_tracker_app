@@ -15,13 +15,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.expense_tracker_app.R;
 import com.example.expense_tracker_app.ui.Month.MonthAdapter;
 import com.example.expense_tracker_app.ui.Month.MonthItem;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import java.time.LocalDate;
 import java.util.*;
 
 public class Transactions extends AppCompatActivity {
 
-    private Map<String, List<CatSum>> monthlyData = new HashMap<>();
+    private final Map<String, List<CatSum>> monthlyData = new HashMap<>();
     private DonutChartView donutChart;
     private TextView tvTotalAmount, tvCenterTop;
 
@@ -30,15 +31,18 @@ public class Transactions extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.transactions);
 
-        // --- init views ---
+        // Toolbar back
+        MaterialToolbar tb = findViewById(R.id.toolbar);
+        setSupportActionBar(tb);
+        tb.setNavigationOnClickListener(v -> onBackPressed()); // hoặc finish()
+
         donutChart = findViewById(R.id.donutChart);
         tvTotalAmount = findViewById(R.id.tvTotalAmount);
         tvCenterTop = findViewById(R.id.tvCenterTop);
 
-        // --- mock data ---
         initMockData();
 
-        // --- setup RecyclerView ---
+        // month strip
         RecyclerView rv = findViewById(R.id.rvMonths);
         LinearLayoutManager lm = new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false);
         rv.setLayoutManager(lm);
@@ -77,49 +81,62 @@ public class Transactions extends AppCompatActivity {
             }
         });
 
+        // ===== mở chi tiết khi bấm vào item =====
+        // Ăn uống
+        findViewById(R.id.item1_2023_03_04).setOnClickListener(v ->
+                openDetail("- 99.000 đ", "Ăn uống", "Đi ăn mì cay",
+                        "Ngày 04 tháng 03 2023", "Tiền mặt",
+                        "123 Nguyễn Khánh Toàn, Cầu..."));
 
-        // Transactions.java  (thêm vào onCreate)
-        findViewById(R.id.item1_2023_03_04).setOnClickListener(v -> {
-            Intent i = new Intent(Transactions.this, TransactionDetail.class);
-            i.putExtra("amount", "- 99.000 đ");
-            i.putExtra("category", "Ăn uống");
-            i.putExtra("note", "Đi ăn mì cay");
-            i.putExtra("date", "Ngày 16 tháng 03 năm 2022");
-            i.putExtra("method", "Tiền mặt");
-            i.putExtra("address", "123 Nguyễn Khánh Toàn, Cầu...");
-            startActivity(i);
-        });
+        // Cà phê
+        findViewById(R.id.item2_2023_03_04).setOnClickListener(v ->
+                openDetail("- 150.000 đ", "Cà phê", "Uống cà phê sáng",
+                        "Ngày 04 tháng 03 2023", "Chuyển khoản",
+                        "Quán Coffee XYZ, Q.1"));
 
+        // Trả nợ
+        findViewById(R.id.item3_2023_03_04).setOnClickListener(v ->
+                openDetail("- 420.000 đ", "Trả nợ", "Trả nợ bạn A",
+                        "Ngày 04 tháng 03 2023", "Chuyển khoản",
+                        "Ngân hàng ABC"));
+    }
+
+    private void openDetail(String amount, String category, String note,
+                            String date, String method, String address) {
+        Intent i = new Intent(Transactions.this, TransactionDetail.class);
+        i.putExtra("amount", amount);
+        i.putExtra("category", category);
+        i.putExtra("note", note);
+        i.putExtra("date", date);
+        i.putExtra("method", method);
+        i.putExtra("address", address);
+        startActivity(i);
     }
 
     // ---------------- MOCK DATA ----------------
     static class CatSum {
         String name;
         float amount;
-
-        CatSum(String n, float a) {
-            name = n;
-            amount = a;
-        }
+        CatSum(String n, float a) { name = n; amount = a; }
     }
 
     private void initMockData() {
         monthlyData.put("2025-03", Arrays.asList(
-                new CatSum("Ăn uống", 1900000f),
-                new CatSum("Cà phê", 450000f),
-                new CatSum("Chi tiêu cố định", 3100000f),
-                new CatSum("Khác", 780000f)
+                new CatSum("Ăn uống", 1_900_000f),
+                new CatSum("Cà phê", 450_000f),
+                new CatSum("Chi tiêu cố định", 3_100_000f),
+                new CatSum("Khác", 780_000f)
         ));
         monthlyData.put("2025-04", Arrays.asList(
-                new CatSum("Ăn uống", 1700000f),
-                new CatSum("Cà phê", 390000f),
-                new CatSum("Giải trí", 1000000f)
+                new CatSum("Ăn uống", 1_700_000f),
+                new CatSum("Cà phê", 390_000f),
+                new CatSum("Giải trí", 1_000_000f)
         ));
         monthlyData.put("2025-05", Arrays.asList(
-                new CatSum("Ăn uống", 2100000f),
-                new CatSum("Cà phê", 520000f),
-                new CatSum("Cố định", 2950000f),
-                new CatSum("Khác", 880000f)
+                new CatSum("Ăn uống", 2_100_000f),
+                new CatSum("Cà phê", 520_000f),
+                new CatSum("Cố định", 2_950_000f),
+                new CatSum("Khác", 880_000f)
         ));
     }
 
@@ -130,11 +147,9 @@ public class Transactions extends AppCompatActivity {
         float total = 0f;
         for (CatSum c : cats) total += c.amount;
 
-        // --- update total text ---
         tvTotalAmount.setText(formatVND(total));
         tvCenterTop.setText(total == 0 ? "0 đ" : formatVND(total));
 
-        // --- update donut ---
         if (total <= 0f) {
             donutChart.setValues(new float[]{0f});
             return;

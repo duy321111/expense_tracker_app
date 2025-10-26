@@ -93,7 +93,7 @@
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:gravity">center_vertical</item>
-        <item name="android:drawableEnd">@drawable/ic_arrow_right</item>
+        <item name="android:drawableEnd">@drawable/ic_arrow_left</item>
     </style>
 
     <style name="MonthChip" parent="Widget.AppCompat.TextView">

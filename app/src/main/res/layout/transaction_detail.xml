@@ -9,20 +9,28 @@
     tools:context=".ui.TransactionDetail">
 
     <!-- Toolbar -->
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@color/white"
-        app:navigationIcon="@drawable/ic_back"
-        app:titleCentered="true"
-        app:titleTextAppearance="@style/Heading3"
-        app:title="Chi tiết giao dịch" />
+        android:layout_height="wrap_content"
+        android:background="@color/white">
 
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/white"
+            app:navigationIcon="@drawable/ic_back"
+            app:navigationIconTint="@color/primary_1"
+            app:titleCentered="true"
+            app:titleTextAppearance="@style/Heading5"
+            app:title="Chi tiết giao dịch"
+            app:titleTextColor="@color/primary_1"/>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Content -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="56dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -36,19 +44,18 @@
                 android:id="@+id/sectionAmount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:layout_marginBottom="6dp"
                 android:background="@color/white"
-                android:padding="9dp"
-                android:layout_marginBottom="6dp">
+                android:orientation="vertical"
+                android:padding="9dp">
 
-                <!-- Card: Số tiền -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_card_neutral_50"
-                    android:padding="9dp"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:padding="9dp">
 
                     <FrameLayout
                         android:layout_width="36dp"
@@ -60,7 +67,7 @@
                             android:layout_height="18dp"
                             android:layout_gravity="center"
                             android:src="@drawable/ic_wallet"
-                            app:tint="@color/neutral_800" />
+                            app:tint="@color/neutral_800"/>
                     </FrameLayout>
 
                     <LinearLayout
@@ -92,42 +99,41 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:src="@drawable/ic_edit"
-                        app:tint="@color/neutral_800" />
+                        app:tint="@color/neutral_800"/>
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- ========== SECTION 2: Danh mục, Ghi chú, Ngày, Hình thức ========== -->
+            <!-- ========== SECTION 2 ========== -->
             <LinearLayout
                 android:id="@+id/sectionInfo1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:layout_marginBottom="6dp"
                 android:background="@color/white"
-                android:padding="9dp"
-                android:layout_marginBottom="6dp">
+                android:orientation="vertical"
+                android:padding="9dp">
 
-                <!-- Danh mục -->
                 <include
                     android:id="@+id/rowCategory"
                     layout="@layout/row_detail_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"/>
-                <!-- Ghi chú -->
+
                 <include
                     android:id="@+id/rowNote"
                     layout="@layout/row_detail_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"/>
-                <!-- Ngày -->
+
                 <include
                     android:id="@+id/rowDate"
                     layout="@layout/row_detail_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"/>
-                <!-- Hình thức -->
+
                 <include
                     android:id="@+id/rowMethod"
                     layout="@layout/row_detail_item"
@@ -135,30 +141,29 @@
                     android:layout_height="wrap_content"/>
             </LinearLayout>
 
-            <!-- ========== SECTION 3: Địa điểm, Thêm hình ảnh, Không tính vào báo cáo ========== -->
+            <!-- ========== SECTION 3 ========== -->
             <LinearLayout
                 android:id="@+id/sectionInfo2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:background="@color/white"
+                android:orientation="vertical"
                 android:padding="9dp">
 
-                <!-- Địa điểm -->
                 <include
                     android:id="@+id/rowLocation"
                     layout="@layout/row_detail_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"/>
-                <!-- Thêm hình ảnh -->
+
                 <include
                     android:id="@+id/rowPhoto"
                     layout="@layout/row_detail_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"/>
-                <!-- Không tính vào báo cáo (switch) -->
+
                 <include
                     android:id="@+id/rowExclude"
                     layout="@layout/row_detail_switch"
