@@ -1,9 +1,125 @@
 <resources>
     <string name="app_name">Expense-tracker-app</string>
-    <string name="add_transaction">Thêm giao dịch</string>
-    <string name="nav_home">Tổng quan</string>
-    <string name="nav_reports">Thống kê</string>
-    <string name="nav_budget">Ngân sách</string>
-    <string name="nav_profile">Cá nhân</string>
+    <string name="login_link"><u>Đăng nhập</u></string>
+
+    <string name="cd_open_notifications">Mở trang thông báo</string>
+    <string name="cd_reload">Làm mới</string>
+    <string name="cd_add_transaction">Thêm giao dịch mới</string>
+    <string name="cd_spending_icon">Xem chi tiêu</string>
+    <string name="notifications">Thông báo</string>
+    <string name="back_button">Quay lại</string>
+    <string name="mark_all_read">Đánh dấu tất cả đã đọc</string>
+    <string name="no_notifications">Chưa có thông báo</string>
+    <string name="empty_notifications">Không có thông báo</string>
+    <string name="detail">Chi tiết</string>
+    <string name="limit_budget">Hạn mức chi tiêu</string>
+    <string name="spent">Đã chi</string>
+    <string name="cd_back_button">Quay lại</string>
+    <string name="wallets_title">Ví của bạn</string>
+    <string name="wallets_total_balance">Tổng cộng</string>
+    <string name="wallets_list">Các ví</string>
+
+    <!-- 5 CHUỖI MỚI CHẮC CHẮN CÒN THIẾU -->
+    <string name="wallets_total_balance_value">0 ₫</string>
+    <string name="wallets_basic_name">Ví cơ bản</string>
+    <string name="wallets_basic_balance">11.458.000 ₫</string>
+    <string name="wallets_tdbank_name">TDbank</string>
+    <string name="wallets_tdbank_balance">12.432.876 ₫</string>
+
+
+    <string name="change_pass_old_hint">Mật khẩu cũ</string>
+    <string name="change_pass_new_hint">Mật khẩu mới</string>
+    <string name="change_pass_confirm_hint">Xác nhận mật khẩu</string>
+
+    <!-- CÁC CHUỖI CHO MÀN HÌNH THÔNG TIN TÀI KHOẢN -->
+    <string name="account_info_title">Thông tin tài khoản</string>
+    <string name="cd_user_avatar">Ảnh đại diện người dùng</string>
+    <string name="account_info_change_avatar">Thay ảnh</string>
+    <string name="account_info_fullname">Họ và tên</string>
+    <string name="account_info_fullname_hint">Nguyễn Văn A</string>
+    <string name="account_info_email">Email đăng nhập</string>
+    <string name="account_info_email_hint">sousa2201@gmail.com</string>
+    <string name="account_info_password">Mật khẩu</string>
+    <string name="account_info_password_hint">************</string>
+    <string name="account_info_change_password">Đổi mật khẩu</string>
+    <string name="account_info_save">Lưu thông tin</string>
+
+
+    <string name="profile_user_name">Nguyễn Văn A</string>
+    <string name="profile_account">Tài khoản</string>
+    <string name="profile_settings_general">Cài đặt chung</string>
+    <string name="profile_transaction_history">Lịch sử giao dịch</string>
+    <string name="profile_my_wallets">Ví của bạn</string>
+    <string name="profile_security">Bảo mật</string>
+    <string name="profile_passcode">Mã bảo vệ</string>
+    <string name="profile_face_id">Face ID</string>
+    <string name="profile_other">Khác</string>
+    <string name="profile_rate_app">Đánh giá ứng dụng</string>
+    <string name="profile_refer_friend">Giới thiệu bạn bè</string>
+    <string name="profile_help">Hướng dẫn sử dụng</string>
+    <string name="profile_terms">Điều khoản và bảo mật</string>
+    <string name="profile_logout">Đăng xuất</string>
+
+    <string name="transaction_history_title">Lịch sử giao dịch</string>
+    <string name="month_1">Tháng 1</string>
+    <string name="month_2">Tháng 2</string>
+    <string name="month_3">Tháng 3</string>
+    <string name="month_4">Tháng 4</string>
+    <string name="month_5">Tháng 5</string>
+    <string name="cd_transaction_icon">Biểu tượng danh mục giao dịch</string>
+    <string name="error_field_required">Trường này không được để trống</string>
+    <string name="error_password_match">Mật khẩu mới và xác nhận không khớp</string>
+    <string name="error_password_length">Mật khẩu phải có ít nhất %1$d ký tự</string>
+
+
+
+    <!-- CHUỖI CHO HOME FRAGMENT -->
+    <string name="user_name_placeholder">Nguyễn Văn A</string>
+    <string name="greeting_placeholder">helo</string>
+
+
+    <string name="title_wallet_info">Thông tin ví</string>
+    <string name="wallet_owner_placeholder">Nguyen Văn A</string>
+    <string name="wallet_balance_placeholder">Số dư: 100.000.000 VND</string>
+
+    <string name="title_chart">Tình hình thu chi</string>
+    <string name="label_income">Thu nhập</string>
+    <string name="label_spending">Chi tiêu</string>
+    <string name="amount_income_placeholder">17.000.000 đ</string>
+    <string name="amount_spending_placeholder">7.845.000 đ</string>
+
+    <string name="title_recent_transactions">Giao dịch gần đây</string>
+    <string name="label_see_all">Xem tất cả</string>
+
+    <string name="title_budget_limit">Hạn mức chi tiêu</string>
+    <string name="label_detail">Chi tiết</string>
+    <string name="label_spent">Đã chi</string>
+    <string name="date_0101">01/01</string>
+    <string name="date_3101">31/01</string>
+
+    <string name="title_debt_tracking">Theo dõi vay nợ</string>
+    <string name="debt_meta_placeholder">Đi vay - Home Credit</string>
+    <string name="label_paid">Đã trả</string>
+    <string name="date_0103">01/03</string>
+    <string name="date_3103">31/03</string>
+
+    <!-- CHUỖI GIAO DỊCH GẦN ĐÂY -->
+    <string name="txn_food_name">Ăn uống</string>
+    <string name="txn_food_date">16/02</string>
+    <string name="txn_food_amount">-99.000 đ</string>
+
+    <string name="txn_rent_name">Thuê nhà</string>
+    <string name="txn_rent_date">10/02</string>
+    <string name="txn_rent_amount">-1.500.000 đ</string>
+
+    <string name="txn_salary_name">Tiền lương</string>
+    <string name="txn_salary_date">10/01</string>
+    <string name="txn_salary_amount">+15.000.000 đ</string>
+
+    <!-- CHUỖI CHO THANH NAVIGATION (Bắt buộc cho Bước 4) -->
+    <string name="nav_home_title">Trang chủ</string>
+    <string name="nav_report_title">Thống kê</string>
+    <string name="nav_budget_title">Ngân sách</string>
+    <string name="nav_profile_title">Cá nhân</string>
 
 </resources>

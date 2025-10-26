@@ -3,6 +3,11 @@
     <style name="Base.Theme.Expensetrackerapp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+        <!-- SỬA Ở ĐÂY: Thêm dòng này -->
+        <!-- Dòng này sẽ buộc các icon trên thanh thông báo (đồng hồ, pin...)
+             chuyển sang MÀU TỐI, giúp chúng nổi bật trên nền sáng. -->
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <style name="Theme.Expensetrackerapp" parent="Base.Theme.Expensetrackerapp" />
