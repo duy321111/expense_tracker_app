@@ -67,4 +67,8 @@
     <string name="month_4">Tháng 4</string>
     <string name="month_5">Tháng 5</string>
     <string name="cd_transaction_icon">Biểu tượng danh mục giao dịch</string>
+    <string name="error_field_required">Trường này không được để trống</string>
+    <string name="error_password_match">Mật khẩu mới và xác nhận không khớp</string>
+    <string name="error_password_length">Mật khẩu phải có ít nhất %1$d ký tự</string>
+
 </resources>

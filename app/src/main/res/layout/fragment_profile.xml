@@ -70,11 +70,6 @@
             style="@style/SettingsItem"
             android:text="Mã bảo vệ" />
 
-        <TextView
-            android:id="@+id/btn_face_id"
-            style="@style/SettingsItem"
-            android:text="Face ID" />
-
 
         <TextView
             android:layout_width="wrap_content"
