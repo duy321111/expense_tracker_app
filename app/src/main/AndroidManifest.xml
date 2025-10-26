@@ -11,7 +11,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Expensetrackerapp">
 
-        <!-- Chỉ activity khởi chạy chính mới có MAIN + LAUNCHER -->
         <activity
             android:name=".ui.MainActivity"
             android:exported="true">
@@ -32,5 +31,10 @@
         <activity android:name=".ui.ResetPassword" android:exported="true"/>
         <activity android:name=".ui.AddWalletActivity" android:exported="true"/>
         <activity android:name=".ui.Home" android:exported="true"/>
+
+        <activity
+            android:name=".ui.ProfileActivity"
+            android:exported="false" />
+
     </application>
 </manifest>

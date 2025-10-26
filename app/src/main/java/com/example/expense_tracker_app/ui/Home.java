@@ -5,11 +5,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton; // SỬA: Thêm import cho ImageButton
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.Toast; // SỬA: Thêm import cho Toast
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -23,11 +24,15 @@ import java.util.Calendar;
 
 public class Home extends AppCompatActivity {
 
+    // SỬA: Khai báo các nút nav
+    private ImageButton btnNavHome, btnNavReport, btnNavBudget, btnNavProfile;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
 
+        // --- (CODE CŨ CỦA BẠN - GIỮ NGUYÊN) ---
         // attach Toolbar
         MaterialToolbar tb = findViewById(R.id.toolbar);
         setSupportActionBar(tb);
@@ -159,9 +164,53 @@ public class Home extends AppCompatActivity {
             @Override
             public void onNothingSelected(AdapterView<?> parent) { }
         });
+        // --- (KẾT THÚC CODE CŨ CỦA BẠN) ---
+
+
+        // --- SỬA: THÊM CODE MỚI CHO NAVIGATION BAR ---
+        initBottomNavigation();
     }
 
-    // helpers
+    /**
+     * SỬA: Thêm hàm mới để gán logic cho thanh Navigation
+     */
+    private void initBottomNavigation() {
+        // 1. Ánh xạ các nút từ layout (đã được include)
+        btnNavHome = findViewById(R.id.btn_nav_home);
+        btnNavReport = findViewById(R.id.btn_nav_report);
+        btnNavBudget = findViewById(R.id.btn_nav_budget);
+        btnNavProfile = findViewById(R.id.btn_nav_profile);
+
+        // 2. Gán hành động (Action)
+
+        // Nút Home (Trang hiện tại)
+        btnNavHome.setOnClickListener(v -> {
+            Toast.makeText(Home.this, "Bạn đang ở Trang chủ", Toast.LENGTH_SHORT).show();
+            // Không làm gì cả vì đang ở Home
+        });
+
+        // Nút Profile -> Mở ProfileActivity (đã tạo ở Bước 3)
+        btnNavProfile.setOnClickListener(v -> {
+            Intent intent = new Intent(Home.this, ProfileActivity.class);
+            startActivity(intent);
+        });
+
+        // Nút Report (Thống kê)
+        btnNavReport.setOnClickListener(v -> {
+            // TODO: Tạo ReportActivity.class giống như cách bạn tạo ProfileActivity
+            Toast.makeText(Home.this, "Mở trang Thống kê", Toast.LENGTH_SHORT).show();
+            // Ví dụ: startActivity(new Intent(Home.this, ReportActivity.class));
+        });
+
+        // Nút Budget (Ngân sách)
+        btnNavBudget.setOnClickListener(v -> {
+            // TODO: Tạo BudgetActivity.class giống như cách bạn tạo ProfileActivity
+            Toast.makeText(Home.this, "Mở trang Ngân sách", Toast.LENGTH_SHORT).show();
+            // Ví dụ: startActivity(new Intent(Home.this, BudgetActivity.class));
+        });
+    }
+
+    // --- (CÁC HÀM HELPER CŨ CỦA BẠN - GIỮ NGUYÊN) ---
     private String two(int n) { return (n < 10 ? "0" : "") + n; }
 
     private String formatMoney(int value) {
@@ -170,3 +219,4 @@ public class Home extends AppCompatActivity {
         return new DecimalFormat("#,###", symbols).format(value);
     }
 }
+
