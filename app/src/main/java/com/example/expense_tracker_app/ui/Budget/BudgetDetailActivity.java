@@ -157,7 +157,7 @@ public class BudgetDetailActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Toast.makeText(BudgetDetailActivity.this,
                         "Chỉnh sửa hạn mức", Toast.LENGTH_SHORT).show();
-                // TODO: Open edit budget screen
+                // TODO1: Open edit budget screen
             }
         });
 
@@ -179,7 +179,7 @@ public class BudgetDetailActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Toast.makeText(BudgetDetailActivity.this,
                         "Thêm hạn mức mới", Toast.LENGTH_SHORT).show();
-                // TODO: Open add budget screen
+                // TODO2: Open add budget screen
             }
         });
     }

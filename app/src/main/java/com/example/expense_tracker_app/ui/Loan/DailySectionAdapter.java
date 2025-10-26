@@ -4,124 +4,121 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.expense_tracker_app.R;
 import com.example.expense_tracker_app.model.DailyLoanSection;
 import com.example.expense_tracker_app.model.LoanTransaction;
+
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class DailySectionAdapter extends RecyclerView.Adapter<DailySectionAdapter.ViewHolder> {
+public class DailySectionAdapter extends RecyclerView.Adapter<DailySectionAdapter.SectionVH> {
 
-    private List<DailyLoanSection> sections;
-    private SimpleDateFormat dateFormat;
-    private DecimalFormat currencyFormat;
-    private OnTransactionClickListener listener;
+    public interface OnTransactionClickListener { void onTransactionClick(LoanTransaction t); }
 
-    public interface OnTransactionClickListener {
-        void onTransactionClick(LoanTransaction transaction);
-    }
+    private final List<DailyLoanSection> sections = new ArrayList<>();
+    private final SimpleDateFormat dateFmt =
+            new SimpleDateFormat("'Ngày' dd 'tháng' MM yyyy", new Locale("vi", "VN"));
+    private final OnTransactionClickListener listener;
 
-    public DailySectionAdapter(OnTransactionClickListener listener) {
-        this.sections = new ArrayList<>();
-        this.dateFormat = new SimpleDateFormat("'Ngày' dd 'tháng' MM yyyy", new Locale("vi", "VN"));
-        this.currencyFormat = new DecimalFormat("#,###");
-        this.listener = listener;
-    }
+    public DailySectionAdapter(OnTransactionClickListener l){ this.listener = l; }
 
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_daily_section, parent, false);
-        return new ViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        DailyLoanSection section = sections.get(position);
-        holder.bind(section);
-    }
-
-    @Override
-    public int getItemCount() {
-        return sections.size();
-    }
-
-    public void setSections(List<DailyLoanSection> sections) {
-        this.sections = sections;
+    public void setSections(List<DailyLoanSection> data){
+        sections.clear();
+        if (data != null) sections.addAll(data);
         notifyDataSetChanged();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvSectionDate;
-        private LinearLayout llTransactionsContainer;
+    @NonNull @Override
+    public SectionVH onCreateViewHolder(@NonNull ViewGroup p, int vt){
+        View v = LayoutInflater.from(p.getContext())
+                .inflate(R.layout.item_daily_section, p, false); // tool:listitem=item_daily_section
+        return new SectionVH(v, listener);
+    }
 
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            tvSectionDate = itemView.findViewById(R.id.tvSectionDate);
-            llTransactionsContainer = itemView.findViewById(R.id.llTransactionsContainer);
+    @Override
+    public void onBindViewHolder(@NonNull SectionVH h, int pos){
+        h.bind(sections.get(pos), dateFmt);
+    }
+
+    @Override
+    public int getItemCount(){ return sections.size(); }
+
+    // -------- Section ViewHolder (mỗi NGÀY) --------
+    static class SectionVH extends RecyclerView.ViewHolder {
+        private final TextView tvDate;
+        private final RecyclerView rvInSection;
+        private final LoanInSectionAdapter childAdapter;
+
+        SectionVH(@NonNull View v, OnTransactionClickListener l){
+            super(v);
+            tvDate = v.findViewById(R.id.tvSectionDate);
+            rvInSection = v.findViewById(R.id.rvSectionTransactions);
+            rvInSection.setLayoutManager(new LinearLayoutManager(v.getContext()));
+            rvInSection.setNestedScrollingEnabled(false);
+            childAdapter = new LoanInSectionAdapter(l);
+            rvInSection.setAdapter(childAdapter);
         }
 
-        public void bind(DailyLoanSection section) {
-            tvSectionDate.setText(dateFormat.format(section.getDate()));
-            llTransactionsContainer.removeAllViews();
+        void bind(DailyLoanSection s, SimpleDateFormat df){
+            tvDate.setText(df.format(s.getDate()));
+            childAdapter.submit(s.getTransactions());
+        }
+    }
 
-            List<LoanTransaction> transactions = section.getTransactions();
-            for (int i = 0; i < transactions.size(); i++) {
-                LoanTransaction transaction = transactions.get(i);
-                View transactionView = createTransactionView(transaction);
-                llTransactionsContainer.addView(transactionView);
+    // -------- Adapter con cho item trong SECTION --------
+    static class LoanInSectionAdapter extends RecyclerView.Adapter<LoanInSectionAdapter.ItemVH> {
 
-                // Add divider except for last item
-                if (i < transactions.size() - 1) {
-                    View divider = new View(itemView.getContext());
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                            ViewGroup.LayoutParams.MATCH_PARENT, 1);
-                    divider.setLayoutParams(params);
-                    divider.setBackgroundColor(
-                            ContextCompat.getColor(itemView.getContext(), R.color.neutral_50));
-                    llTransactionsContainer.addView(divider);
-                }
+        private final List<LoanTransaction> items = new ArrayList<>();
+        private final DecimalFormat moneyFmt = new DecimalFormat("#,###");
+        private final OnTransactionClickListener listener;
+
+        LoanInSectionAdapter(OnTransactionClickListener l){ this.listener = l; }
+
+        void submit(List<LoanTransaction> data){
+            items.clear();
+            if (data != null) items.addAll(data);
+            notifyDataSetChanged();
+        }
+
+        @NonNull @Override
+        public ItemVH onCreateViewHolder(@NonNull ViewGroup p, int vt){
+            View v = LayoutInflater.from(p.getContext())
+                    .inflate(R.layout.item_loan_transaction_section, p, false);
+            return new ItemVH(v);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ItemVH h, int pos){
+            LoanTransaction t = items.get(pos);
+            h.tvType.setText(t.getTypeDisplay());
+            h.tvPerson.setText(t.getPersonName());
+            h.tvAmount.setText(moneyFmt.format(t.getAmount()) + " đ");
+            // icon nếu cần: h.ivIcon.setImageResource(R.drawable.ic_loan);
+            h.itemView.setOnClickListener(v -> { if (listener != null) listener.onTransactionClick(t); });
+        }
+
+        @Override
+        public int getItemCount(){ return items.size(); }
+
+        static class ItemVH extends RecyclerView.ViewHolder{
+            final ImageView ivIcon;
+            final TextView tvType, tvPerson, tvAmount;
+            ItemVH(@NonNull View v){
+                super(v);
+                ivIcon  = v.findViewById(R.id.ivTransactionIcon);
+                tvType  = v.findViewById(R.id.tvTransactionType);
+                tvPerson= v.findViewById(R.id.tvPersonName);
+                tvAmount= v.findViewById(R.id.tvAmount);
             }
-        }
-
-        private View createTransactionView(LoanTransaction transaction) {
-            View view = LayoutInflater.from(itemView.getContext())
-                    .inflate(R.layout.item_loan_transaction, llTransactionsContainer, false);
-
-            // Find views
-            CardView cvIconContainer = view.findViewById(R.id.cvIconContainer);
-            ImageView ivIcon = view.findViewById(R.id.ivTransactionIcon);
-            TextView tvType = view.findViewById(R.id.tvTransactionType);
-            TextView tvPerson = view.findViewById(R.id.tvPersonName);
-            TextView tvAmount = view.findViewById(R.id.tvAmount);
-
-            // Set icon background color
-            cvIconContainer.setCardBackgroundColor(
-                    ContextCompat.getColor(itemView.getContext(), R.color.success_1));
-
-            // Set transaction data
-            tvType.setText(transaction.getTypeDisplay());
-            tvPerson.setText(transaction.getPersonName());
-            tvAmount.setText(currencyFormat.format(transaction.getAmount()) + " đ");
-
-            // Set click listener
-            view.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onTransactionClick(transaction);
-                }
-            });
-
-            return view;
         }
     }
 }

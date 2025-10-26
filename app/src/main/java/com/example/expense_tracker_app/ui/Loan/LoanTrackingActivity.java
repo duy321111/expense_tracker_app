@@ -4,9 +4,9 @@ package com.example.expense_tracker_app.ui.Loan;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
@@ -15,37 +15,32 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.expense_tracker_app.R;
 import com.example.expense_tracker_app.model.DailyLoanSection;
 import com.example.expense_tracker_app.model.LoanTransaction;
-import com.example.expense_tracker_app.ui.Loan.DailySectionAdapter;
+import com.example.expense_tracker_app.ui.Month.MonthAdapter;
+import com.example.expense_tracker_app.ui.Month.MonthItem;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
-
-// dùng MonthAdapter của bạn
-import com.example.expense_tracker_app.ui.Month.MonthAdapter;
-import com.example.expense_tracker_app.ui.Month.MonthItem;
 
 public class LoanTrackingActivity extends AppCompatActivity
         implements DailySectionAdapter.OnTransactionClickListener {
 
     private ImageView ivBack;
-    private TextView tvYear;
-    private RecyclerView rvMonthSelector;
-    private RecyclerView rvLoanTransactions;
+    private RecyclerView rvMonths, rvDailySections;
     private BottomNavigationView bottomNavigation;
     private FloatingActionButton fabAdd;
 
     private MonthAdapter monthAdapter;
     private DailySectionAdapter dailySectionAdapter;
 
-    private Calendar currentCalendar;
     private int selectedMonth;
     private int selectedYear;
 
     private final List<MonthItem> monthItems = new ArrayList<>();
-    private int lastObservedSelected = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,92 +48,75 @@ public class LoanTrackingActivity extends AppCompatActivity
         setContentView(R.layout.activity_loan_tracking);
 
         initViews();
-        setupCalendar();
-        setupMonthSelector();
-        setupTransactionsList();
-        setupClickListeners();
+        initCalendar();
+        setupMonthStrip();
+        setupDailySectionList();
+        setupClicks();
         loadDataForSelectedMonth();
     }
 
     private void initViews() {
         ivBack = findViewById(R.id.ivBack);
-        tvYear = findViewById(R.id.tvYear);
-        rvMonthSelector = findViewById(R.id.rvMonthSelector);
-        rvLoanTransactions = findViewById(R.id.rvLoanTransactions);
+        rvMonths = findViewById(R.id.rvMonths);
+        rvDailySections = findViewById(R.id.rvDailySections);
         bottomNavigation = findViewById(R.id.bottomNavigation);
         fabAdd = findViewById(R.id.fabAdd);
     }
 
-    private void setupCalendar() {
-        currentCalendar = Calendar.getInstance();
-        selectedMonth = currentCalendar.get(Calendar.MONTH) + 1;
-        selectedYear = currentCalendar.get(Calendar.YEAR);
-        tvYear.setText(String.valueOf(selectedYear));
+    private void initCalendar() {
+        Calendar c = Calendar.getInstance();
+        selectedMonth = c.get(Calendar.MONTH) + 1;
+        selectedYear = c.get(Calendar.YEAR);
     }
 
-    private void setupMonthSelector() {
+    private void setupMonthStrip() {
         monthItems.clear();
-        for (int i = 1; i <= 12; i++) monthItems.add(new MonthItem(i, selectedYear));
+        monthItems.addAll(buildMonths(24));
 
-        LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        rvMonthSelector.setLayoutManager(lm);
+        LinearLayoutManager lm = new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false);
+        rvMonths.setLayoutManager(lm);
 
         monthAdapter = new MonthAdapter(monthItems);
-        rvMonthSelector.setAdapter(monthAdapter);
+        rvMonths.setAdapter(monthAdapter);
 
-        // chọn tháng hiện tại
-        int initialIndex = selectedMonth - 1;
-        monthAdapter.selected = initialIndex;
-        lastObservedSelected = initialIndex;
-        rvMonthSelector.scrollToPosition(initialIndex);
+        PagerSnapHelper snap = new PagerSnapHelper();
+        snap.attachToRecyclerView(rvMonths);
 
-        // Snap
-        new PagerSnapHelper().attachToRecyclerView(rvMonthSelector);
+        int currentIndex = findCurrentIndex(monthItems);
 
-        // Quan sát thay đổi selection qua notifyItemChanged của Adapter
-        monthAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override public void onItemRangeChanged(int positionStart, int itemCount) {
-                handleSelectionIfChanged();
-            }
-            @Override public void onChanged() {
-                handleSelectionIfChanged();
-            }
+        rvMonths.post(() -> {
+            monthAdapter.selected = currentIndex;
+            rvMonths.scrollToPosition(currentIndex);
+            monthAdapter.notifyDataSetChanged();
+            MonthItem cur = monthItems.get(currentIndex);
+            onMonthSelected(cur.year, cur.month);
         });
 
-        // Load thêm tháng khi scroll tới đầu/cuối
-        rvMonthSelector.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                LinearLayoutManager llm = (LinearLayoutManager) recyclerView.getLayoutManager();
-                if (llm == null) return;
-                int firstVisible = llm.findFirstVisibleItemPosition();
-                int lastVisible = llm.findLastVisibleItemPosition();
-
-                if (firstVisible == 0 && dx < 0) loadPreviousYearMonths();
-                if (lastVisible == monthItems.size() - 1 && dx > 0) loadNextYearMonths();
+        rvMonths.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView r, int state) {
+                if (state == RecyclerView.SCROLL_STATE_IDLE) {
+                    View v = snap.findSnapView(lm);
+                    if (v == null) return;
+                    int idx = lm.getPosition(v);
+                    if (idx != RecyclerView.NO_POSITION && idx != monthAdapter.selected) {
+                        monthAdapter.selected = idx;
+                        monthAdapter.notifyDataSetChanged();
+                        MonthItem cur = monthItems.get(idx);
+                        onMonthSelected(cur.year, cur.month);
+                    }
+                }
             }
         });
     }
 
-    private void handleSelectionIfChanged() {
-        if (monthAdapter == null) return;
-        int idx = monthAdapter.selected;
-        if (idx == RecyclerView.NO_POSITION || idx == lastObservedSelected) return;
-
-        lastObservedSelected = idx;
-        MonthItem mi = monthItems.get(idx);
-        selectedMonth = mi.month;
-        selectedYear = mi.year;
-        tvYear.setText(String.valueOf(selectedYear));
-        loadDataForSelectedMonth();
-    }
-
-    private void setupTransactionsList() {
-        rvLoanTransactions.setLayoutManager(new LinearLayoutManager(this));
+    private void setupDailySectionList() {
+        rvDailySections.setLayoutManager(new LinearLayoutManager(this));
         dailySectionAdapter = new DailySectionAdapter(this);
-        rvLoanTransactions.setAdapter(dailySectionAdapter);
+        rvDailySections.setAdapter(dailySectionAdapter);
     }
 
-    private void setupClickListeners() {
+    private void setupClicks() {
         ivBack.setOnClickListener(v -> finish());
 
         fabAdd.setOnClickListener(v ->
@@ -146,43 +124,51 @@ public class LoanTrackingActivity extends AppCompatActivity
 
         bottomNavigation.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.nav_home) { Toast.makeText(this, "Trang chủ", Toast.LENGTH_SHORT).show(); return true; }
-            if (id == R.id.nav_transactions) { Toast.makeText(this, "Giao dịch", Toast.LENGTH_SHORT).show(); return true; }
-            if (id == R.id.nav_add) { return true; }
-            if (id == R.id.nav_reports) { Toast.makeText(this, "Báo cáo", Toast.LENGTH_SHORT).show(); return true; }
+            if (id == R.id.nav_home) { Toast.makeText(this, "Tổng quan", Toast.LENGTH_SHORT).show(); return true; }
+            if (id == R.id.nav_reports) { Toast.makeText(this, "Thống kê", Toast.LENGTH_SHORT).show(); return true; }
+            if (id == R.id.nav_budget) { Toast.makeText(this, "Ngân sách", Toast.LENGTH_SHORT).show(); return true; }
             if (id == R.id.nav_profile) { Toast.makeText(this, "Cá nhân", Toast.LENGTH_SHORT).show(); return true; }
             return false;
         });
     }
 
-    @Override
-    public void onTransactionClick(LoanTransaction transaction) {
-        Toast.makeText(this, "Chi tiết: " + transaction.getPersonName(), Toast.LENGTH_SHORT).show();
+    private List<MonthItem> buildMonths(int centerMonths) {
+        LocalDate now = LocalDate.now();
+        LocalDate start = now.minusMonths(centerMonths);
+        List<MonthItem> list = new ArrayList<>();
+        for (int i = 0; i <= centerMonths * 2; i++) {
+            LocalDate d = start.plusMonths(i);
+            list.add(new MonthItem(d.getYear(), d.getMonthValue()));
+        }
+        return list;
+    }
+
+    private int findCurrentIndex(List<MonthItem> list) {
+        LocalDate now = LocalDate.now();
+        for (int i = 0; i < list.size(); i++) {
+            MonthItem it = list.get(i);
+            if (it.year == now.getYear() && it.month == now.getMonthValue()) return i;
+        }
+        return list.size() / 2;
+    }
+
+    private void onMonthSelected(int year, int month) {
+        selectedYear = year;
+        selectedMonth = month;
+        loadDataForSelectedMonth();
     }
 
     private void loadDataForSelectedMonth() {
         List<DailyLoanSection> sections = generateMockData(selectedMonth, selectedYear);
+
+        // Sắp xếp giảm dần theo ngày: mới nhất ở trên
+        Collections.sort(sections, (a, b) -> b.getDate().compareTo(a.getDate()));
+
         dailySectionAdapter.setSections(sections);
+        rvDailySections.scrollToPosition(0);
     }
 
-    private void loadPreviousYearMonths() {
-        int firstYear = monthItems.get(0).year;
-        int previousYear = firstYear - 1;
-        List<MonthItem> newMonths = new ArrayList<>();
-        for (int i = 1; i <= 12; i++) newMonths.add(new MonthItem(i, previousYear));
-        monthItems.addAll(0, newMonths);
-        monthAdapter.notifyItemRangeInserted(0, 12);
-    }
-
-    private void loadNextYearMonths() {
-        int lastYear = monthItems.get(monthItems.size() - 1).year;
-        int nextYear = lastYear + 1;
-        int start = monthItems.size();
-        for (int i = 1; i <= 12; i++) monthItems.add(new MonthItem(i, nextYear));
-        monthAdapter.notifyItemRangeInserted(start, 12);
-    }
-
-    // giữ nguyên mock data của bạn
+    // Mock demo
     private List<DailyLoanSection> generateMockData(int month, int year) {
         List<DailyLoanSection> sections = new ArrayList<>();
         Calendar cal = Calendar.getInstance();
@@ -200,5 +186,10 @@ public class LoanTrackingActivity extends AppCompatActivity
         sections.add(s2);
 
         return sections;
+    }
+
+    @Override
+    public void onTransactionClick(LoanTransaction transaction) {
+        Toast.makeText(this, "Chi tiết: " + transaction.getPersonName(), Toast.LENGTH_SHORT).show();
     }
 }

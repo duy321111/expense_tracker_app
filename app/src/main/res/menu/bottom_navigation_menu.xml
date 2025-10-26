@@ -1,27 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
     <item
         android:id="@+id/nav_home"
         android:icon="@drawable/ic_home"
-        android:title="Trang chủ" />
-
-    <item
-        android:id="@+id/nav_transactions"
-        android:icon="@drawable/ic_spending"
-        android:title="Giao dịch" />
-
-    <item
-        android:id="@+id/nav_add"
-        android:icon="@drawable/ic_add"
-        android:title="Thêm" />
+        android:title="Tổng quan" />
 
     <item
         android:id="@+id/nav_reports"
         android:icon="@drawable/ic_report"
-        android:title="Báo cáo" />
+        android:title="Thống kê" />
+
+    <item
+        android:id="@+id/nav_budget"
+        android:icon="@drawable/ic_wallet"
+        android:title="Ngân sách" />
 
     <item
         android:id="@+id/nav_profile"
         android:icon="@drawable/user"
         android:title="Cá nhân" />
+
 </menu>

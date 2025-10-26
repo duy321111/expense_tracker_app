@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="currencies">
+        <item>🇻🇳 Việt Nam Đồng (VND)</item>
+        <item>🇺🇸 Đô la Mỹ (USD)</item>
+        <item>🇪🇺 Euro (EUR)</item>
+        <item>🇯🇵 Yên Nhật (JPY)</item>
+        <item>Khác...</item>
+    </string-array>
+    <string-array name="wallet_array">
+        <item>Ví tiền mặt</item>
+        <item>Ví ngân hàng</item>
+        <item>Ví điện tử</item>
+    </string-array>
+
     <string-array name="month_options">
         <item>Tháng này</item>
         <item>Tháng trước</item>

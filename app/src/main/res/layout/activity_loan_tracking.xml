@@ -27,8 +27,6 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="16dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:focusable="true"
             android:contentDescription="@string/back"
             android:src="@drawable/ic_back" />
 
@@ -43,56 +41,45 @@
             android:textStyle="bold" />
     </RelativeLayout>
 
-    <!-- Năm -->
-    <TextView
-        android:id="@+id/tvYear"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="2025"
-        android:textColor="@color/text_secondary"
-        android:textSize="14sp"
+    <!-- Năm + Tháng (RecyclerView) -->
+    <FrameLayout
+        android:id="@+id/monthSection"
+        android:layout_width="0dp"
+        android:layout_height="72dp"
+        android:background="@color/neutral_50"
+        android:paddingHorizontal="0dp"
+        android:paddingVertical="8dp"
         app:layout_constraintTop_toBottomOf="@id/rlHeader"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <!-- Chọn tháng -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvMonths"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            android:clipToPadding="false"
+            android:paddingHorizontal="0dp"/>
+    </FrameLayout>
+
+    <!-- Danh sách mỗi ngày là 1 section -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvMonthSelector"
+        android:id="@+id/rvDailySections"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_height="0dp"
         android:clipToPadding="false"
         android:overScrollMode="never"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:paddingTop="12dp"
+        android:paddingTop="8dp"
         android:paddingBottom="12dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintTop_toBottomOf="@id/tvYear"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:listitem="@layout/item_month"
-        tools:itemCount="12" />
-
-    <!-- Danh sách giao dịch vay nợ -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvLoanTransactions"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:clipToPadding="false"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="6dp"
-        android:paddingBottom="6dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintTop_toBottomOf="@id/rvMonthSelector"
+        app:layout_constraintTop_toBottomOf="@id/monthSection"
         app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:listitem="@layout/item_loan_transaction"
-        tools:itemCount="6" />
+        tools:listitem="@layout/item_daily_section"
+        tools:itemCount="2" />
 
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -105,17 +92,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- FAB thêm -->
+    <!-- FAB trung tâm -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAdd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="80dp"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
         android:src="@drawable/ic_add"
         app:backgroundTint="@color/primary_1"
         app:tint="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:layout_marginBottom="12dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
