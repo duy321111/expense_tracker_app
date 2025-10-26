@@ -1,116 +1,258 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:padding="16dp" android:background="@color/neutral_50">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:padding="20dp">
+
+    <ImageButton
+        android:id="@+id/btnClose"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_close"
+        android:tint="@color/neutral_800"
+        android:contentDescription="@null"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Thêm giao dịch mới"
+        android:textColor="@color/neutral_900"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        android:layout_marginTop="36dp" />
+
+    <!-- Loại giao dịch -->
+    <LinearLayout
+        android:id="@+id/row_type"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/bg_input"
+        android:paddingHorizontal="12dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toBottomOf="@id/tv_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="28dp">
+
+        <TextView
+            android:id="@+id/tv_type"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Item 1"
+            android:textColor="@color/neutral_900" />
+
+        <ImageView
+            android:id="@+id/iv_type"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_list"
+        android:tint="@color/primary_1" />
+    </LinearLayout>
+
+    <!-- Danh mục-->
+    <LinearLayout
+        android:id="@+id/row_category"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/bg_input"
+        android:paddingHorizontal="12dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toBottomOf="@id/row_type"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:id="@+id/tv_category"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Danh mục mới"
+            android:textColor="@color/neutral_700" />
+
+        <ImageView
+            android:id="@+id/iv_category"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_category"
+        android:tint="@color/primary_1" />
+    </LinearLayout>
+
+    <!-- Số tiền -->
+    <EditText
+        android:id="@+id/etAmount"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_input"
+        android:hint="Nhập số tiền"
+        android:textColorHint="@color/neutral_700"
+        android:textColor="@color/neutral_900"
+        android:textSize="14sp"
+        android:inputType="number"
+        android:digits="0123456789"
+        android:paddingHorizontal="12dp"
+        android:imeOptions="actionDone"
+        app:layout_constraintTop_toBottomOf="@id/row_category"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
+
+    <!-- Ngày -->
+    <LinearLayout
+        android:id="@+id/row_date"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/bg_input"
+        android:paddingHorizontal="12dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toBottomOf="@id/etAmount"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:id="@+id/tv_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="xx/xx/20xx"
+            android:textColor="@color/neutral_700" />
+
+        <ImageView
+            android:id="@+id/iv_calendar"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_calendar"
+            android:tint="@color/primary_1" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_payment_method"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hình thức sử dụng"
+        android:textColor="@color/neutral_900"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/row_date"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="24dp" />
 
     <LinearLayout
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="vertical" android:gravity="center_horizontal">
+        android:id="@+id/layout_payment"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        app:layout_constraintTop_toBottomOf="@id/tv_payment_method"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="12dp">
 
-        <TextView android:text="Thêm giao dịch mới"
-            android:textColor="@color/neutral_900" android:textSize="20sp" android:textStyle="bold"
-            android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="12dp"/>
-
+        <!-- Tiền mặt -->
         <LinearLayout
-            android:id="@+id/sectionInit"
-            android:layout_width="match_parent"
+            android:id="@+id/opt_cash"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_card_neutral_50"
+            android:clipToOutline="true"
             android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:visibility="visible">
+            android:gravity="center"
+            android:padding="12dp">
 
-            <ImageView android:id="@+id/imgHeader" android:layout_width="260dp" android:layout_height="170dp"
-                android:src="@drawable/img_add_transaction" android:contentDescription="@null"/>
+            <LinearLayout
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_circle_purple"
+                android:gravity="center">
 
-            <TextView android:text="Bạn có muốn thêm giao dịch mới hay không?"
-                android:textColor="@color/neutral_600" android:textSize="14sp"
-                android:layout_marginTop="12dp" android:layout_marginBottom="8dp"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-
-            <RadioGroup android:id="@+id/rgType"
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <RadioButton android:id="@+id/rbIncome"
-                    android:layout_width="0dp" android:layout_height="wrap_content"
-                    android:layout_weight="1" android:gravity="center" android:padding="16dp"
-                    android:text="Thu nhập" android:textColor="@color/neutral_900"
-                    android:button="@null" android:drawableTop="@drawable/ic_income"
-                    android:background="@drawable/sel_radio_income"/>
-
-                <RadioButton android:id="@+id/rbExpense"
-                    android:layout_width="0dp" android:layout_height="wrap_content"
-                    android:layout_weight="1" android:gravity="center" android:padding="16dp"
-                    android:text="Chi tiêu" android:textColor="@color/neutral_900"
-                    android:button="@null" android:drawableTop="@drawable/ic_expense"
-                    android:background="@drawable/sel_radio_expense"
-                    android:layout_marginStart="12dp"/>
-            </RadioGroup>
-
-            <Button
-                android:id="@+id/btnContinue"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:text="Tiếp tục" android:textColor="@color/white"
-                app:backgroundTint="@color/primary_1" android:layout_marginTop="16dp"/>
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_cash"
+                    android:tint="@color/white" />
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/tvSkip"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Bỏ qua" android:textColor="@color/accent_1"
-                android:layout_marginTop="8dp"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tiền mặt"
+                android:textSize="13sp"
+                android:textColor="@color/primary_1"
+                android:layout_marginTop="6dp" />
         </LinearLayout>
 
+        <!-- Chuyển khoản -->
         <LinearLayout
-            android:id="@+id/sectionDetails"
-            android:layout_width="match_parent"
+            android:id="@+id/opt_transfer"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/bg_card_neutral_50"
+            android:clipToOutline="true"
             android:orientation="vertical"
-            android:visibility="gone"
-            android:layout_marginTop="16dp">
+            android:gravity="center"
+            android:padding="12dp">
 
-            <Button
-                android:id="@+id/btnCategory"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:text="Chọn danh mục" android:textAllCaps="false"
-                android:background="@drawable/bg_input_box" android:textColor="@color/neutral_900"/>
+            <LinearLayout
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_circle_orange"
+                android:gravity="center">
 
-            <EditText
-                android:id="@+id/etAmount"
-                android:layout_width="match_parent"
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_transfer"
+                    android:tint="@color/white" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="Nhập số tiền"
-                android:inputType="numberDecimal"
-                android:background="@drawable/bg_input_box"
-                android:layout_marginTop="12dp"/>
-
-            <TextView android:text="Hình thức" android:textColor="@color/neutral_600"
-                android:layout_marginTop="12dp"/>
-
-            <Spinner
-                android:id="@+id/spMethod"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_input_box"/>
-
-            <Button android:id="@+id/btnDate" android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:text="Chọn ngày" app:backgroundTint="@color/primary_1" android:textColor="@color/white"
-                android:layout_marginTop="12dp"/>
-
-            <TextView android:text="Ghi chú" android:textColor="@color/neutral_600"
-                android:layout_marginTop="12dp"/>
-
-            <EditText
-                android:id="@+id/etNote"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_input_box"
-                android:hint="Ví dụ: cà phê sáng"/>
-
-            <Button android:id="@+id/btnSubmit" android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:text="Thêm ngay" android:textColor="@color/white" app:backgroundTint="@color/primary_1"
-                android:layout_marginTop="18dp"/>
+                android:text="Chuyển khoản"
+                android:textSize="13sp"
+                android:textColor="@color/accent_1"
+                android:layout_marginTop="6dp" />
         </LinearLayout>
     </LinearLayout>
-</ScrollView>
+
+    <Button
+        android:id="@+id/btnSave"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:text="Lưu giao dịch"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:background="@drawable/bg_rounded_primary_1"
+        android:enabled="false"
+        android:alpha="0.5"
+        app:layout_constraintTop_toBottomOf="@id/layout_payment"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="28dp" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

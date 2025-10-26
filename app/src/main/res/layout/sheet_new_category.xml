@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:padding="16dp"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:background="@color/white">
+
+    <TextView style="@style/Heading5" android:text="Tạo danh mục mới"
+        android:textColor="@color/neutral_900"/>
+
+    <EditText
+        android:id="@+id/etName" android:layout_width="match_parent"
+        android:layout_height="48dp" android:layout_marginTop="12dp"
+        android:hint="Tên danh mục" android:background="@drawable/bg_input"
+        android:paddingHorizontal="12dp"/>
+
+    <!-- chọn màu -->
+    <LinearLayout android:id="@+id/rowColors"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:layout_marginTop="12dp">
+        <View android:id="@+id/c1" android:layout_width="32dp" android:layout_height="32dp"
+            android:background="@drawable/bg_icon_round_primary_1" android:layout_marginEnd="8dp"/>
+        <View android:id="@+id/c2" android:layout_width="32dp" android:layout_height="32dp"
+            android:background="@drawable/bg_icon_round_accent_1" android:layout_marginEnd="8dp"/>
+        <View android:id="@+id/c3" android:layout_width="32dp" android:layout_height="32dp"
+            android:background="@drawable/bg_icon_round_success_1"/>
+    </LinearLayout>
+
+    <!-- chọn icon đơn giản -->
+    <LinearLayout android:id="@+id/rowIcons"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:layout_marginTop="12dp">
+        <ImageView android:id="@+id/i1" android:layout_width="40dp" android:layout_height="40dp"
+            android:src="@drawable/ic_cat_food"/>
+        <ImageView android:id="@+id/i2" android:layout_width="40dp" android:layout_height="40dp"
+            android:src="@drawable/ic_cat_coffee" android:layout_marginStart="12dp"/>
+        <ImageView android:id="@+id/i3" android:layout_width="40dp" android:layout_height="40dp"
+            android:src="@drawable/ic_cat_groceries" android:layout_marginStart="12dp"/>
+    </LinearLayout>
+
+    <Button android:id="@+id/btnCreate"
+        android:layout_width="match_parent" android:layout_height="48dp"
+        android:text="Tạo" android:textColor="@color/white"
+        android:background="@drawable/bg_rounded_primary_1"
+        android:layout_marginTop="16dp"/>
+</LinearLayout>

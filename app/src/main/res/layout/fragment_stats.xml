@@ -7,63 +7,187 @@
     android:background="@color/neutral_50"
     android:padding="12dp">
 
-    <TextView android:id="@+id/tvTitle" android:text="Thống kê"
-        android:textSize="20sp" android:textStyle="bold" android:textColor="@color/neutral_900"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <!-- Header -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="4dp">
 
-    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:layout_marginTop="8dp" android:scrollbars="none">
-        <LinearLayout android:id="@+id/llMonths" android:orientation="horizontal"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        <!-- Tiêu đề căn giữa -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:text="Thống kê"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/neutral_900"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <!-- Icon lịch ở góc phải -->
+        <ImageButton
+            android:id="@+id/btnCalendar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@android:color/transparent"
+            android:contentDescription="Chọn tháng"
+            android:padding="8dp"
+            android:src="@drawable/ic_calendar"
+            android:tint="@color/primary_1" />
+
+    </RelativeLayout>
+
+
+    <!-- Thanh chọn tháng -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:scrollbars="none">
+        <LinearLayout
+            android:id="@+id/llMonths"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </HorizontalScrollView>
 
+    <!-- Biểu đồ -->
     <com.example.expense_tracker_app.ui.BarChartView
-        android:id="@+id/barChart" android:layout_width="match_parent" android:layout_height="200dp"
+        android:id="@+id/barChart"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
         android:layout_marginTop="8dp" />
 
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="horizontal" android:layout_marginTop="8dp"
+    <!-- Thẻ tổng thu nhập / chi tiêu -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
         android:baselineAligned="false">
-        <LinearLayout android:id="@+id/cardIncome" android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:background="@drawable/bg_card" android:padding="12dp" android:layout_marginEnd="6dp"
-            android:gravity="center_vertical" android:orientation="horizontal">
-            <ImageView android:src="@drawable/ic_income" app:tint="@color/success_1"
-                android:layout_width="24dp" android:layout_height="24dp"
-                android:contentDescription="Icon thu nhập"/>
-            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:orientation="vertical" android:layout_marginStart="8dp">
-                <TextView android:text="Thu nhập" android:textColor="@color/neutral_600" android:textSize="12sp"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                <TextView android:id="@+id/tvIncome" android:text="0 đ" android:textStyle="bold" android:textColor="@color/neutral_900"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+        <!-- Card Thu nhập -->
+        <LinearLayout
+            android:id="@+id/cardIncome"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/bg_card"
+            android:padding="12dp"
+            android:layout_marginEnd="6dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_icon_round_success_1">
+
+                <ImageView
+                    android:src="@drawable/ic_income"
+                    app:tint="@color/white"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="Icon thu nhập" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="8dp">
+
+                <TextView
+                    android:text="Thu nhập"
+                    android:textColor="@color/neutral_600"
+                    android:textSize="12sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/tvIncome"
+                    android:text="0 đ"
+                    android:textStyle="bold"
+                    android:textColor="@color/neutral_900"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
             </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout android:id="@+id/cardExpense" android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:background="@drawable/bg_card" android:padding="12dp" android:layout_marginStart="6dp"
-            android:gravity="center_vertical" android:orientation="horizontal">
-            <ImageView android:src="@drawable/ic_expense" app:tint="@color/accent_1"
-                android:layout_width="24dp" android:layout_height="24dp"
-                android:contentDescription="Icon chi tiêu"/>
-            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:orientation="vertical" android:layout_marginStart="8dp">
-                <TextView android:text="Chi tiêu" android:textColor="@color/neutral_600" android:textSize="12sp"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                <TextView android:id="@+id/tvExpense" android:text="0 đ" android:textStyle="bold" android:textColor="@color/neutral_900"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        <!-- Card Chi tiêu -->
+        <LinearLayout
+            android:id="@+id/cardExpense"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/bg_card"
+            android:padding="12dp"
+            android:layout_marginStart="6dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_icon_round_accent_1">
+
+                <ImageView
+                    android:src="@drawable/ic_expense"
+                    app:tint="@color/white"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="Icon chi tiêu" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="8dp">
+
+                <TextView
+                    android:text="Chi tiêu"
+                    android:textColor="@color/neutral_600"
+                    android:textSize="12sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/tvExpense"
+                    android:text="0 đ"
+                    android:textStyle="bold"
+                    android:textColor="@color/neutral_900"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 
+    <!-- Danh sách giao dịch -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvTx" android:layout_width="match_parent" android:layout_height="0dp"
-        android:layout_weight="1" android:layout_marginTop="8dp" />
+        android:id="@+id/rvTx"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp" />
 
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:gravity="end" android:layout_marginTop="6dp">
-        <ImageButton android:id="@+id/btnMore" android:src="@drawable/ic_more"
+    <!-- Nút more -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:layout_marginTop="6dp">
+
+        <ImageButton
+            android:id="@+id/btnMore"
+            android:src="@drawable/ic_more"
             android:background="@android:color/transparent"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:contentDescription="Tùy chọn khác"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="Tùy chọn khác" />
     </LinearLayout>
 </LinearLayout>

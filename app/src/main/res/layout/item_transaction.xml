@@ -2,34 +2,86 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
 
-    <TextView android:id="@+id/tvDateHeader"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:text="Ngày 01 tháng 03 2023" android:textColor="@color/neutral_900"
-        android:textSize="14sp" android:textStyle="bold" android:layout_marginStart="8dp"
-        android:layout_marginTop="12dp" android:layout_marginBottom="4dp"/>
+    <!-- header ngày -->
+    <TextView
+        android:id="@+id/tvDateHeader"
+        style="@style/Body2"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ngày 01 tháng 03 2023"
+        android:textColor="@color/neutral_900"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="4dp"/>
 
+    <!-- item giao dịch -->
     <LinearLayout
-        android:orientation="horizontal" android:padding="12dp"
+        android:orientation="horizontal"
+        android:padding="12dp"
         android:background="@drawable/bg_card"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="8dp">
 
-        <TextView android:id="@+id/tvDate" android:text="01"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:textColor="@color/neutral_600" android:layout_marginEnd="10dp"/>
+        <!-- ngày trong tháng -->
+        <TextView
+            android:id="@+id/tvDate"
+            style="@style/Body2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="01"
+            android:textColor="@color/neutral_600"
+            android:layout_marginEnd="10dp"/>
 
-        <LinearLayout android:orientation="vertical" android:layout_width="0dp" android:layout_height="wrap_content"
+        <!-- icon danh mục -->
+        <FrameLayout
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_icon_round_accent_1"
+            android:layout_marginEnd="10dp">
+
+            <ImageView
+                android:id="@+id/ivCatIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_cat_food"
+                android:tint="@color/white"/>
+        </FrameLayout>
+
+        <!-- tên danh mục + phương thức -->
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1">
-            <TextView android:id="@+id/tvCat" android:text="Danh mục"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
+
+            <TextView
+                android:id="@+id/tvCat"
+                style="@style/Body2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Danh mục"
                 android:textColor="@color/neutral_900"/>
-            <TextView android:id="@+id/tvMethod" android:text="Hình thức"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:textColor="@color/neutral_600" android:textSize="12sp"/>
+
+            <TextView
+                android:id="@+id/tvMethod"
+                style="@style/Caption1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hình thức"
+                android:textColor="@color/neutral_600"/>
         </LinearLayout>
 
-        <TextView android:id="@+id/tvAmount" android:text="+0 đ"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:textStyle="bold" android:textColor="@color/neutral_900"/>
+        <!-- số tiền -->
+        <TextView
+            android:id="@+id/tvAmount"
+            style="@style/Body2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:text="+0 đ"
+            android:textColor="@color/neutral_900"/>
     </LinearLayout>
 </LinearLayout>

@@ -1,15 +1,20 @@
 package com.example.expense_tracker_app.ui;
 
 import android.os.Bundle;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
-import androidx.annotation.*;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.example.expense_tracker_app.R;
 import com.example.expense_tracker_app.adapter.TransactionAdapter;
-import com.example.expense_tracker_app.data.model.TxType; // Cần import TxType
+import com.example.expense_tracker_app.data.model.TxType;
 import com.example.expense_tracker_app.databinding.FragmentStatsBinding;
 import com.example.expense_tracker_app.viewmodel.StatsViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -20,7 +25,9 @@ public class StatsFragment extends Fragment {
     private TransactionAdapter ad;
     private final int MAX_MONTHS = 4;
 
-    @Nullable @Override public View onCreateView(@NonNull LayoutInflater i, @Nullable ViewGroup c, @Nullable Bundle s){
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater i, @Nullable ViewGroup c, @Nullable Bundle s){
         b = FragmentStatsBinding.inflate(i, c, false);
         vm = new ViewModelProvider(this).get(StatsViewModel.class);
 
@@ -28,48 +35,50 @@ public class StatsFragment extends Fragment {
         b.rvTx.setLayoutManager(new LinearLayoutManager(getContext()));
         b.rvTx.setAdapter(ad);
 
-        // Khởi tạo chips và set tháng mặc định
         renderMonthChips();
         if (vm.getMonth() == -1) vm.setMonth(3);
 
-        // 1. Logic xem chi tiết (FIXED: Đã chuyển lên trước return)
+        // Xem chi tiết theo loại
         b.cardIncome.setOnClickListener(v -> navigateToTransactionList(TxType.INCOME));
         b.cardExpense.setOnClickListener(v -> navigateToTransactionList(TxType.EXPENSE));
 
-        // 2. Logic cập nhật UI
+        // Cập nhật UI
         vm.chart().observe(getViewLifecycleOwner(), bars -> b.barChart.setData(bars));
         vm.txs().observe(getViewLifecycleOwner(), ad::submit);
         vm.income().observe(getViewLifecycleOwner(), a -> b.tvIncome.setText(a));
         vm.expense().observe(getViewLifecycleOwner(), a -> b.tvExpense.setText(a));
-        vm.month().observe(getViewLifecycleOwner(), month -> updateMonthChips(month));
+        vm.month().observe(getViewLifecycleOwner(), this::updateMonthChips);
 
-        // 3. Các nút khác
+        // Bottom sheet
         b.btnMore.setOnClickListener(v -> openExportShare());
 
-        // LỖI CODE GỐC: Dòng 'b.cardIncome.setOnClickListener' và 'b.cardExpense.setOnClickListener'
-        // đã bị đặt sau 'return b.getRoot()', khiến chúng không bao giờ được thực thi.
-        // ĐÃ SỬA: Logic đã được chuyển lên trên.
+        // Chọn tháng/năm
+        b.btnCalendar.setOnClickListener(v -> {
+            int y = vm.getYear();
+            int m = vm.getMonth() > 0 ? vm.getMonth() : java.time.LocalDate.now().getMonthValue();
+            android.app.DatePickerDialog dlg = new android.app.DatePickerDialog(
+                    requireContext(),
+                    (view, yy, mm, dd) -> { vm.setYear(yy); vm.setMonth(mm + 1); },
+                    y, m - 1, 1
+            );
+            dlg.show();
+        });
 
         return b.getRoot();
     }
 
-    // Hàm điều hướng đã được cải tiến để truyền đủ Year và Month
     private void navigateToTransactionList(TxType type) {
-        // 1. Lấy thông tin tháng và năm hiện tại từ ViewModel
         int currentYear = vm.getYear();
         int currentMonth = vm.getMonth();
 
-        // 2. Tạo Bundle để truyền dữ liệu
         Bundle bundle = new Bundle();
         bundle.putString("TX_TYPE", type.name());
         bundle.putInt("YEAR", currentYear);
         bundle.putInt("MONTH", currentMonth);
 
-        // 3. Khởi tạo Fragment và thiết lập đối số
         TransactionListFragment listFragment = new TransactionListFragment();
         listFragment.setArguments(bundle);
 
-        // 4. Thực hiện giao dịch Fragment
         requireActivity().getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, listFragment)
                 .addToBackStack(null)
@@ -78,11 +87,10 @@ public class StatsFragment extends Fragment {
 
     private void renderMonthChips(){
         b.llMonths.removeAllViews();
-        // Cải tiến: Hiển thị năm hiện tại trên chip
         int currentYear = vm.getYear();
         for(int m=1;m<=MAX_MONTHS;m++){
             TextView chip = (TextView) getLayoutInflater().inflate(R.layout.chip_month, b.llMonths, false);
-            chip.setText("Tháng " + m + " " + currentYear); // Thêm năm vào chip
+            chip.setText("Tháng " + m + " " + currentYear);
             int month = m;
             chip.setOnClickListener(v -> vm.setMonth(month));
             b.llMonths.addView(chip);
@@ -90,7 +98,6 @@ public class StatsFragment extends Fragment {
     }
 
     private void updateMonthChips(int currentMonth) {
-        // ... (Logic cập nhật chip, đã sửa getResources().getColor)
         for (int i = 0; i < b.llMonths.getChildCount(); i++) {
             TextView chip = (TextView) b.llMonths.getChildAt(i);
             int month = i + 1;
