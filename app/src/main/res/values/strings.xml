@@ -18,6 +18,8 @@
     <string name="wallets_title">Ví của bạn</string>
     <string name="wallets_total_balance">Tổng cộng</string>
     <string name="wallets_list">Các ví</string>
+    <string name="back">Quay lại</string>
+    <string name="edit">Chỉnh sửa</string>
 
     <!-- 5 CHUỖI MỚI CHẮC CHẮN CÒN THIẾU -->
     <string name="wallets_total_balance_value">0 ₫</string>

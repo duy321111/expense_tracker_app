@@ -33,6 +33,10 @@
         <activity android:name=".ui.MyWalletsFragment" android:exported="true"/>
         <activity android:name=".ui.TransactionHistoryFragment" android:exported="true"/>
         <activity android:name=".ui.AccountInfoFragment" android:exported="true"/>
-
+        <activity android:name=".ui.TransactionDetail" android:exported="false"/>
+        <activity android:name=".ui.Loan.LoanTrackingActivity" android:exported="true"/>
+        <activity android:name=".ui.Budget.BudgetDetailActivity" android:exported="true"/>
+        <activity android:name=".ui.Notification.NotificationActivity" android:exported="true"/>
+        <activity android:name=".ui.Transactions" android:exported="true"/>
     </application>
 </manifest>

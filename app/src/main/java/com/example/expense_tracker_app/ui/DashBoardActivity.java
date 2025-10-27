@@ -6,13 +6,13 @@ import android.widget.ImageButton;
 
 import com.example.expense_tracker_app.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
+import com.example.expense_tracker_app.ui.stats.StatsActivity;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 public class DashBoardActivity extends AppCompatActivity {
 
-    private ImageButton btnNavHome, btnNavReport, btnNavBudget, btnNavProfile;
+    private ImageButton btnNavHome, btnNavStats, btnNavBudget, btnNavProfile;
     private FloatingActionButton fab;
 
     @Override
@@ -29,14 +29,15 @@ public class DashBoardActivity extends AppCompatActivity {
 
     private void initBottomNavigation() {
         btnNavHome = findViewById(R.id.btn_nav_home);
-        btnNavReport = findViewById(R.id.btn_nav_report);
         btnNavBudget = findViewById(R.id.btn_nav_budget);
         btnNavProfile = findViewById(R.id.btn_nav_profile);
+        btnNavStats = findViewById(R.id.btn_nav_stats);
 
         btnNavHome.setOnClickListener(v -> switchFragment(new Home()));
         //btnNavReport.setOnClickListener(v -> switchFragment(new ReportFragment()));
         btnNavBudget.setOnClickListener(v -> switchFragment(new BudgetHomePage()));
         btnNavProfile.setOnClickListener(v -> switchFragment(new ProfileFragment()));
+        btnNavStats.setOnClickListener(v -> switchFragment(new StatsActivity()));
     }
 
     private void initFAB() {

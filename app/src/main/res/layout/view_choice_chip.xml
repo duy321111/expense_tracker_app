@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheckedTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content" android:layout_height="40dp"
+    android:gravity="center" android:minWidth="64dp"
+    android:paddingHorizontal="12dp"
+    android:background="@drawable/bg_choice_chip"
+    android:textColor="@color/text_primary"
+    android:checkMark="@null"
+    android:text="Item"/>

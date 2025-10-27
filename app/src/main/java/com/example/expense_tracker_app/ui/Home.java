@@ -19,6 +19,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.expense_tracker_app.R;
+import com.example.expense_tracker_app.ui.Budget.BudgetDetailActivity;
+import com.example.expense_tracker_app.ui.Loan.LoanTrackingActivity;
 import com.example.expense_tracker_app.ui.Notification.NotificationActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 
@@ -51,14 +53,11 @@ public class Home extends Fragment {
         view.findViewById(R.id.imgAvatar).setOnClickListener(v ->
                 startActivity(new Intent(getActivity(), ProfileFragment.class)));
 
-        // --- Reload ---
-        view.findViewById(R.id.btnReload).setOnClickListener(v -> {
-            if(getActivity() != null) getActivity().recreate();
-        });
+        view.findViewById(R.id.btnReload).setOnClickListener(v -> requireActivity().recreate());
+        view.findViewById(R.id.btnNotification).setOnClickListener(
+                v -> startActivity(new Intent(requireContext(), NotificationActivity.class))
+        );
 
-        // --- Notification ---
-        view.findViewById(R.id.btnNotification).setOnClickListener(v ->
-                startActivity(new Intent(getActivity(), NotificationActivity.class)));
 
         // --- Biểu đồ thu chi ---
         View barIncome = view.findViewById(R.id.barIncome);
@@ -126,11 +125,11 @@ public class Home extends Fragment {
                 .setText(two(end.get(Calendar.DAY_OF_MONTH)) + "/" + two(m + 1));
 
         view.findViewById(R.id.tvDetailLimit).setOnClickListener(v ->
-                startActivity(new Intent(getActivity(), SpendingLimit.class)));
+                startActivity(new Intent(getActivity(), BudgetDetailActivity.class)));
 
         // --- Theo dõi vay nợ ---
         view.findViewById(R.id.tvDebtDetail).setOnClickListener(v ->
-                startActivity(new Intent(getActivity(), DebtTracking.class)));
+                startActivity(new Intent(getActivity(), LoanTrackingActivity.class)));
 
         int paid = 4_500_000;
         int total = 12_000_000;
