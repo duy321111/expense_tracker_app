@@ -2,18 +2,25 @@ package com.example.expense_tracker_app.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.expense_tracker_app.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.example.expense_tracker_app.ui.stats.StatsActivity;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 public class DashBoardActivity extends AppCompatActivity {
 
-    private ImageButton btnNavHome, btnNavStats, btnNavBudget, btnNavProfile;
+    private LinearLayout btnNavHome, btnNavStats, btnNavBudget, btnNavProfile;
     private FloatingActionButton fab;
+
+    // Tham chiếu icon + text
+    private ImageView iconHome, iconStats, iconBudget, iconProfile;
+    private TextView textHome, textStats, textBudget, textProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +30,8 @@ public class DashBoardActivity extends AppCompatActivity {
         initBottomNavigation();
         initFAB();
 
-        // Mặc định load HomeFragment
+        // Mặc định chọn Home
+        setSelectedNav(btnNavHome);
         switchFragment(new Home());
     }
 
@@ -33,21 +41,56 @@ public class DashBoardActivity extends AppCompatActivity {
         btnNavProfile = findViewById(R.id.btn_nav_profile);
         btnNavStats = findViewById(R.id.btn_nav_stats);
 
-        btnNavHome.setOnClickListener(v -> switchFragment(new Home()));
-        //btnNavReport.setOnClickListener(v -> switchFragment(new ReportFragment()));
-        btnNavBudget.setOnClickListener(v -> switchFragment(new BudgetHomePage()));
-        btnNavProfile.setOnClickListener(v -> switchFragment(new ProfileFragment()));
-        btnNavStats.setOnClickListener(v -> switchFragment(new StatsActivity()));
+        iconHome = findViewById(R.id.icon_home);
+        iconStats = findViewById(R.id.icon_stats);
+        iconBudget = findViewById(R.id.icon_budget);
+        iconProfile = findViewById(R.id.icon_profile);
+
+        textHome = findViewById(R.id.text_home);
+        textStats = findViewById(R.id.text_stats);
+        textBudget = findViewById(R.id.text_budget);
+        textProfile = findViewById(R.id.text_profile);
+
+        btnNavHome.setOnClickListener(v -> {
+            setSelectedNav(btnNavHome);
+            switchFragment(new Home());
+        });
+
+        btnNavBudget.setOnClickListener(v -> {
+            setSelectedNav(btnNavBudget);
+            switchFragment(new BudgetHomePage());
+        });
+
+        btnNavProfile.setOnClickListener(v -> {
+            setSelectedNav(btnNavProfile);
+            switchFragment(new ProfileFragment());
+        });
+
+        btnNavStats.setOnClickListener(v -> {
+            setSelectedNav(btnNavStats);
+            switchFragment(new StatsActivity());
+
+        });
+    }
+
+    private void setSelectedNav(LinearLayout selectedBtn) {
+        // Reset trạng thái
+        btnNavHome.setSelected(false);
+        btnNavStats.setSelected(false);
+        btnNavBudget.setSelected(false);
+        btnNavProfile.setSelected(false);
+
+        // Đặt selected = true cho nút được chọn
+        selectedBtn.setSelected(true);
     }
 
     private void initFAB() {
         fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
-            // Mở màn hình thêm giao dịch
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragmentContainer, new AddTransactionFragment())
-                    .addToBackStack(null) // để nhấn back trở lại dashboard
+                    .addToBackStack(null)
                     .commit();
         });
     }

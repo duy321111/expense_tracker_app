@@ -164,7 +164,6 @@ public class Home extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view1, int position, long id) {
                 String selectedWallet = parent.getItemAtPosition(position).toString();
-                Toast.makeText(getActivity(), "Đã chọn: " + selectedWallet, Toast.LENGTH_SHORT).show();
             }
 
             @Override

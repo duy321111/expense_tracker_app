@@ -36,10 +36,9 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="Thống kê"
-            style="Heading5"
+            style="@style/Heading5"
             android:textColor="@color/primary_1"
-            android:textSize="18sp"
-            android:textStyle="bold"/>
+            android:textSize="18sp"/>
         <ImageView
             android:id="@+id/ivCalendar"
             android:layout_width="24dp"

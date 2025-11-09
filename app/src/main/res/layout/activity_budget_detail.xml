@@ -34,9 +34,10 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="Hạn mức chi tiêu"
-            android:textColor="#212121"
+            android:textColor="@color/primary_1"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            style="@style/Heading5"
+            />
 
         <ImageView
             android:id="@+id/ivEdit"
@@ -190,7 +191,7 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/ic_list"
-                        android:tint="#757575" />
+                        app:tint="#757575" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -205,7 +206,7 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:src="@drawable/ic_chevron_right"
-                        android:tint="#757575" />
+                        app:tint="#757575" />
 
                 </LinearLayout>
 
@@ -249,7 +250,7 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@drawable/ic_wallet"
-                            android:tint="#757575" />
+                            app:tint="#757575" />
 
                         <TextView
                             android:layout_width="0dp"
@@ -288,7 +289,7 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@drawable/ic_trending_down"
-                            android:tint="#4CAF50" />
+                            app:tint="#4CAF50" />
 
                         <TextView
                             android:layout_width="0dp"
@@ -327,7 +328,7 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@drawable/ic_chart"
-                            android:tint="#2196F3" />
+                            app:tint="#2196F3" />
 
                         <TextView
                             android:layout_width="0dp"
@@ -376,7 +377,7 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/ic_transfer"
-                        android:tint="#9C27B0" />
+                        app:tint="#9C27B0" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -413,18 +414,18 @@
             </androidx.cardview.widget.CardView>
 
             <!-- Add Budget Button -->
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddBudget"
+                style="@style/Body1"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="Thêm hạn mức"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:background="@drawable/button_gradient"
-                android:elevation="4dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="16dp"
+                android:backgroundTint="@color/primary_1"
+                android:elevation="4dp"
+                android:text="Thêm hạn mức"
+                android:textColor="@android:color/white" />
+
 
         </LinearLayout>
 

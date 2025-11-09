@@ -1,51 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:paddingHorizontal="4dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ImageButton
-        android:id="@+id/btn_nav_home"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="?attr/selectableItemBackground"
-        android:contentDescription="@string/nav_home_title"
-        android:src="@drawable/ic_home" />
+    <!-- Thanh navigation dưới cùng -->
+    <LinearLayout
+        android:id="@+id/bottom_nav_bar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="4dp"
+        android:background="@android:color/white">
 
-    <ImageButton
-        android:id="@+id/btn_nav_stats"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="?attr/selectableItemBackground"
-        android:src="@drawable/ic_chart"
-        android:contentDescription="@string/nav_report_title"/>
+        <!-- Trang chủ -->
+        <LinearLayout
+            android:id="@+id/btn_nav_home"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="bottom|center"
+            android:paddingBottom="15dp"
+            android:background="?attr/selectableItemBackground">
 
-    <Space
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"/>
+            <ImageView
+                android:id="@+id/icon_home"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_home"
+                app:tint="@color/nav_item_color" />
 
-    <ImageButton
-        android:id="@+id/btn_nav_budget"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="?attr/selectableItemBackground"
-        android:src="@drawable/ic_wallet"
-        android:contentDescription="@string/nav_budget_title"/>
+            <TextView
+                android:id="@+id/text_home"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Trang chủ"
+                android:textSize="12sp"
+                android:textColor="@color/nav_item_color"
+                android:layout_marginTop="2dp" />
+        </LinearLayout>
 
-    <ImageButton
-        android:id="@+id/btn_nav_profile"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="?attr/selectableItemBackground"
-        android:src="@drawable/user"
-        android:contentDescription="@string/nav_profile_title"/>
+        <!-- Thống kê -->
+        <LinearLayout
+            android:id="@+id/btn_nav_stats"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="bottom|center"
+            android:paddingBottom="15dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:background="?attr/selectableItemBackground">
 
-</LinearLayout>
+            <ImageView
+                android:id="@+id/icon_stats"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_chart"
+                app:tint="@color/nav_item_color" />
+
+            <TextView
+                android:id="@+id/text_stats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Thống kê"
+                android:textSize="12sp"
+                android:textColor="@color/nav_item_color"
+                android:layout_marginTop="2dp" />
+        </LinearLayout>
+
+        <!-- Chừa khoảng trống giữa để đặt FAB -->
+
+        <!-- Ngân sách -->
+        <Space
+            android:layout_width="60dp"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:id="@+id/btn_nav_budget"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="bottom|center"
+            android:paddingBottom="15dp"
+            android:background="?attr/selectableItemBackground">
+
+            <ImageView
+                android:id="@+id/icon_budget"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_wallet"
+                app:tint="@color/nav_item_color" />
+
+            <TextView
+                android:id="@+id/text_budget"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ngân sách"
+                android:textSize="12sp"
+                android:textColor="@color/nav_item_color"
+                android:layout_marginTop="2dp" />
+        </LinearLayout>
+
+        <!-- Hồ sơ -->
+        <LinearLayout
+            android:id="@+id/btn_nav_profile"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="bottom|center"
+            android:paddingBottom="15dp"
+            android:background="?attr/selectableItemBackground">
+
+            <ImageView
+                android:id="@+id/icon_profile"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/user"
+                app:tint="@color/nav_item_color" />
+
+            <TextView
+                android:id="@+id/text_profile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hồ sơ"
+                android:textSize="12sp"
+                android:textColor="@color/nav_item_color"
+                android:layout_marginTop="2dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Nút FAB nằm giữa thanh điều hướng -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="8dp"
+        android:contentDescription="@string/cd_add_transaction"
+        android:src="@drawable/ic_add"
+        app:backgroundTint="@color/primary_1"
+        app:fabCustomSize="56dp"
+        app:tint="@android:color/white" />
+</FrameLayout>
