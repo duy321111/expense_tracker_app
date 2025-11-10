@@ -16,7 +16,6 @@ import com.example.expense_tracker_app.data.model.LoanTransaction;
 import com.example.expense_tracker_app.ui.Month.MonthAdapter;
 import com.example.expense_tracker_app.ui.Month.MonthItem;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.time.LocalDate;
@@ -30,7 +29,6 @@ public class LoanTrackingActivity extends AppCompatActivity
 
     private MaterialToolbar toolbar;
     private RecyclerView rvMonths, rvDailySections;
-    private BottomNavigationView bottomNavigation;
     private FloatingActionButton fabAdd;
 
     private MonthAdapter monthAdapter;
@@ -59,7 +57,7 @@ public class LoanTrackingActivity extends AppCompatActivity
         toolbar = findViewById(R.id.toolbar);
         rvMonths = findViewById(R.id.rvMonths);
         rvDailySections = findViewById(R.id.rvDailySections);
-
+        fabAdd = findViewById(R.id.fabAdd); // ĐÃ THÊM
     }
 
     private void setupToolbarBack() {
@@ -125,9 +123,11 @@ public class LoanTrackingActivity extends AppCompatActivity
     }
 
     private void setupClicks() {
-        fabAdd.setOnClickListener(v ->
-                Toast.makeText(this, "Thêm giao dịch mới", Toast.LENGTH_SHORT).show());
-
+        if (fabAdd != null) {
+            fabAdd.setOnClickListener(v ->
+                    Toast.makeText(this, "Thêm giao dịch mới", Toast.LENGTH_SHORT).show()
+            );
+        }
     }
 
     private List<MonthItem> buildMonths(int centerMonths) {
