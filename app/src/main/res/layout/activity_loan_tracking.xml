@@ -28,7 +28,7 @@
             app:title="Theo dõi vay nợ"
             app:titleCentered="true"
             app:titleTextColor="@color/primary_1"
-            style="@style/Heading5"/>
+            app:titleTextAppearance="@style/Heading5"/>
     </com.google.android.material.appbar.AppBarLayout>
 
     <!-- Năm + Tháng -->
