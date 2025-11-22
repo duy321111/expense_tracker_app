@@ -14,6 +14,8 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.expense_tracker_app.R;
 import com.example.expense_tracker_app.data.model.User;
 import com.example.expense_tracker_app.ui.AddWalletActivity;
+import com.example.expense_tracker_app.ui.DashBoardActivity;
+import com.example.expense_tracker_app.ui.Home;
 import com.example.expense_tracker_app.viewmodel.LoginViewModel;
 
 public class Login extends AppCompatActivity {
@@ -38,7 +40,7 @@ public class Login extends AppCompatActivity {
         // Auto-login
         User loggedUser = loginViewModel.repository.getLoggedInUser();
         if (loggedUser != null) {
-            startActivity(new Intent(Login.this, AddWalletActivity.class));
+            startActivity(new Intent(Login.this, DashBoardActivity.class));
             finish();
         }
 
@@ -52,7 +54,7 @@ public class Login extends AppCompatActivity {
         loginViewModel.loginResult.observe(this, success -> {
             if (success) {
                 Toast.makeText(this, "Login thành công", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(Login.this, AddWalletActivity.class));
+                startActivity(new Intent(Login.this, DashBoardActivity.class));
                 finish();
             } else {
                 Toast.makeText(this, "Email hoặc mật khẩu sai", Toast.LENGTH_SHORT).show();
