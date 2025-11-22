@@ -1,4 +1,4 @@
-package com.example.expense_tracker_app.ui;
+package com.example.expense_tracker_app.ui.Auth;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.expense_tracker_app.R;
 import android.widget.Button;
-import android.widget.TextView;
+
 public class OTPVerification extends AppCompatActivity {
 
     @Override

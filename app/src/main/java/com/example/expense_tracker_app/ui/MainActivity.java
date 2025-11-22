@@ -10,9 +10,9 @@ import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
+
 import com.example.expense_tracker_app.R;
-import com.example.expense_tracker_app.databinding.ActivityMainBinding;
+import com.example.expense_tracker_app.ui.Auth.Login;
 
 public class MainActivity extends AppCompatActivity {
 
