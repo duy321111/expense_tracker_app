@@ -12,14 +12,12 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.expense_tracker_app.R;
-import com.example.expense_tracker_app.ui.Budget.BudgetDetailActivity;
 import com.example.expense_tracker_app.ui.Loan.LoanTrackingActivity;
 import com.example.expense_tracker_app.ui.Notification.NotificationActivity;
 import com.google.android.material.appbar.MaterialToolbar;

@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Expense-tracker-app</string>
+    <string name="label_budget_month">Ngân sách %1$s %2$d</string>
+    <string name="label_budget_empty">Chưa có ngân sách nào. Hãy tạo ngân sách mới!</string>
+    <string name="budget_spent_pattern">Đã chi %1$s / %2$s</string>
     <string name="login_link"><u>Đăng nhập</u></string>
 
     <string name="cd_open_notifications">Mở trang thông báo</string>

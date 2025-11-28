@@ -1,221 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:background="@color/neutral_50">
+    android:background="@color/neutral_50"
+    android:fitsSystemWindows="true">
 
-    <!-- Toolbar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="@color/white"
         app:navigationIcon="@drawable/ic_back"
+        app:title="Ngân sách sử dụng"
         app:titleCentered="true"
         app:titleTextAppearance="@style/Heading5"
-        app:title="Ngân sách sử dụng"
-        app:titleTextColor="@color/primary_1"/>
+        app:titleTextColor="@color/primary_1" />
 
-    <!-- Nội dung chính -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
-        android:padding="12dp"
-        android:clipToPadding="false">
+        android:clipToPadding="false"
+        android:padding="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- SECTION: RecyclerView hiển thị tháng/năm -->
-            <FrameLayout
-                android:id="@+id/monthSection"
-                android:layout_width="match_parent"
-                android:layout_height="72dp"
-                android:layout_marginBottom="12dp"
-                android:background="@drawable/modal_bg">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvMonths"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:clipToPadding="false"
-                    android:paddingHorizontal="8dp"
-                    android:overScrollMode="never" />
-            </FrameLayout>
-
-            <!-- CARD: Ngân sách Ăn uống -->
-            <LinearLayout
-                android:id="@+id/BudgetCardHome"
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:orientation="vertical"
-                android:background="@drawable/modal_bg">
-
-                <TextView
-                    android:text="Ngân sách Ăn uống"
-                    android:textColor="@color/neutral_900"
-                    style="@style/Body1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp" />
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:padding="16dp">
 
-                    <TextView
-                        android:text="Đã chi"
-                        android:textColor="@color/neutral_700"
-                        android:layout_width="0dp"
-                        style="@style/Body2"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" />
-
-                    <TextView
-                        android:text="1.200.000 / 2.000.000"
-                        android:textColor="@color/neutral_900"
-                        style="@style/Body2"
-                        android:textStyle="bold"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-                </LinearLayout>
-
-                <ProgressBar
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="18dp"
-                    android:layout_marginTop="8dp"
-                    android:max="100"
-                    android:progress="60"
-                    android:indeterminate="false"
-                    android:progressDrawable="@drawable/progress_rounded" />
-            </LinearLayout>
-
-            <!-- CARD: Ngân sách Đi lại -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:background="@drawable/modal_bg"
-                android:orientation="vertical">
-
-                <TextView
-                    style="@style/Body1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:text="Ngân sách Đi lại"
-                    android:textColor="@color/neutral_900" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        style="@style/Body2"
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Đã chi"
-                        android:textColor="@color/neutral_700" />
+                        android:orientation="vertical">
 
-                    <TextView
-                        style="@style/Body2"
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tháng"
+                            android:textColor="@color/neutral_600"
+                            android:textSize="14sp" />
+
+                        <Spinner
+                            android:id="@+id/spinnerMonth"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:background="@drawable/bg_spinner"
+                            android:entries="@array/months"
+                            android:padding="8dp"
+                            android:popupBackground="@drawable/bg_spinner_popup"
+                            android:spinnerMode="dropdown" />
+                    </LinearLayout>
+
+                    <Space
+                        android:layout_width="12dp"
+                        android:layout_height="wrap_content" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="600.000 / 1.000.000"
-                        android:textColor="@color/neutral_900"
-                        android:textStyle="bold" />
-                </LinearLayout>
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
-                <ProgressBar
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="18dp"
-                    android:layout_marginTop="8dp"
-                    android:indeterminate="false"
-                    android:max="100"
-                    android:progress="60"
-                    android:progressDrawable="@drawable/progress_rounded" />
-            </LinearLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Năm"
+                            android:textColor="@color/neutral_600"
+                            android:textSize="14sp" />
+
+                        <Spinner
+                            android:id="@+id/spinnerYear"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:background="@drawable/bg_spinner"
+                            android:padding="8dp"
+                            android:popupBackground="@drawable/bg_spinner_popup"
+                            android:spinnerMode="dropdown" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
+                android:gravity="center_vertical"
                 android:orientation="vertical"
-                android:background="@drawable/modal_bg">
+                android:layout_marginBottom="8dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnGoCurrentMonth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:backgroundTint="@color/primary_5"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="16dp"
+                    android:text="Quay về tháng hiện tại"
+                    android:textAllCaps="false"
+                    android:textColor="@color/primary_1"
+                    app:cornerRadius="20dp" />
 
                 <TextView
-                    android:text="Ngân sách Đi lại"
-                    android:textColor="@color/neutral_900"
-                    style="@style/Body1"
+                    android:id="@+id/tvSelectedMonthLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:text="Đã chi"
-                        android:textColor="@color/neutral_700"
-                        style="@style/Body2"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" />
-
-                    <TextView
-                        android:text="600.000 / 1.000.000"
-                        android:textColor="@color/neutral_900"
-                        style="@style/Body2"
-                        android:textStyle="bold"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-                </LinearLayout>
-
-                <ProgressBar
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="18dp"
                     android:layout_marginTop="8dp"
-                    android:max="100"
-                    android:progress="60"
-                    android:indeterminate="false"
-                    android:progressDrawable="@drawable/progress_rounded" />
+                    android:text="Ngân sách tháng ..."
+                    android:textAppearance="@style/Heading5"
+                    android:textColor="@color/neutral_900" />
             </LinearLayout>
 
-            <!-- Nút thêm ngân sách -->
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvBudgets"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddBudget"
-                style="@style/Body2"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="54dp"
                 android:layout_marginTop="16dp"
-                android:layout_gravity="center_horizontal"
-                android:gravity="center"
                 android:backgroundTint="@color/primary_1"
                 android:text="Thêm ngân sách mới"
+                android:textAllCaps="false"
                 android:textColor="@color/white"
-                app:cornerRadius="12dp"
-                app:iconGravity="textStart"
-                app:iconTint="@color/white"
-                app:iconPadding="8dp"/>
-
-
+                app:cornerRadius="12dp" />
         </LinearLayout>
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

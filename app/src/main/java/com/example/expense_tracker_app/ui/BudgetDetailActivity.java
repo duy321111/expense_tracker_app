@@ -1,4 +1,4 @@
-package com.example.expense_tracker_app.ui.Budget;
+package com.example.expense_tracker_app.ui;
 
 import android.animation.ValueAnimator;
 import android.os.Bundle;
@@ -69,6 +69,7 @@ public class BudgetDetailActivity extends AppCompatActivity {
         initViews();
         setupFormatters();
         loadMockData();
+        overrideBudgetFromIntentIfAny();
         setupClickListeners();
         displayBudgetData();
     }
@@ -145,6 +146,30 @@ public class BudgetDetailActivity extends AppCompatActivity {
                 "",
                 R.drawable.ic_chart
         ));
+    }
+
+    /**
+     * Nếu được mở từ màn danh sách ngân sách, ta override dữ liệu mock
+     * bằng thông tin thật truyền qua Intent (tên, hạn mức, số đã chi…)
+     */
+    private void overrideBudgetFromIntentIfAny() {
+        if (getIntent() == null) return;
+
+        String name = getIntent().getStringExtra("budget_name");
+        double limit = getIntent().getDoubleExtra("budget_limit", -1);
+        double spent = getIntent().getDoubleExtra("budget_spent", -1);
+
+        if (currentBudget == null) return;
+
+        if (name != null) {
+            currentBudget.setCategory(name);
+        }
+        if (limit >= 0) {
+            currentBudget.setLimitAmount(limit);
+        }
+        if (spent >= 0) {
+            currentBudget.setSpentAmount(spent);
+        }
     }
 
     private void setupClickListeners() {

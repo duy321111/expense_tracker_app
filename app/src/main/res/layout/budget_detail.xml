@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="@color/white"
-        app:navigationIcon="@drawable/ic_back"
+        app:navigationIcon="@drawable/ic_arrow_left"
         app:titleCentered="true"
         app:titleTextColor="@color/primary_1"
         app:titleTextAppearance="@style/Heading5"
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- SECTION: Tổng đã chi -->
+            <!-- SECTION: Tổng đã chi (không dùng chart, chỉ số liệu) -->
             <LinearLayout
                 android:id="@+id/sectionTotal"
                 android:layout_width="match_parent"
@@ -49,14 +49,12 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
 
-                    <!-- Cột bên trái: Tên ngân sách + Tháng/Năm -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
 
-                        <!-- Tên ngân sách -->
                         <TextView
                             android:id="@+id/tvBudgetName"
                             android:layout_width="wrap_content"
@@ -65,7 +63,6 @@
                             style="@style/Body1"
                             android:textColor="@color/primary_1" />
 
-                        <!-- Tháng/Năm -->
                         <TextView
                             android:id="@+id/tvMonthYear"
                             android:layout_width="wrap_content"
@@ -76,7 +73,6 @@
                             android:layout_marginTop="2dp"/>
                     </LinearLayout>
 
-                    <!-- Nút sửa ngân sách -->
                     <TextView
                         android:id="@+id/tvEdit"
                         android:layout_width="wrap_content"
@@ -90,7 +86,7 @@
                         android:foreground="?attr/selectableItemBackground"/>
                 </LinearLayout>
 
-                <!-- Tổng đã chi (hàng dưới) -->
+                <!-- Hàng dưới: Tổng đã chi + phần trăm -->
                 <LinearLayout
                     android:id="@+id/rowTotal"
                     android:layout_width="match_parent"
@@ -113,55 +109,22 @@
                         android:layout_weight="1" />
 
                     <TextView
+                        android:id="@+id/tvCenterTop"
+                        style="@style/Caption1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="80%"
+                        android:textColor="@color/neutral_700"
+                        android:layout_marginEnd="8dp"/>
+
+                    <TextView
                         android:id="@+id/tvTotalAmount"
                         style="@style/Heading5"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="7.945.000 đ"
+                        android:text="7.945.000 đ / 10.000.000 đ"
                         android:textColor="@color/black" />
                 </LinearLayout>
-
-                <!-- Donut chart -->
-                <FrameLayout
-                    android:id="@+id/donutContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="220dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:gravity="center">
-
-                    <com.example.expense_tracker_app.ui.DonutChartView
-                        android:id="@+id/donutChart"
-                        android:layout_width="200dp"
-                        android:layout_height="200dp"
-                        android:layout_gravity="center" />
-
-                    <LinearLayout
-                        android:id="@+id/donutCenterTexts"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/tvCenterTop"
-                            style="@style/Heading5"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="100%"
-                            android:textColor="@color/black" />
-
-                        <TextView
-                            android:id="@+id/tvCenterBottom"
-                            style="@style/Caption1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="Đã chi tiêu"
-                            android:textColor="@color/neutral_800" />
-                    </LinearLayout>
-                </FrameLayout>
             </LinearLayout>
 
 

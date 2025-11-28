@@ -20,10 +20,10 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.BudgetDetail" android:exported="true" />
-        <activity android:name=".ui.EditBudget" android:exported="true" />
+        <activity android:name=".ui.Budget.BudgetDetail" android:exported="true" />
+        <activity android:name=".ui.Budget.EditBudget" android:exported="true" />
         <activity android:name=".ui.DashBoardActivity" android:exported="true"/>
-        <activity android:name=".ui.AddBudget" android:exported="true"/>
+        <activity android:name=".ui.Budget.AddBudget" android:exported="true"/>
         <activity android:name=".ui.Auth.Login" android:exported="true"/>
         <activity android:name=".ui.Auth.Register" android:exported="true"/>
         <activity android:name=".ui.Auth.ForgotPassword" android:exported="true"/>
@@ -35,7 +35,7 @@
         <activity android:name=".ui.AccountInfoFragment" android:exported="true"/>
         <activity android:name=".ui.TransactionDetail" android:exported="false"/>
         <activity android:name=".ui.Loan.LoanTrackingActivity" android:exported="true"/>
-        <activity android:name=".ui.Budget.BudgetDetailActivity" android:exported="true"/>
+        <activity android:name=".ui.BudgetDetailActivity" android:exported="true"/>
         <activity android:name=".ui.Notification.NotificationActivity" android:exported="true"/>
         <activity android:name=".ui.Transactions" android:exported="true"/>
     </application>

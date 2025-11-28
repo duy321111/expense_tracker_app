@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:background="@drawable/modal_bg"
+    android:layout_marginBottom="12dp">
+
+    <ImageView
+        android:id="@+id/ivCategoryIcon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/bg_icon_round_accent_1"
+        android:contentDescription="@string/cd_spending_icon"
+        android:padding="10dp"
+        android:src="@drawable/ic_cat_food" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvBudgetName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ngân sách sinh hoạt"
+            android:textAppearance="@style/Heading5"
+            android:textColor="@color/neutral_900" />
+
+        <TextView
+            android:id="@+id/tvCategories"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Ăn uống, Đi chợ"
+            android:textAppearance="@style/Caption1"
+            android:textColor="@color/neutral_600" />
+
+        <TextView
+            android:id="@+id/tvSpentInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Đã chi 0 đ / 5.000.000 đ"
+            android:textAppearance="@style/Body2"
+            android:textColor="@color/neutral_900" />
+
+        <ProgressBar
+            android:id="@+id/pbProgress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="18dp"
+            android:layout_marginTop="6dp"
+            android:max="100"
+            android:progress="0"
+            android:progressDrawable="@drawable/progress_rounded" />
+    </LinearLayout>
+</LinearLayout>
