@@ -27,7 +27,7 @@
             android:id="@+id/tv_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/transaction_history_title"
+            android:text="Lịch sử giao dịch"
             android:textColor="@color/neutral_900"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -38,32 +38,19 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <HorizontalScrollView
+        android:id="@+id/scroll_months"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="none">
 
         <LinearLayout
+            android:id="@+id/layout_month_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:paddingStart="16dp"
             android:paddingEnd="16dp">
 
-            <TextView
-                style="@style/MonthChip"
-                android:text="@string/month_1" />
-            <TextView
-                style="@style/MonthChip"
-                android:text="@string/month_2" />
-            <TextView
-                style="@style/MonthChip.Selected"
-                android:text="@string/month_3" />
-            <TextView
-                style="@style/MonthChip"
-                android:text="@string/month_4" />
-            <TextView
-                style="@style/MonthChip"
-                android:text="@string/month_5" />
         </LinearLayout>
     </HorizontalScrollView>
 
@@ -73,6 +60,4 @@
         android:layout_height="match_parent"
         android:padding="16dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/item_transaction" />
-
-</LinearLayout>
+        tools:listitem="@layout/item_transaction_stat" /> </LinearLayout>

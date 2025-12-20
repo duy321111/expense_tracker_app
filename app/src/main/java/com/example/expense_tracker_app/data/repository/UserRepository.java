@@ -1,6 +1,9 @@
 package com.example.expense_tracker_app.data.repository;
 
+import android.app.Application;
 import android.content.Context;
+import android.util.Log;
+
 import com.example.expense_tracker_app.data.database.AppDatabase;
 import com.example.expense_tracker_app.data.database.UserDao;
 import com.example.expense_tracker_app.data.datasource.UserLocalDataSource;
@@ -8,41 +11,44 @@ import com.example.expense_tracker_app.data.model.User;
 
 public class UserRepository {
 
-    private UserDao userDao; // Dùng DAO thay vì DatabaseHandler
+    private UserDao userDao;
     private UserLocalDataSource localDataSource;
 
+    // Constructor cho Application (dùng trong ViewModel)
+    public UserRepository(Application application) {
+        AppDatabase db = AppDatabase.getInstance(application);
+        userDao = db.userDao();
+        localDataSource = new UserLocalDataSource(application);
+    }
+
+    // Constructor cho Context (dùng trong Activity nếu cần)
     public UserRepository(Context context) {
-        // Khởi tạo Room Database
         AppDatabase db = AppDatabase.getInstance(context);
         userDao = db.userDao();
-
         localDataSource = new UserLocalDataSource(context);
     }
 
-    // Room: insert user
+    // Đăng ký: Trả về true nếu thành công
     public boolean registerUser(User user) {
         try {
             long id = userDao.insertUser(user);
-            return id > 0; // Nếu id > 0 nghĩa là thêm thành công
+            return id > 0; // Nếu id > 0 nghĩa là insert thành công
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("UserRepository", "Register error", e);
             return false;
         }
     }
 
-    // Room: check login
+    // Đăng nhập: Kiểm tra DB -> Lưu vào Local
     public boolean checkLogin(String email, String password) {
         try {
-            // Room tự map dữ liệu vào object User, không cần Cursor nữa
             User user = userDao.checkLogin(email, password);
-
             if (user != null) {
-                // Lưu vào SharedPreferences như cũ
                 localDataSource.saveLoggedInUser(user);
                 return true;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("UserRepository", "Login error", e);
         }
         return false;
     }

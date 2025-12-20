@@ -2,39 +2,45 @@ package com.example.expense_tracker_app.data.model;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "users") // Định nghĩa tên bảng
+@Entity(tableName = "users")
 public class User {
 
-    @PrimaryKey(autoGenerate = true) // Tự động tăng ID
-    private int id;
+    @PrimaryKey(autoGenerate = true)
+    public int id; // ID tự tăng
 
     @ColumnInfo(name = "full_name")
-    private String fullName;
+    public String fullName;
 
     @ColumnInfo(name = "email")
-    private String email;
+    public String email;
 
     @ColumnInfo(name = "password")
-    private String password;
+    public String password;
 
-    // Constructor (Room cần 1 constructor rỗng hoặc đầy đủ, ta dùng cái này)
+    @ColumnInfo(name = "profile_image_path")
+    public String profileImagePath;
+
+    // Constructor mặc định cho Room
+    public User() { }
+
+    // Constructor đầy đủ (dành cho Room khi đọc dữ liệu)
+    public User(int id, String fullName, String email, String password, String profileImagePath) {
+        this.id = id;
+        this.fullName = fullName;
+        this.email = email;
+        this.password = password;
+        this.profileImagePath = profileImagePath;
+    }
+
+    // Constructor dùng để tạo User mới (ID tự sinh, ảnh rỗng)
+    @Ignore
     public User(String fullName, String email, String password) {
         this.fullName = fullName;
         this.email = email;
         this.password = password;
+        this.profileImagePath = "";
     }
-
-    // Getter & Setter cho ID (Bắt buộc phải thêm vì có trường id mới)
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-
-    // ... Giữ nguyên các Getter/Setter cũ của fullName, email, password
-    public String getFullName() { return fullName; }
-    public void setFullName(String fullName) { this.fullName = fullName; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
 }

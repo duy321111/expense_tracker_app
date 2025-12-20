@@ -1,77 +1,120 @@
 package com.example.expense_tracker_app.ui;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
 import android.os.Bundle;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
-import android.widget.Toast;
-import com.example.expense_tracker_app.data.model.TransactionItem;
-import com.example.expense_tracker_app.ui.adapter.TransactionAdapter;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.example.expense_tracker_app.ui.adapter.TransactionAdapter;
 import com.example.expense_tracker_app.R;
+import com.example.expense_tracker_app.data.repository.TransactionRepository;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
 
 public class TransactionHistoryFragment extends AppCompatActivity {
 
     private RecyclerView rvTransactions;
     private ImageView btnBack;
-    private TransactionAdapter adapter; // Bỏ comment khi bạn tạo Adapter
+    private LinearLayout layoutMonthContainer;
+    private HorizontalScrollView scrollMonths;
+
+    private TransactionAdapter adapter;
+    private TransactionRepository repository;
+
+    // Biến lưu tháng đang chọn (Mặc định là hôm nay)
+    private LocalDate selectedDate = LocalDate.now();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_transaction_history); // đổi layout nếu muốn
+        setContentView(R.layout.fragment_transaction_history);
 
-        // 1. Tìm Views
+        // 1. Ánh xạ View
         rvTransactions = findViewById(R.id.rv_transactions);
         btnBack = findViewById(R.id.btn_back);
+        layoutMonthContainer = findViewById(R.id.layout_month_container); // ID mới thêm trong XML
+        scrollMonths = findViewById(R.id.scroll_months);
 
-        // 2. Khởi tạo RecyclerView
-        setupRecyclerView();
+        // 2. Setup RecyclerView
+        rvTransactions.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new TransactionAdapter(this);
+        rvTransactions.setAdapter(adapter);
 
-        // 3. Gán sự kiện cho nút "Quay lại"
+        // 3. Khởi tạo Repository
+        repository = new TransactionRepository(getApplication());
+
+        // 4. Xử lý sự kiện
         btnBack.setOnClickListener(v -> finish());
 
-        // TODO: Thêm logic xử lý sự kiện cho các TextView chip Tháng (Tháng 1, Tháng 2...)
+        // 5. Tạo danh sách tháng và tải dữ liệu
+        setupMonthTabs();
+        loadDataForSelectedMonth();
     }
 
-    /**
-     * Khởi tạo RecyclerView và gán Adapter giả lập
-     */
-    private void setupRecyclerView() {
-        rvTransactions.setLayoutManager(new LinearLayoutManager(this));
+    private void setupMonthTabs() {
+        layoutMonthContainer.removeAllViews(); // Xóa sạch views cũ nếu có
 
-        // Tạm thời sử dụng một List trống hoặc List giả lập
-        List<TransactionItem> transactionList = createDummyData();
+        int currentMonth = selectedDate.getMonthValue(); // Tháng hiện tại (ví dụ 12)
+        int currentYear = selectedDate.getYear();
 
-        // TODO: Thay thế bằng Adapter và Model thật của bạn
-        adapter = new TransactionAdapter(this, transactionList);
+        // Vòng lặp tạo 12 tháng
+        for (int i = 1; i <= 12; i++) {
+            TextView tvMonth = new TextView(this);
+            tvMonth.setText("Tháng " + i);
+            tvMonth.setPadding(32, 16, 32, 16);
+            tvMonth.setTextSize(14);
 
-        rvTransactions.setAdapter(adapter);
+            // Layout params để có khoảng cách
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(8, 0, 8, 0);
+            tvMonth.setLayoutParams(params);
+
+            // Kiểm tra xem có phải tháng đang chọn không
+            if (i == currentMonth) {
+                // Style cho tháng ĐƯỢC CHỌN (Đậm, màu đen)
+                tvMonth.setTextColor(getColor(R.color.neutral_900)); // Màu đen
+                tvMonth.setTypeface(ResourcesCompat.getFont(this, R.font.bold)); // Font đậm
+                // Nếu bạn có drawable gạch chân dưới thì setBackground ở đây
+            } else {
+                // Style cho tháng THƯỜNG (Nhạt, thường)
+                tvMonth.setTextColor(getColor(R.color.neutral_500)); // Màu xám
+                tvMonth.setTypeface(ResourcesCompat.getFont(this, R.font.regular));
+            }
+
+            final int monthToLoad = i;
+            tvMonth.setOnClickListener(v -> {
+                // Cập nhật ngày đang chọn
+                selectedDate = LocalDate.of(currentYear, monthToLoad, 1);
+                // Vẽ lại danh sách tháng (để cập nhật màu đậm/nhạt)
+                setupMonthTabs();
+                // Tải lại dữ liệu
+                loadDataForSelectedMonth();
+            });
+
+            layoutMonthContainer.addView(tvMonth);
+
+            // Tự động cuộn tới tháng hiện tại lúc mở app
+            if (i == currentMonth) {
+                scrollMonths.post(() -> scrollMonths.smoothScrollTo(tvMonth.getLeft(), 0));
+            }
+        }
     }
 
-    // Hàm tạo dữ liệu giả lập cho RecyclerView
-    private List<TransactionItem> createDummyData() {
-        List<TransactionItem> data = new ArrayList<>();
-
-        // Dữ liệu giả lập (Giống hình ảnh bạn cung cấp)
-        // Tham chiếu R.drawable.ic_... phải là tên file icon chính xác của bạn
-        data.add(new TransactionItem("Điện", "Tiền mặt", "-250.000 đ", R.drawable.ic_settings, true));
-        data.add(new TransactionItem("Nước", "Tiền mặt", "-100.000 đ", R.drawable.ic_close, true));
-        data.add(new TransactionItem("Internet", "Chuyển khoản", "-165.000 đ", R.drawable.ic_notification, true));
-        data.add(new TransactionItem("Ăn uống", "Tiền mặt", "-50.000 đ", R.drawable.ic_food, true));
-
-        // Thêm một giao dịch thu nhập để kiểm tra màu sắc
-        data.add(new TransactionItem("Lương", "Ngân hàng", "+15.000.000 đ", R.drawable.ic_money_bag, false));
-
-        data.add(new TransactionItem("GAS", "Tiền mặt", "-120.000 đ", R.drawable.ic_fooddrinks, true));
-        data.add(new TransactionItem("Thuê nhà", "Chuyển khoản", "-1.500.000 đ", R.drawable.ic_rent_house, true));
-
-        return data;
+    private void loadDataForSelectedMonth() {
+        // Gọi repository lấy dữ liệu theo tháng đang chọn
+        // userId = 1 (Ví dụ)
+        repository.getTransactionsByMonth(1, selectedDate).observe(this, transactions -> {
+            if (transactions != null) {
+                adapter.setData(transactions);
+            }
+        });
     }
 }
