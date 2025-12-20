@@ -14,7 +14,8 @@
         android:background="@color/white"
         app:navigationIcon="@drawable/ic_back"
         app:titleCentered="true"
-        app:titleTextAppearance="@style/Heading3"
+        app:titleTextColor="@color/primary_1"
+        app:titleTextAppearance="@style/Heading5"
         app:title="Giao dịch gần đây" />
 
     <!-- Nội dung -->
@@ -97,7 +98,7 @@
                     android:layout_marginBottom="8dp"
                     android:gravity="center">
 
-                    <com.example.expense_tracker_app.ui.view.DonutChartView
+                    <com.example.expense_tracker_app.ui.DonutChartView
                         android:id="@+id/donutChart"
                         android:layout_width="200dp"
                         android:layout_height="200dp"

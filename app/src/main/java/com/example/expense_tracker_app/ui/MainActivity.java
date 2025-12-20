@@ -4,16 +4,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.animation.AnimationSet;
 import android.view.animation.AlphaAnimation;
+import android.view.animation.AnimationSet;
 import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.expense_tracker_app.R;
+import com.example.expense_tracker_app.ui.Auth.Login;
 
 public class MainActivity extends AppCompatActivity {
+
 
     private static final int SPLASH_DELAY = 2000; // 2 giây
 

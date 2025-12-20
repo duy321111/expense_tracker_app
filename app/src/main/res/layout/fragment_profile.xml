@@ -18,14 +18,16 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingBottom="16dp">
+            android:paddingBottom="16dp"
+            android:background="@drawable/modal_bg">
 
             <ImageView
                 android:id="@+id/img_avatar"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
+
                 android:contentDescription="@string/cd_user_avatar"
-                android:src="@drawable/ic_launcher_background" />
+                android:src="@drawable/cute" />
 
             <!-- SỬA LỖI: Đã tách TextView ra khỏi ImageView & Dùng @string -->
             <TextView

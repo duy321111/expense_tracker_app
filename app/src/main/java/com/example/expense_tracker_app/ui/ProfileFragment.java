@@ -5,16 +5,15 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
 import com.example.expense_tracker_app.R;
+import com.example.expense_tracker_app.ui.Auth.Login;
 
 public class ProfileFragment extends Fragment {
 
-    // SỬA: Khai báo các biến View (như các nút bấm) ở đây
+    // Khai báo các nút
     private View btnAccountInfo;
     private View btnTransactionHistory;
     private View btnMyWallets;
@@ -22,7 +21,10 @@ public class ProfileFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        // Inflate layout fragment
         return inflater.inflate(R.layout.fragment_profile, container, false);
     }
 
@@ -30,47 +32,33 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // --- 1. ÁNH XẠ CÁC NÚT BẤM ---
-        // Ánh xạ các biến đã khai báo ở đầu class
+        // --- 1. Ánh xạ các nút bấm ---
         btnAccountInfo = view.findViewById(R.id.btn_account_info);
         btnTransactionHistory = view.findViewById(R.id.btn_transaction_history);
         btnMyWallets = view.findViewById(R.id.btn_my_wallets);
-        btnLogout = view.findViewById(R.id.btn_logout); // Đã ánh xạ nút Đăng xuất
+        btnLogout = view.findViewById(R.id.btn_logout);
 
+        // --- 2. Gán hành động click ---
+        btnAccountInfo.setOnClickListener(v ->
+                startActivity(new Intent(getActivity(), AccountInfoFragment.class)));
 
-        // --- 2. GÁN HÀNH ĐỘNG CLICK ĐỂ ĐIỀU HƯỚNG ---
+        btnTransactionHistory.setOnClickListener(v ->
+                startActivity(new Intent(getActivity(), TransactionHistoryFragment.class)));
 
-        // Trỏ tới "Account Info"
-        btnAccountInfo.setOnClickListener(v -> {
-            NavHostFragment.findNavController(ProfileFragment.this)
-                    .navigate(R.id.action_profileFragment_to_accountInfoFragment);
-        });
+        btnMyWallets.setOnClickListener(v ->
+                startActivity(new Intent(getActivity(), MyWalletsFragment.class)));
 
-        // Trỏ tới "Transaction History"
-        btnTransactionHistory.setOnClickListener(v -> {
-            NavHostFragment.findNavController(ProfileFragment.this)
-                    .navigate(R.id.action_profileFragment_to_transactionHistoryFragment);
-        });
-
-        // Trỏ tới "My Wallets"
-        btnMyWallets.setOnClickListener(v -> {
-            NavHostFragment.findNavController(ProfileFragment.this)
-                    .navigate(R.id.action_profileFragment_to_myWalletsFragment);
-        });
-
-        // Logic Đăng xuất
         btnLogout.setOnClickListener(v -> {
-            // 1. Khởi tạo Intent bằng requireActivity().getApplicationContext()
-            // Đảm bảo tên class Login là chính xác
+            // 1. Khởi tạo Intent tới Login
             Intent intent = new Intent(requireActivity().getApplicationContext(), Login.class);
 
-            // 2. Sử dụng cờ FLAG để xóa stack (Activity Profile và Home)
+            // 2. Xóa stack Activity
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
 
-            // 3. Sử dụng requireActivity().startActivity(intent) để khởi chạy
+            // 3. Bắt đầu Activity Login
             requireActivity().startActivity(intent);
 
-            // 4. Kết thúc Activity cha (ProfileActivity)
+            // 4. Kết thúc Activity cha
             requireActivity().finish();
         });
     }

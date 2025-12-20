@@ -1,68 +1,61 @@
 package com.example.expense_tracker_app.ui;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import com.example.expense_tracker_app.R;
+import static androidx.core.content.ContentProviderCompat.requireContext;
 
-// SỬA: Thêm các import mới
+import android.os.Bundle;
+import android.widget.ImageView;
+import android.widget.Toast;
 import com.example.expense_tracker_app.data.model.TransactionItem;
 import com.example.expense_tracker_app.ui.adapter.TransactionAdapter;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.expense_tracker_app.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TransactionHistoryFragment extends Fragment {
+public class TransactionHistoryFragment extends AppCompatActivity {
 
     private RecyclerView rvTransactions;
     private ImageView btnBack;
-    private TransactionAdapter adapter; // Bỏ comment và sử dụng adapter thật
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_transaction_history, container, false);
-    }
+    private TransactionAdapter adapter; // Bỏ comment khi bạn tạo Adapter
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.fragment_transaction_history); // đổi layout nếu muốn
 
         // 1. Tìm Views
-        rvTransactions = view.findViewById(R.id.rv_transactions);
-        btnBack = view.findViewById(R.id.btn_back);
+        rvTransactions = findViewById(R.id.rv_transactions);
+        btnBack = findViewById(R.id.btn_back);
 
         // 2. Khởi tạo RecyclerView
         setupRecyclerView();
 
         // 3. Gán sự kiện cho nút "Quay lại"
-        btnBack.setOnClickListener(v -> {
-            NavHostFragment.findNavController(TransactionHistoryFragment.this).popBackStack();
-        });
+        btnBack.setOnClickListener(v -> finish());
 
         // TODO: Thêm logic xử lý sự kiện cho các TextView chip Tháng (Tháng 1, Tháng 2...)
     }
 
+    /**
+     * Khởi tạo RecyclerView và gán Adapter giả lập
+     */
     private void setupRecyclerView() {
-        rvTransactions.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvTransactions.setLayoutManager(new LinearLayoutManager(this));
 
-        // SỬA: Lấy dữ liệu giả lập là List<TransactionItem>
+        // Tạm thời sử dụng một List trống hoặc List giả lập
         List<TransactionItem> transactionList = createDummyData();
 
-        // SỬA: Khởi tạo và gán Adapter thật
-        adapter = new TransactionAdapter(requireContext(), transactionList);
+        // TODO: Thay thế bằng Adapter và Model thật của bạn
+        adapter = new TransactionAdapter(this, transactionList);
+
         rvTransactions.setAdapter(adapter);
     }
 
-    // SỬA: Hàm tạo dữ liệu giả lập phải trả về List<TransactionItem>
+    // Hàm tạo dữ liệu giả lập cho RecyclerView
     private List<TransactionItem> createDummyData() {
         List<TransactionItem> data = new ArrayList<>();
 

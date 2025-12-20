@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="horizontal" android:gravity="center_vertical"
+    android:padding="8dp">
+    <ImageView android:id="@+id/ivPrev" android:layout_width="24dp" android:layout_height="24dp"
+        android:src="@drawable/ic_chevron_left"/>
+    <TextView android:id="@+id/tvYear" android:layout_width="0dp" android:layout_height="wrap_content"
+        android:layout_weight="1" android:text="2025" android:textStyle="bold" android:gravity="center"/>
+    <ImageView android:id="@+id/ivNext" android:layout_width="24dp" android:layout_height="24dp"
+        android:src="@drawable/ic_chevron_right"/>
+</LinearLayout>
