@@ -1,419 +1,490 @@
 package com.example.expense_tracker_app.ui;
 
+import android.graphics.Color;
+import android.view.Gravity;
+import android.widget.GridLayout;
+import android.content.Context;
+import android.widget.ImageView;
+import android.widget.FrameLayout;
+import android.net.Uri;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.expense_tracker_app.R;
-import com.example.expense_tracker_app.adapter.TypePickerAdapter;
 import com.example.expense_tracker_app.data.model.Category;
 import com.example.expense_tracker_app.data.model.TxType;
-import com.example.expense_tracker_app.databinding.FragmentAddBinding;
 import com.example.expense_tracker_app.viewmodel.AddTxViewModel;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 
 public class AddTransactionFragment extends Fragment {
 
-    private FragmentAddBinding b;
-    private AddTxViewModel vm;
-    private boolean showDetails = false;
+    private AddTxViewModel viewModel;
+
+    // Views
+    private EditText etAmount;
+    private LinearLayout rowType, rowCategory, rowDate;
+    private TextView tvType, tvCategory, tvDate;
+    private LinearLayout optCash, optTransfer;
+    private Button btnSave;
+    private View toolbar;
+
+    // Views Chi tiết
+    private TextView btnToggleDetail;
+    private LinearLayout layoutDetail;
+    private LinearLayout rowNote, rowLocation, rowImage;
+    private SwitchCompat switchReport;
+    private TextView tvReportHint;
+    private TextView tvImageStatus;
+
+    private ActivityResultLauncher<String> pickImageLauncher;
+
+    private final List<String> AVAILABLE_ICONS = Arrays.asList(
+            "ic_cat_food", "ic_cat_coffee", "ic_cat_groceries",
+            "ic_cat_transport", "ic_cat_home",
+            "ic_cat_health", "ic_cat_car_service", "ic_cat_insurance",
+            "ic_cat_sport", "ic_cat_music", "ic_cat_travel", "ic_cat_gamepad"
+    );
+    private String selectedIconName = "ic_cat_food";
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater i, @Nullable ViewGroup c, @Nullable Bundle s) {
-        b = FragmentAddBinding.inflate(i, c, false);
-        vm = new ViewModelProvider(this).get(AddTxViewModel.class);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_add, container, false);
+        viewModel = new ViewModelProvider(this).get(AddTxViewModel.class);
 
-        // back
-        b.toolbar.setNavigationOnClickListener(v ->
-                requireActivity().getSupportFragmentManager().popBackStack());
+        initViews(view);
+        registerImagePicker();
+        setupEvents();
+        observeViewModel();
+        return view;
+    }
 
-        // menu "Clear"
+    private void registerImagePicker() {
+        pickImageLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
+            if (uri != null) {
+                String internalPath = saveImageToInternalStorage(uri);
+                if (internalPath != null) {
+                    viewModel.imagePath.setValue(internalPath);
+                    Toast.makeText(getContext(), "Đã lưu ảnh!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Lỗi khi lưu ảnh", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
 
+    private String saveImageToInternalStorage(Uri sourceUri) {
+        try {
+            String fileName = "img_" + System.currentTimeMillis() + ".jpg";
+            File file = new File(requireContext().getFilesDir(), fileName);
+            InputStream inputStream = requireContext().getContentResolver().openInputStream(sourceUri);
+            FileOutputStream outputStream = new FileOutputStream(file);
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) > 0) outputStream.write(buffer, 0, length);
+            outputStream.close();
+            inputStream.close();
+            return Uri.fromFile(file).toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
-        // mở chọn loại
-        View.OnClickListener openType = v -> openTypeSheet();
-        b.rowType.setOnClickListener(openType);
-        b.ivType.setOnClickListener(openType);
+    private void initViews(View view) {
+        toolbar = view.findViewById(R.id.toolbar);
+        etAmount = view.findViewById(R.id.etAmount);
+        rowType = view.findViewById(R.id.row_type);
+        tvType = view.findViewById(R.id.tv_type);
+        rowCategory = view.findViewById(R.id.row_category);
+        tvCategory = view.findViewById(R.id.tv_category);
+        rowDate = view.findViewById(R.id.row_date);
+        tvDate = view.findViewById(R.id.tv_date);
+        optCash = view.findViewById(R.id.opt_cash);
+        optTransfer = view.findViewById(R.id.opt_transfer);
+        btnSave = view.findViewById(R.id.btnSave);
+        btnToggleDetail = view.findViewById(R.id.btnToggleDetail);
+        layoutDetail = view.findViewById(R.id.layout_detail);
+        rowNote = view.findViewById(R.id.row_note);
+        rowLocation = view.findViewById(R.id.row_location);
+        rowImage = view.findViewById(R.id.row_image);
+        switchReport = view.findViewById(R.id.switchReport);
+        tvReportHint = view.findViewById(R.id.tv_report_hint);
 
-        // mở chọn danh mục
-        View.OnClickListener openCat = v -> openCategorySheet();
-        b.rowCategory.setOnClickListener(openCat);
-        b.ivCategory.setOnClickListener(openCat);
+        if (rowImage != null && rowImage.getChildCount() > 0) {
+            for (int i = 0; i < rowImage.getChildCount(); i++) {
+                View child = rowImage.getChildAt(i);
+                if (child instanceof TextView) {
+                    tvImageStatus = (TextView) child;
+                    break;
+                }
+            }
+        }
+    }
 
-        // chọn phương thức
-        b.optCash.setOnClickListener(v -> selectMethod("Tiền mặt"));
-        b.optTransfer.setOnClickListener(v -> selectMethod("Chuyển khoản"));
-        if (vm.method.getValue() != null) selectMethod(vm.method.getValue());
+    private void setupEvents() {
+        if (toolbar != null) toolbar.setOnClickListener(v -> requireActivity().onBackPressed());
 
-        // chọn ngày
-        b.rowDate.setOnClickListener(v -> showDatePicker());
-
-        // Ẩn chi tiết mặc định
-        setDetailsVisible(false);
-
-// Gán nội dung hint cho phần báo cáo
-        b.tvReportHint.setText("Không ghi giao dịch này vào báo cáo, dù có ở Tổng quan.");
-
-// Nút toggle chi tiết
-        b.btnToggleDetail.setOnClickListener(v -> {
-            showDetails = !showDetails;
-            setDetailsVisible(showDetails);
-            b.btnToggleDetail.setText(showDetails ? "Ẩn chi tiết ⌃" : "Hiển thị chi tiết ⌄");
-            b.btnToggleDetail.setBackgroundResource(showDetails
-                    ? R.drawable.bg_card_primary_5
-                    : R.drawable.bg_card_neutral_50);
+        etAmount.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                viewModel.amount.setValue(s.toString());
+                boolean hasMoney = s.length() > 0;
+                btnSave.setEnabled(hasMoney);
+                btnSave.setAlpha(hasMoney ? 1.0f : 0.5f);
+            }
+            @Override public void afterTextChanged(Editable s) {}
         });
 
+        rowType.setOnClickListener(v -> showTypePickerDialog());
+        rowCategory.setOnClickListener(v -> showCategoryPickerDialog());
+        rowDate.setOnClickListener(v -> showDatePicker());
 
-        // observe
-        vm.date.observe(getViewLifecycleOwner(), d ->
-                b.tvDate.setText(String.format(java.util.Locale.getDefault(),
-                        "%02d/%02d/%d", d.getDayOfMonth(), d.getMonthValue(), d.getYear())));
+        // --- SỬA LOGIC CHỌN VÍ ---
+        optCash.setOnClickListener(v -> {
+            viewModel.method.setValue("Tiền mặt");
+            updateMethodUI(true);
+        });
 
-        vm.type.observe(getViewLifecycleOwner(), t ->
-                b.tvType.setText(t == TxType.INCOME ? "Thu nhập" : "Chi tiêu"));
+        optTransfer.setOnClickListener(v -> {
+            viewModel.method.setValue("Chuyển khoản"); // Đảm bảo tên này khớp với ví bạn tạo
+            updateMethodUI(false);
+        });
+        // -------------------------
 
-        vm.category.observe(getViewLifecycleOwner(), cata -> {
-            if (cata != null) {
-                b.tvCategory.setText(cata.name);
-                b.tvCategory.setTextColor(requireContext().getColor(R.color.primary_1));
+        btnToggleDetail.setOnClickListener(v -> {
+            if (layoutDetail.getVisibility() == View.VISIBLE) {
+                layoutDetail.setVisibility(View.GONE);
+                btnToggleDetail.setText("Hiển thị chi tiết ⌄");
             } else {
-                b.tvCategory.setText("Chọn danh mục");
-                b.tvCategory.setTextColor(requireContext().getColor(R.color.neutral_900));
-            }
-            updateSaveEnabled();
-        });
-
-        b.etAmount.addTextChangedListener(new SimpleTextWatcher(this::updateSaveEnabled));
-
-        b.btnSave.setOnClickListener(v -> {
-            if (!b.btnSave.isEnabled()) return;
-            vm.amount.setValue(b.etAmount.getText().toString().replaceAll("[^0-9]", ""));
-            vm.submit();
-        });
-
-        vm.done.observe(getViewLifecycleOwner(), ok -> {
-            if (Boolean.TRUE.equals(ok)) {
-                Toast.makeText(requireContext(), "Thêm thành công", Toast.LENGTH_SHORT).show();
-                resetForm(); // ở lại màn hình thêm
-                vm.done.setValue(false);
+                layoutDetail.setVisibility(View.VISIBLE);
+                btnToggleDetail.setText("Ẩn chi tiết ⌃");
             }
         });
 
-        // mặc định
-        if (vm.date.getValue() == null) vm.date.setValue(LocalDate.now());
-        if (vm.type.getValue() == null) vm.type.setValue(TxType.EXPENSE);
-        selectMethod("Tiền mặt");
-        updateSaveEnabled();
-        bindEnableSave();
+        rowNote.setOnClickListener(v -> {
+            EditText input = new EditText(getContext());
+            input.setHint("Nhập ghi chú...");
+            input.setText(viewModel.note.getValue());
+            new AlertDialog.Builder(getContext()).setTitle("Ghi chú").setView(input)
+                    .setPositiveButton("OK", (d, w) -> viewModel.note.setValue(input.getText().toString()))
+                    .setNegativeButton("Hủy", null).show();
+        });
 
-        return b.getRoot();
+        rowLocation.setOnClickListener(v -> {
+            EditText input = new EditText(getContext());
+            input.setHint("Nhập địa điểm...");
+            input.setText(viewModel.location.getValue());
+            new AlertDialog.Builder(getContext()).setTitle("Địa điểm").setView(input)
+                    .setPositiveButton("OK", (d, w) -> viewModel.location.setValue(input.getText().toString()))
+                    .setNegativeButton("Hủy", null).show();
+        });
+
+        rowImage.setOnClickListener(v -> pickImageLauncher.launch("image/*"));
+
+        switchReport.setOnCheckedChangeListener((btn, isChecked) -> {
+            viewModel.excludeReport.setValue(isChecked);
+            tvReportHint.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            if(isChecked) tvReportHint.setText("Giao dịch này sẽ không tính vào báo cáo.");
+        });
+
+        btnSave.setOnClickListener(v -> viewModel.submit());
     }
 
-    private void setDetailsVisible(boolean visible) {
-        b.layoutDetail.setVisibility(visible ? View.VISIBLE : View.GONE);
+    private void observeViewModel() {
+        viewModel.date.observe(getViewLifecycleOwner(), d -> tvDate.setText(d.getDayOfMonth() + "/" + d.getMonthValue() + "/" + d.getYear()));
+        viewModel.type.observe(getViewLifecycleOwner(), t -> {
+            String s = "Chi tiêu"; if (t == TxType.INCOME) s = "Thu nhập";
+            tvType.setText(s); tvCategory.setText("Chọn danh mục");
+        });
+        viewModel.category.observe(getViewLifecycleOwner(), c -> { if (c != null) tvCategory.setText(c.name); });
+
+        // Cập nhật UI nút ví khi viewModel thay đổi
+        viewModel.method.observe(getViewLifecycleOwner(), m -> updateMethodUI("Tiền mặt".equals(m)));
+
+        viewModel.imagePath.observe(getViewLifecycleOwner(), path -> {
+            if (tvImageStatus != null) {
+                if (path != null && !path.isEmpty()) {
+                    tvImageStatus.setText("Đã chọn 1 ảnh");
+                    tvImageStatus.setTextColor(getResources().getColor(R.color.primary_1, null));
+                } else {
+                    tvImageStatus.setText("Thêm hình ảnh");
+                    tvImageStatus.setTextColor(getResources().getColor(R.color.neutral_700, null));
+                }
+            }
+        });
+        viewModel.done.observe(getViewLifecycleOwner(), done -> {
+            if (done) {
+                Toast.makeText(getContext(), "Lưu thành công", Toast.LENGTH_SHORT).show();
+                viewModel.done.setValue(false);
+                if (getActivity() != null) getActivity().getOnBackPressedDispatcher().onBackPressed();
+            }
+        });
     }
 
-    private void showDatePicker() {
-        LocalDate d = vm.date.getValue() == null ? LocalDate.now() : vm.date.getValue();
-        Calendar cal = Calendar.getInstance();
-        cal.set(d.getYear(), d.getMonthValue() - 1, d.getDayOfMonth());
-        DatePickerDialog dialog = new DatePickerDialog(
-                requireContext(),
-                (view, year, month, dayOfMonth) ->
-                        vm.date.setValue(LocalDate.of(year, month + 1, dayOfMonth)),
-                cal.get(Calendar.YEAR),
-                cal.get(Calendar.MONTH),
-                cal.get(Calendar.DAY_OF_MONTH)
-        );
+    // ... (Các hàm dialog giữ nguyên) ...
+
+    private void showTypePickerDialog() {
+        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
+        dialog.setContentView(R.layout.sheet_pick_type);
+        RecyclerView rv = dialog.findViewById(R.id.rvTypes);
+        if (rv != null) {
+            rv.setLayoutManager(new LinearLayoutManager(getContext()));
+            List<TxType> list = Arrays.asList(TxType.INCOME, TxType.EXPENSE, TxType.BORROW, TxType.LEND);
+            rv.setAdapter(new TypeAdapter(requireContext(), list, type -> {
+                viewModel.type.setValue(type);
+                dialog.dismiss();
+            }));
+        }
         dialog.show();
     }
 
-    private void selectMethod(String method) {
-        vm.method.setValue(method);
-        b.optCash.setBackgroundResource(R.drawable.bg_card_neutral_50);
-        b.optTransfer.setBackgroundResource(R.drawable.bg_card_neutral_50);
-        if ("Tiền mặt".equals(method)) b.optCash.setBackgroundResource(R.drawable.bg_card_primary_5);
-        if ("Chuyển khoản".equals(method)) b.optTransfer.setBackgroundResource(R.drawable.bg_card_primary_5);
-        updateSaveEnabled();
-    }
+    private void showCategoryPickerDialog() {
+        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
+        View sheet = getLayoutInflater().inflate(R.layout.sheet_pick_category, null);
+        dialog.setContentView(sheet);
 
-    private void openTypeSheet() {
-        BottomSheetDialog d = new BottomSheetDialog(requireContext(), R.style.AppBottomSheetDialog);
-        View sheet = LayoutInflater.from(getContext()).inflate(R.layout.sheet_pick_type, null, false);
-        androidx.recyclerview.widget.RecyclerView rv = sheet.findViewById(R.id.rvTypes);
+        bindCat(sheet, dialog, R.id.cat_food, "Ăn uống", "ic_cat_food");
+        bindCat(sheet, dialog, R.id.cat_coffee, "Cà phê", "ic_cat_coffee");
+        bindCat(sheet, dialog, R.id.cat_groceries_market, "Đi chợ/Siêu thị", "ic_cat_groceries");
+        bindCat(sheet, dialog, R.id.cat_electric, "Điện", "ic_cat_electric");
+        bindCat(sheet, dialog, R.id.cat_water, "Nước", "ic_cat_water");
+        bindCat(sheet, dialog, R.id.cat_internet, "Internet", "ic_cat_internet");
+        bindCat(sheet, dialog, R.id.cat_transport, "Di chuyển", "ic_cat_transport");
+        bindCat(sheet, dialog, R.id.cat_tv, "TV", "ic_cat_tv");
+        bindCat(sheet, dialog, R.id.cat_gas, "GAS", "ic_cat_gas");
+        bindCat(sheet, dialog, R.id.cat_rent, "Thuê nhà", "ic_cat_home");
+        bindCat(sheet, dialog, R.id.cat_phone, "Điện thoại", "ic_cat_phone");
+        bindCat(sheet, dialog, R.id.cat_study, "Học tập", "ic_cat_study");
+        bindCat(sheet, dialog, R.id.cat_health, "Khám sức khỏe", "ic_cat_health");
+        bindCat(sheet, dialog, R.id.cat_vehicle, "Bảo dưỡng xe", "ic_cat_car_service");
+        bindCat(sheet, dialog, R.id.cat_insurance, "Bảo hiểm", "ic_cat_insurance");
+        bindCat(sheet, dialog, R.id.cat_sport, "Thể thao", "ic_cat_sport");
+        bindCat(sheet, dialog, R.id.cat_music, "Nhạc", "ic_cat_music");
+        bindCat(sheet, dialog, R.id.cat_travel, "Du lịch", "ic_cat_travel");
+        bindCat(sheet, dialog, R.id.cat_games, "Trò chơi", "ic_cat_gamepad");
 
-        List<TypePickerAdapter.TypeItem> items = Arrays.asList(
-                new TypePickerAdapter.TypeItem("Chi tiêu", R.drawable.ic_expense, R.drawable.bg_icon_round_accent_1),
-                new TypePickerAdapter.TypeItem("Thu nhập", R.drawable.ic_income, R.drawable.bg_icon_round_success_1),
-                new TypePickerAdapter.TypeItem("Đi vay", R.drawable.ic_cat_borrow, R.drawable.bg_icon_round_primary_1),
-                new TypePickerAdapter.TypeItem("Cho vay", R.drawable.ic_cat_lend, R.drawable.bg_icon_round_success_1),
-                new TypePickerAdapter.TypeItem("Điều chỉnh số dư", R.drawable.ic_cat_adjust, R.drawable.bg_icon_round_accent_1)
-        );
+        TextView tvOtherTitle = sheet.findViewById(R.id.tvOtherTitle);
+        View cardOther = sheet.findViewById(R.id.cardOther);
+        GridLayout gridOther = sheet.findViewById(R.id.gridOther);
+        Button btnAdd = sheet.findViewById(R.id.btnAddCategory);
 
-        int selected = vm.type.getValue() == TxType.INCOME ? 1 : 0;
+        List<Category> customList = viewModel.getCustomCategories();
+        if (customList != null && !customList.isEmpty()) {
+            tvOtherTitle.setVisibility(View.VISIBLE);
+            cardOther.setVisibility(View.VISIBLE);
 
-        TypePickerAdapter ad = new TypePickerAdapter(items, selected, (item, pos) -> {
-            vm.type.setValue("Thu nhập".equals(item.name) ? TxType.INCOME : TxType.EXPENSE);
-            d.dismiss();
-        });
+            for (Category cat : customList) {
+                LinearLayout itemLayout = new LinearLayout(getContext());
+                itemLayout.setOrientation(LinearLayout.VERTICAL);
+                itemLayout.setGravity(Gravity.CENTER);
+                itemLayout.setPadding(10, 20, 10, 20);
 
-        rv.setLayoutManager(new LinearLayoutManager(getContext()));
-        rv.setAdapter(ad);
+                FrameLayout iconBackground = new FrameLayout(getContext());
+                int bgSize = (int) (50 * getResources().getDisplayMetrics().density); // 50dp
+                LinearLayout.LayoutParams bgParams = new LinearLayout.LayoutParams(bgSize, bgSize);
+                bgParams.bottomMargin = 8;
+                iconBackground.setLayoutParams(bgParams);
+                iconBackground.setBackgroundResource(R.drawable.bg_icon_round_accent_1); // Màu nền
 
-        d.setContentView(sheet);
-        d.setOnShowListener(dialog -> {
-            View bottom = d.findViewById(com.google.android.material.R.id.design_bottom_sheet);
-            if (bottom != null) {
-                BottomSheetBehavior<View> be = BottomSheetBehavior.from(bottom);
-                be.setSkipCollapsed(true);
-                be.setState(BottomSheetBehavior.STATE_EXPANDED);
+                ImageView iv = new ImageView(getContext());
+                int resId = getResources().getIdentifier(cat.icon, "drawable", requireContext().getPackageName());
+                iv.setImageResource(resId != 0 ? resId : R.drawable.ic_category);
+                iv.setColorFilter(Color.WHITE); // Fix: Đổi màu icon thành trắng
+
+                int iconSize = (int) (24 * getResources().getDisplayMetrics().density); // 24dp
+                FrameLayout.LayoutParams imgParams = new FrameLayout.LayoutParams(iconSize, iconSize);
+                imgParams.gravity = Gravity.CENTER;
+                iv.setLayoutParams(imgParams);
+
+                iconBackground.addView(iv);
+
+                TextView tv = new TextView(getContext());
+                tv.setText(cat.name);
+                tv.setGravity(Gravity.CENTER);
+                tv.setTextSize(12);
+                tv.setMaxLines(2);
+
+                itemLayout.addView(iconBackground);
+                itemLayout.addView(tv);
+
+                itemLayout.setOnClickListener(v -> {
+                    viewModel.category.setValue(cat);
+                    dialog.dismiss();
+                });
+
+                GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+                params.width = 0;
+                params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
+                itemLayout.setLayoutParams(params);
+                gridOther.addView(itemLayout);
             }
-        });
-        d.show();
-    }
-
-    private void openCategorySheet() {
-        BottomSheetDialog d = new BottomSheetDialog(requireContext(), R.style.AppBottomSheetDialog);
-        View sheet = LayoutInflater.from(getContext()).inflate(R.layout.sheet_pick_category, null, false);
-
-        // click các danh mục có sẵn
-        View.OnClickListener pick = v -> {
-            int id = v.getId();
-            String name;
-            if (id == R.id.cat_food) name = "Ăn uống";
-            else if (id == R.id.cat_coffee) name = "Cà phê";
-            else if (id == R.id.cat_groceries_market) name = "Đi chợ/Siêu thị";
-            else if (id == R.id.cat_electric) name = "Điện";
-            else if (id == R.id.cat_water) name = "Nước";
-            else if (id == R.id.cat_internet) name = "Internet";
-            else if (id == R.id.cat_transport) name = "Di chuyển";
-            else if (id == R.id.cat_tv) name = "TV";
-            else if (id == R.id.cat_gas) name = "GAS";
-            else if (id == R.id.cat_rent) name = "Thuê nhà";
-            else if (id == R.id.cat_phone) name = "Điện thoại";
-            else if (id == R.id.cat_study) name = "Học tập";
-            else if (id == R.id.cat_health) name = "Khám sức khỏe";
-            else if (id == R.id.cat_vehicle) name = "Bảo dưỡng xe";
-            else if (id == R.id.cat_insurance) name = "Bảo hiểm";
-            else if (id == R.id.cat_sport) name = "Thể thao";
-            else if (id == R.id.cat_music) name = "Nhạc";
-            else if (id == R.id.cat_travel) name = "Du lịch";
-            else if (id == R.id.cat_games) name = "Trò chơi điện tử";
-            else name = "Khác";
-
-            vm.category.setValue(new Category(name));
-            d.dismiss();
-        };
-
-        int[] ids = {
-                R.id.cat_food, R.id.cat_coffee, R.id.cat_groceries_market,
-                R.id.cat_electric, R.id.cat_water, R.id.cat_internet, R.id.cat_transport,
-                R.id.cat_tv, R.id.cat_gas, R.id.cat_rent, R.id.cat_phone,
-                R.id.cat_study, R.id.cat_health, R.id.cat_vehicle, R.id.cat_insurance,
-                R.id.cat_sport, R.id.cat_music, R.id.cat_travel, R.id.cat_games
-        };
-        for (int id : ids) {
-            View v = sheet.findViewById(id);
-            if (v != null) v.setOnClickListener(pick);
         }
 
-        // nút "Thêm danh mục"
-        View btnAdd = sheet.findViewById(R.id.btnAddCategory);
-        if (btnAdd != null) btnAdd.setOnClickListener(v -> {
-            d.dismiss();
-            openCreateCategorySheet();
+        if (btnAdd != null) {
+            btnAdd.setOnClickListener(v -> showAddCategoryDialog(dialog));
+        }
+
+        dialog.show();
+    }
+
+    private void showAddCategoryDialog(BottomSheetDialog parentSheet) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        View view = getLayoutInflater().inflate(R.layout.dialog_add_category, null);
+        builder.setView(view);
+        AlertDialog dialog = builder.create();
+        if(dialog.getWindow() != null) dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        EditText etName = view.findViewById(R.id.etCatName);
+        RecyclerView rvIcons = view.findViewById(R.id.rvIcons);
+        Button btnConfirm = view.findViewById(R.id.btnConfirmAdd);
+
+        rvIcons.setLayoutManager(new GridLayoutManager(getContext(), 5));
+        IconAdapter iconAdapter = new IconAdapter(AVAILABLE_ICONS, iconName -> {
+            selectedIconName = iconName;
+        });
+        rvIcons.setAdapter(iconAdapter);
+
+        btnConfirm.setOnClickListener(v -> {
+            String name = etName.getText().toString().trim();
+            if (!name.isEmpty()) {
+                viewModel.addNewCategory(name, selectedIconName);
+                dialog.dismiss();
+                parentSheet.dismiss();
+                Toast.makeText(getContext(), "Đã thêm: " + name, Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "Vui lòng nhập tên", Toast.LENGTH_SHORT).show();
+            }
         });
 
-        // tìm kiếm
-        EditText et = sheet.findViewById(R.id.etSearchCategory);
-        if (et != null) {
-            et.addTextChangedListener(new android.text.TextWatcher() {
-                @Override public void onTextChanged(CharSequence s, int st, int b1, int c) {
-                    String q = s.toString().trim().toLowerCase();
-                    for (int id : ids) {
-                        View chip = sheet.findViewById(id);
-                        if (chip == null) continue;
-                        TextView label = null;
-                        if (chip instanceof ViewGroup) {
-                            ViewGroup vg = (ViewGroup) chip;
-                            View tvCandidate = vg.getChildAt(vg.getChildCount() - 1);
-                            if (tvCandidate instanceof TextView) label = (TextView) tvCandidate;
-                        }
-                        boolean match = true;
-                        if (label != null) match = label.getText().toString().toLowerCase().contains(q);
-                        chip.setVisibility(match ? View.VISIBLE : View.GONE);
-                    }
-                }
-                @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
-                @Override public void afterTextChanged(android.text.Editable s) {}
+        dialog.show();
+    }
+
+    private void bindCat(View root, BottomSheetDialog d, int id, String name, String icon) {
+        View v = root.findViewById(id);
+        if (v != null) {
+            v.setOnClickListener(view -> {
+                viewModel.category.setValue(new Category(name, icon));
+                d.dismiss();
+            });
+        }
+    }
+
+    private void updateMethodUI(boolean isCash) {
+        if (optCash == null) return;
+        optCash.setBackgroundResource(isCash ? R.drawable.bg_rounded_primary_1 : R.drawable.bg_card_neutral_50);
+        optTransfer.setBackgroundResource(!isCash ? R.drawable.bg_rounded_primary_1 : R.drawable.bg_card_neutral_50);
+    }
+
+    private void showDatePicker() {
+        LocalDate d = viewModel.date.getValue();
+        if (d == null) d = LocalDate.now();
+        new DatePickerDialog(requireContext(), (v, y, m, day) -> viewModel.date.setValue(LocalDate.of(y, m + 1, day)), d.getYear(), d.getMonthValue() - 1, d.getDayOfMonth()).show();
+    }
+
+    static class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.Holder> {
+        List<TxType> list; Context ctx; OnTypeClick listener;
+        interface OnTypeClick { void onClick(TxType t); }
+        TypeAdapter(Context c, List<TxType> l, OnTypeClick li) { ctx = c; list = l; listener = li; }
+        @NonNull @Override public Holder onCreateViewHolder(@NonNull ViewGroup p, int t) {
+            return new Holder(LayoutInflater.from(ctx).inflate(R.layout.item_type, p, false));
+        }
+        @Override public void onBindViewHolder(@NonNull Holder h, int p) {
+            int pos = h.getAdapterPosition();
+            if(pos == RecyclerView.NO_POSITION) return;
+
+            TxType t = list.get(pos);
+            String name = "Chi tiêu"; int iconRes = R.drawable.ic_expense; int bgRes = R.drawable.bg_icon_round_accent_1;
+            if(t == TxType.INCOME) { name="Thu nhập"; iconRes = R.drawable.ic_income; bgRes = R.drawable.bg_icon_round_success_1; }
+            else if (t == TxType.BORROW) { name = "Đi vay"; iconRes = R.drawable.ic_loan; }
+            else if (t == TxType.LEND) { name = "Cho vay"; iconRes = R.drawable.ic_giving; }
+            h.tv.setText(name); h.icon.setImageResource(iconRes); h.iconBg.setBackgroundResource(bgRes);
+            h.itemView.setOnClickListener(v -> listener.onClick(t));
+        }
+        @Override public int getItemCount() { return list.size(); }
+        static class Holder extends RecyclerView.ViewHolder {
+            TextView tv; ImageView icon; FrameLayout iconBg;
+            Holder(View v) { super(v); tv = v.findViewById(R.id.tvName); icon = v.findViewById(R.id.icon); iconBg = v.findViewById(R.id.iconBg); }
+        }
+    }
+
+    static class IconAdapter extends RecyclerView.Adapter<IconAdapter.IconViewHolder> {
+        List<String> icons;
+        OnIconSelect listener;
+        int selectedPos = 0;
+
+        interface OnIconSelect { void onSelect(String iconName); }
+
+        public IconAdapter(List<String> icons, OnIconSelect listener) {
+            this.icons = icons;
+            this.listener = listener;
+        }
+
+        @NonNull @Override
+        public IconViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            return new IconViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_icon_select, parent, false));
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull IconViewHolder holder, int position) {
+            int safePosition = holder.getAdapterPosition();
+            if(safePosition == RecyclerView.NO_POSITION) return;
+
+            String iconName = icons.get(safePosition);
+            int resId = holder.itemView.getContext().getResources().getIdentifier(iconName, "drawable", holder.itemView.getContext().getPackageName());
+            holder.img.setImageResource(resId);
+
+            if (selectedPos == safePosition) {
+                holder.bg.setBackgroundResource(R.drawable.bg_icon_round_primary_1);
+                holder.img.setColorFilter(Color.WHITE);
+            } else {
+                holder.bg.setBackgroundResource(R.drawable.bg_icon_round_white);
+                holder.img.setColorFilter(Color.BLACK);
+            }
+
+            holder.itemView.setOnClickListener(v -> {
+                int old = selectedPos;
+                selectedPos = safePosition;
+                notifyItemChanged(old);
+                notifyItemChanged(selectedPos);
+                listener.onSelect(iconName);
             });
         }
 
-        d.setContentView(sheet);
-        d.setOnShowListener(dialog -> {
-            View bottom = d.findViewById(com.google.android.material.R.id.design_bottom_sheet);
-            if (bottom != null) {
-                ViewGroup.LayoutParams lp = bottom.getLayoutParams();
-                lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
-                bottom.setLayoutParams(lp);
-                BottomSheetBehavior<View> be = BottomSheetBehavior.from(bottom);
-                be.setSkipCollapsed(true);
-                be.setState(BottomSheetBehavior.STATE_EXPANDED);
-                be.setDraggable(true);
-            }
-        });
+        @Override public int getItemCount() { return icons.size(); }
 
-        d.show();
-    }
-
-    // ====== Tạo danh mục mới: tên + loại 2 hàng + màu + 8 icon (2 hàng) ======
-    private void openCreateCategorySheet() {
-        BottomSheetDialog d = new BottomSheetDialog(requireContext(), R.style.AppBottomSheetDialog);
-        View sheet = LayoutInflater.from(getContext()).inflate(R.layout.sheet_new_category, null, false);
-
-        EditText etName = sheet.findViewById(R.id.etName);
-
-        // 2 nhóm RadioGroup cho 2 hàng
-        RadioGroup g1 = sheet.findViewById(R.id.groupType1);
-        RadioGroup g2 = sheet.findViewById(R.id.groupType2);
-
-        // ==== chọn màu: 3 ô ví dụ (c1, c2, c3) ====
-        int[] colorViews = { R.id.c1, R.id.c2, R.id.c3 };
-        // bạn có thể lưu hẳn mã màu, ở đây demo giữ id resource nền tròn
-        final int[] selColorIdx = {0};
-        View.OnClickListener pickColor = v -> {
-            for (int i = 0; i < colorViews.length; i++) {
-                View cv = sheet.findViewById(colorViews[i]);
-                boolean sel = v.getId() == colorViews[i];
-                cv.setAlpha(sel ? 1f : 0.35f);
-                if (sel) selColorIdx[0] = i;
-            }
-        };
-        for (int id : colorViews) sheet.findViewById(id).setOnClickListener(pickColor);
-        pickColor.onClick(sheet.findViewById(R.id.c1));
-
-        // ==== chọn icon: 8 cái, chia 2 hàng trong XML ====
-        int[] iconViews = {
-                R.id.i1, R.id.i2, R.id.i3, R.id.i4,
-                R.id.i5, R.id.i6, R.id.i7, R.id.i8
-        };
-        int[] iconRes = {
-                R.drawable.ic_cat_food, R.drawable.ic_cat_coffee, R.drawable.ic_cat_groceries, R.drawable.ic_cat_health,
-                R.drawable.ic_cat_phone, R.drawable.ic_cat_music, R.drawable.ic_cat_travel, R.drawable.ic_cat_sport
-        };
-        final int[] selIconIdx = {0};
-        View.OnClickListener pickIcon = v -> {
-            for (int i = 0; i < iconViews.length; i++) {
-                View iv = sheet.findViewById(iconViews[i]);
-                boolean sel = v.getId() == iconViews[i];
-                iv.setAlpha(sel ? 1f : 0.35f);
-                if (sel) selIconIdx[0] = i;
-            }
-        };
-        for (int id : iconViews) sheet.findViewById(id).setOnClickListener(pickIcon);
-        pickIcon.onClick(sheet.findViewById(R.id.i1));
-
-        // Tạo
-        sheet.findViewById(R.id.btnCreate).setOnClickListener(v -> {
-            String name = etName.getText() == null ? "" : etName.getText().toString().trim();
-            if (name.isEmpty()) {
-                Toast.makeText(requireContext(), "Nhập tên danh mục", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            int checkedId = g1.getCheckedRadioButtonId() != -1
-                    ? g1.getCheckedRadioButtonId() : g2.getCheckedRadioButtonId();
-            String group;
-            if (checkedId == R.id.rMonthly) group = "Chi tiêu hằng tháng";
-            else if (checkedId == R.id.rEssential) group = "Chi tiêu cần thiết";
-            else if (checkedId == R.id.rEntertainment) group = "Vui chơi giải trí";
-            else group = "Chi tiêu hằng ngày";
-
-            // Map màu đơn giản theo index (tự mở rộng theo nhu cầu)
-            int colorTag;
-            if (selColorIdx[0] == 1) colorTag = R.color.accent_1;
-            else if (selColorIdx[0] == 2) colorTag = R.color.success_1;
-            else colorTag = R.color.primary_1;
-
-            // Category mở rộng: name, color, icon, group/type
-            Category cat = new Category(name);
-            // nếu Category có các field, set thêm ở đây:
-            // cat.colorRes = colorTag;
-            // cat.iconRes = iconRes[selIconIdx[0]];
-            // cat.group = group;
-
-            // nếu ViewModel có lưu DS category, thêm vào:
-            // vm.addCategory(cat);
-
-            vm.category.setValue(cat);
-            Toast.makeText(requireContext(), "Đã tạo danh mục", Toast.LENGTH_SHORT).show();
-            d.dismiss();
-        });
-
-        d.setContentView(sheet);
-        d.show();
-    }
-
-    private void updateSaveEnabled() {
-        boolean hasAmount = b.etAmount.getText() != null
-                && b.etAmount.getText().toString().replaceAll("[^0-9]", "").length() > 0;
-        boolean hasCat = vm.category.getValue() != null;
-        boolean hasType = vm.type.getValue() != null;
-        boolean hasMethod = vm.method.getValue() != null && !vm.method.getValue().isEmpty();
-        boolean ok = hasAmount && hasCat && hasType && hasMethod;
-        b.btnSave.setEnabled(ok);
-        b.btnSave.setAlpha(ok ? 1f : 0.5f);
-    }
-
-    private void bindEnableSave() {
-        androidx.lifecycle.Observer<Object> o = x -> updateSaveEnabled();
-        vm.category.observe(getViewLifecycleOwner(), o);
-        vm.date.observe(getViewLifecycleOwner(), o);
-        b.etAmount.addTextChangedListener(new android.text.TextWatcher() {
-            @Override public void onTextChanged(CharSequence s, int st, int b1, int c) { o.onChanged(null); }
-            @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
-            @Override public void afterTextChanged(android.text.Editable s) {}
-        });
-    }
-
-    private void resetForm() {
-        b.etAmount.setText("");
-        vm.type.setValue(TxType.EXPENSE);
-        vm.category.setValue(null);
-        vm.method.setValue("Tiền mặt");
-        vm.date.setValue(LocalDate.now());
-        setDetailsVisible(false);
-        b.btnToggleDetail.setText("Hiển thị chi tiết ⌄");
-        b.btnToggleDetail.setBackgroundResource(R.drawable.bg_card_neutral_50);
-        updateSaveEnabled();
-        b.scrollView.fullScroll(View.FOCUS_UP);
-    }
-
-    private static class SimpleTextWatcher implements android.text.TextWatcher {
-        private final Runnable onChange;
-        SimpleTextWatcher(Runnable r) { onChange = r; }
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-        public void onTextChanged(CharSequence s, int start, int before, int count) {}
-        public void afterTextChanged(android.text.Editable s) { onChange.run(); }
+        static class IconViewHolder extends RecyclerView.ViewHolder {
+            ImageView img; FrameLayout bg;
+            public IconViewHolder(View v) { super(v); img = v.findViewById(R.id.imgIcon); bg = v.findViewById(R.id.bgIcon); }
+        }
     }
 }
