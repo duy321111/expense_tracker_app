@@ -24,7 +24,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity android:name=".ui.FeedbackActivity" android:exported="false"/>
         <activity android:name=".ui.Budget.BudgetDetail" android:exported="true" />
         <activity android:name=".ui.Budget.EditBudget" android:exported="true" />
         <activity android:name=".ui.DashBoardActivity" android:exported="true"/>
@@ -43,5 +43,8 @@
         <activity android:name=".ui.BudgetDetailActivity" android:exported="true"/>
         <activity android:name=".ui.Notification.NotificationActivity" android:exported="true"/>
         <activity android:name=".ui.Transactions" android:exported="true"/>
+
+        <activity android:name=".ui.TermsPrivacyActivity" android:exported="false"/>
+
     </application>
 </manifest>

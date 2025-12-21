@@ -19,12 +19,12 @@ import java.util.concurrent.Executors;
 public class AddTxViewModel extends AndroidViewModel {
 
     private final TransactionRepository repo;
-    private final WalletDao walletDao; // 1. Khai báo WalletDao
+    private final WalletDao walletDao;
 
     // Các biến LiveData binding với UI
     public final MutableLiveData<TxType> type = new MutableLiveData<>(TxType.EXPENSE);
     public final MutableLiveData<Category> category = new MutableLiveData<>();
-    public final MutableLiveData<String> method = new MutableLiveData<>("Tiền mặt"); // Mặc định là Tiền mặt
+    public final MutableLiveData<String> method = new MutableLiveData<>("Tiền mặt");
     public final MutableLiveData<String> amount = new MutableLiveData<>("");
     public final MutableLiveData<LocalDate> date = new MutableLiveData<>(LocalDate.now());
     public final MutableLiveData<Boolean> done = new MutableLiveData<>(false);
@@ -36,7 +36,7 @@ public class AddTxViewModel extends AndroidViewModel {
     public AddTxViewModel(@NonNull Application application) {
         super(application);
         repo = new TransactionRepository(application);
-        // 2. Khởi tạo WalletDao từ Database
+        // Khởi tạo WalletDao
         walletDao = AppDatabase.getInstance(application).walletDao();
     }
 
@@ -54,6 +54,7 @@ public class AddTxViewModel extends AndroidViewModel {
         } catch (NumberFormatException e) { return; }
 
         Category finalCat = category.getValue();
+        // Fallback icon mặc định nếu chưa chọn category
         if (finalCat == null) finalCat = new Category(type.getValue().name(), "ic_category");
 
         String finalNote = note.getValue();
@@ -71,41 +72,45 @@ public class AddTxViewModel extends AndroidViewModel {
                 type.getValue(),
                 finalCat,
                 amountVal,
-                method.getValue(), // Đây là tên Ví ("Tiền mặt" hoặc "Chuyển khoản")
+                method.getValue(),
                 date.getValue(),
                 finalNote,
                 locationVal,
                 imagePathVal
         );
 
-        // --- LOGIC QUAN TRỌNG: Cập nhật Ví & Lưu Giao dịch ---
+        // --- LOGIC CẬP NHẬT VÍ ---
         final long finalAmount = amountVal;
 
         Executors.newSingleThreadExecutor().execute(() -> {
-            // 1. Lưu giao dịch vào bảng transactions
+            // 1. Lưu giao dịch
             repo.insertTransaction(newTx);
 
-            // 2. Tính toán số tiền thay đổi (Dương hoặc Âm)
+            // 2. Tính toán thay đổi số dư
             double changeAmount = 0;
             TxType currentType = type.getValue();
 
+            // Logic quan trọng bạn yêu cầu:
             if (currentType == TxType.EXPENSE) {
-                changeAmount = -finalAmount; // Chi tiêu -> Trừ tiền
+                // Chi tiêu: Tiền đi ra -> Trừ
+                changeAmount = -finalAmount;
             } else if (currentType == TxType.INCOME) {
-                changeAmount = finalAmount;  // Thu nhập -> Cộng tiền
+                // Thu nhập: Tiền đi vào -> Cộng
+                changeAmount = finalAmount;
             } else if (currentType == TxType.BORROW) {
-                changeAmount = finalAmount;  // Đi vay -> Tiền vào ví -> Cộng tiền
+                // Đi vay: Mình cầm tiền về -> Ví tăng -> Cộng
+                changeAmount = finalAmount;
             } else if (currentType == TxType.LEND) {
-                changeAmount = -finalAmount; // Cho vay -> Tiền ra khỏi ví -> Trừ tiền
+                // Cho vay: Mình đưa tiền cho người khác -> Ví giảm -> Trừ
+                changeAmount = -finalAmount;
             }
 
-            // 3. Cập nhật vào Ví (dựa theo tên ví: "Tiền mặt" hoặc "Chuyển khoản")
-            // method.getValue() sẽ trả về đúng chuỗi mà người dùng chọn ở UI
+            // 3. Cập nhật vào Ví (nếu có thay đổi)
             if (changeAmount != 0) {
                 walletDao.updateBalance(method.getValue(), changeAmount);
             }
 
-            // 4. Báo xong để UI quay về màn hình trước
+            // 4. Hoàn tất
             done.postValue(true);
         });
     }

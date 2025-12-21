@@ -191,7 +191,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
                         android:text="Tiền mặt"
-                        android:textColor="@color/primary_1"
+                        android:textColor="@color/black"
                         android:textSize="13sp" />
                 </LinearLayout>
 
@@ -235,7 +235,7 @@
                 android:id="@+id/btnToggleDetail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Hiển thị chi tiết ⌄"
+                android:text="Chi tiết"
                 android:gravity="center"
                 android:textColor="@color/primary_1"
                 android:textStyle="bold"
