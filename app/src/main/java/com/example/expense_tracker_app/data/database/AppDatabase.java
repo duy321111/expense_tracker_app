@@ -8,14 +8,15 @@ import androidx.room.TypeConverters;
 
 import com.example.expense_tracker_app.data.model.Budget;
 import com.example.expense_tracker_app.data.model.Category;
+import com.example.expense_tracker_app.data.model.Subcategory;
 import com.example.expense_tracker_app.data.model.Transaction;
 import com.example.expense_tracker_app.data.model.User;
 import com.example.expense_tracker_app.data.model.Wallet; // Import Wallet
 import com.example.expense_tracker_app.data.model.converter.Converters;
 import com.example.expense_tracker_app.data.model.converter.StringListConverter;
 
-// NHỚ: Tăng version lên 6
-@Database(entities = {User.class, Budget.class, Transaction.class, Category.class, Wallet.class}, version = 6)
+// NHỚ: Tăng version lên 7
+@Database(entities = {User.class, Budget.class, Transaction.class, Category.class, Subcategory.class, Wallet.class}, version = 7)
 @TypeConverters({StringListConverter.class, Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 

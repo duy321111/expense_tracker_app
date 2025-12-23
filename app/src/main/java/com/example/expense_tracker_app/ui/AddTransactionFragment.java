@@ -2,7 +2,6 @@ package com.example.expense_tracker_app.ui;
 
 import android.graphics.Color;
 import android.view.Gravity;
-import android.widget.GridLayout;
 import android.content.Context;
 import android.widget.ImageView;
 import android.widget.FrameLayout;
@@ -18,6 +17,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.GridLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +35,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.expense_tracker_app.R;
 import com.example.expense_tracker_app.data.model.Category;
+import com.example.expense_tracker_app.data.model.CategoryWithSubcategories;
+import com.example.expense_tracker_app.data.model.Subcategory;
 import com.example.expense_tracker_app.data.model.TxType;
 import com.example.expense_tracker_app.viewmodel.AddTxViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -74,6 +77,7 @@ public class AddTransactionFragment extends Fragment {
             "ic_cat_sport", "ic_cat_music", "ic_cat_travel", "ic_cat_gamepad"
     );
     private String selectedIconName = "ic_cat_food";
+    private String tempSelectedIconName = "ic_cat_food";
 
     @Nullable
     @Override
@@ -254,9 +258,17 @@ public class AddTransactionFragment extends Fragment {
             tvType.setText(s);
             tvCategory.setText("Chọn danh mục");
             viewModel.category.setValue(null);
+            viewModel.subcategory.setValue(null);
+            viewModel.refreshCategories();
         });
 
-        viewModel.category.observe(getViewLifecycleOwner(), c -> { if (c != null) tvCategory.setText(c.name); });
+        viewModel.subcategory.observe(getViewLifecycleOwner(), sub -> {
+            if (sub != null) {
+                tvCategory.setText(sub.name);
+            } else if (viewModel.category.getValue() != null) {
+                tvCategory.setText(viewModel.category.getValue().name);
+            }
+        });
 
         viewModel.method.observe(getViewLifecycleOwner(), m -> updateMethodUI("Tiền mặt".equals(m)));
 
@@ -299,91 +311,223 @@ public class AddTransactionFragment extends Fragment {
 
     private void showCategoryPickerDialog() {
         BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
-        View sheet = getLayoutInflater().inflate(R.layout.sheet_pick_category, null);
-        dialog.setContentView(sheet);
 
-        bindCat(sheet, dialog, R.id.cat_food, "Ăn uống", "ic_cat_food");
-        bindCat(sheet, dialog, R.id.cat_coffee, "Cà phê", "ic_cat_coffee");
-        bindCat(sheet, dialog, R.id.cat_groceries_market, "Đi chợ/Siêu thị", "ic_cat_groceries");
-        bindCat(sheet, dialog, R.id.cat_electric, "Điện", "ic_cat_electric");
-        bindCat(sheet, dialog, R.id.cat_water, "Nước", "ic_cat_water");
-        bindCat(sheet, dialog, R.id.cat_internet, "Internet", "ic_cat_internet");
-        bindCat(sheet, dialog, R.id.cat_transport, "Di chuyển", "ic_cat_transport");
-        bindCat(sheet, dialog, R.id.cat_tv, "TV", "ic_cat_tv");
-        bindCat(sheet, dialog, R.id.cat_gas, "GAS", "ic_cat_gas");
-        bindCat(sheet, dialog, R.id.cat_rent, "Thuê nhà", "ic_cat_home");
-        bindCat(sheet, dialog, R.id.cat_phone, "Điện thoại", "ic_cat_phone");
-        bindCat(sheet, dialog, R.id.cat_study, "Học tập", "ic_cat_study");
-        bindCat(sheet, dialog, R.id.cat_health, "Khám sức khỏe", "ic_cat_health");
-        bindCat(sheet, dialog, R.id.cat_vehicle, "Bảo dưỡng xe", "ic_cat_car_service");
-        bindCat(sheet, dialog, R.id.cat_insurance, "Bảo hiểm", "ic_cat_insurance");
-        bindCat(sheet, dialog, R.id.cat_sport, "Thể thao", "ic_cat_sport");
-        bindCat(sheet, dialog, R.id.cat_music, "Nhạc", "ic_cat_music");
-        bindCat(sheet, dialog, R.id.cat_travel, "Du lịch", "ic_cat_travel");
-        bindCat(sheet, dialog, R.id.cat_games, "Trò chơi", "ic_cat_gamepad");
+        List<CategoryWithSubcategories> data = viewModel.categories.getValue();
+        if (data == null || data.isEmpty()) {
+            viewModel.refreshCategories();
+            Toast.makeText(getContext(), "Đang tải danh mục...", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        TextView tvOtherTitle = sheet.findViewById(R.id.tvOtherTitle);
-        View cardOther = sheet.findViewById(R.id.cardOther);
-        GridLayout gridOther = sheet.findViewById(R.id.gridOther);
-        Button btnAdd = sheet.findViewById(R.id.btnAddCategory);
+        ScrollView scrollView = new ScrollView(requireContext());
+        LinearLayout container = new LinearLayout(requireContext());
+        container.setOrientation(LinearLayout.VERTICAL);
+        int pad = (int) (16 * getResources().getDisplayMetrics().density);
+        container.setPadding(pad, pad, pad, pad);
+        scrollView.addView(container);
 
-        List<Category> customList = viewModel.getCustomCategories();
-        if (customList != null && !customList.isEmpty()) {
-            tvOtherTitle.setVisibility(View.VISIBLE);
-            cardOther.setVisibility(View.VISIBLE);
-
-            for (Category cat : customList) {
-                LinearLayout itemLayout = new LinearLayout(getContext());
-                itemLayout.setOrientation(LinearLayout.VERTICAL);
-                itemLayout.setGravity(Gravity.CENTER);
-                itemLayout.setPadding(10, 20, 10, 20);
-
-                FrameLayout iconBackground = new FrameLayout(getContext());
-                int bgSize = (int) (50 * getResources().getDisplayMetrics().density); // 50dp
-                LinearLayout.LayoutParams bgParams = new LinearLayout.LayoutParams(bgSize, bgSize);
-                bgParams.bottomMargin = 8;
-                iconBackground.setLayoutParams(bgParams);
-                iconBackground.setBackgroundResource(R.drawable.bg_icon_round_accent_1); // Màu nền
-
-                ImageView iv = new ImageView(getContext());
-                int resId = getResources().getIdentifier(cat.icon, "drawable", requireContext().getPackageName());
-                iv.setImageResource(resId != 0 ? resId : R.drawable.ic_category);
-                iv.setColorFilter(Color.WHITE); // Fix: Đổi màu icon thành trắng
-
-                int iconSize = (int) (24 * getResources().getDisplayMetrics().density); // 24dp
-                FrameLayout.LayoutParams imgParams = new FrameLayout.LayoutParams(iconSize, iconSize);
-                imgParams.gravity = Gravity.CENTER;
-                iv.setLayoutParams(imgParams);
-
-                iconBackground.addView(iv);
-
-                TextView tv = new TextView(getContext());
-                tv.setText(cat.name);
-                tv.setGravity(Gravity.CENTER);
-                tv.setTextSize(12);
-                tv.setMaxLines(2);
-
-                itemLayout.addView(iconBackground);
-                itemLayout.addView(tv);
-
-                itemLayout.setOnClickListener(v -> {
-                    viewModel.category.setValue(cat);
-                    dialog.dismiss();
-                });
-
-                GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-                params.width = 0;
-                params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
-                itemLayout.setLayoutParams(params);
-                gridOther.addView(itemLayout);
+        for (CategoryWithSubcategories cws : data) {
+            if (cws == null || cws.category == null) {
+                continue;
             }
+
+            TextView title = new TextView(requireContext());
+            title.setText(cws.category.name);
+            title.setTextSize(16);
+            title.setTextColor(getResources().getColor(R.color.neutral_900, null));
+            LinearLayout.LayoutParams titleLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            titleLp.bottomMargin = (int) (8 * getResources().getDisplayMetrics().density);
+            title.setLayoutParams(titleLp);
+            container.addView(title);
+
+            GridLayout grid = new GridLayout(requireContext());
+            grid.setColumnCount(4);
+            grid.setUseDefaultMargins(true);
+
+            if (cws.subcategories != null) {
+                for (Subcategory sub : cws.subcategories) {
+                    LinearLayout item = new LinearLayout(requireContext());
+                    item.setOrientation(LinearLayout.VERTICAL);
+                    item.setGravity(Gravity.CENTER);
+                    int itemPad = (int) (8 * getResources().getDisplayMetrics().density);
+                    item.setPadding(itemPad, itemPad, itemPad, itemPad);
+                    item.setBackgroundResource(R.drawable.bg_chip_category_state);
+
+                    FrameLayout iconBg = new FrameLayout(requireContext());
+                    int bgSize = (int) (48 * getResources().getDisplayMetrics().density);
+                    FrameLayout.LayoutParams bgParams = new FrameLayout.LayoutParams(bgSize, bgSize);
+                    iconBg.setLayoutParams(bgParams);
+                    iconBg.setBackgroundResource(R.drawable.bg_icon_round_accent_1);
+
+                    ImageView iv = new ImageView(requireContext());
+                    int resId = getResources().getIdentifier(sub.icon, "drawable", requireContext().getPackageName());
+                    iv.setImageResource(resId != 0 ? resId : R.drawable.ic_category);
+                    iv.setColorFilter(Color.WHITE);
+                    int iconSize = (int) (24 * getResources().getDisplayMetrics().density);
+                    FrameLayout.LayoutParams iconLp = new FrameLayout.LayoutParams(iconSize, iconSize);
+                    iconLp.gravity = Gravity.CENTER;
+                    iv.setLayoutParams(iconLp);
+                    iconBg.addView(iv);
+
+                    TextView tv = new TextView(requireContext());
+                    tv.setText(sub.name);
+                    tv.setGravity(Gravity.CENTER);
+                    tv.setTextSize(12);
+                    tv.setMaxLines(2);
+
+                    item.addView(iconBg);
+                    item.addView(tv);
+
+                    item.setOnClickListener(v -> {
+                        viewModel.category.setValue(cws.category);
+                        viewModel.subcategory.setValue(sub);
+                        viewModel.subcategoryId.setValue(sub.id);
+                        dialog.dismiss();
+                    });
+
+                    GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+                    params.width = 0;
+                    params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
+                    item.setLayoutParams(params);
+                    grid.addView(item);
+                }
+            }
+
+            // Nút thêm danh mục (dấu +) sau mỗi nhóm
+            LinearLayout addItem = new LinearLayout(requireContext());
+            addItem.setOrientation(LinearLayout.VERTICAL);
+            addItem.setGravity(Gravity.CENTER);
+            int itemPadAdd = (int) (8 * getResources().getDisplayMetrics().density);
+            addItem.setPadding(itemPadAdd, itemPadAdd, itemPadAdd, itemPadAdd);
+            addItem.setBackgroundResource(R.drawable.bg_chip_category_state);
+
+            FrameLayout addBg = new FrameLayout(requireContext());
+            int bgSizeAdd = (int) (48 * getResources().getDisplayMetrics().density);
+            FrameLayout.LayoutParams bgParamsAdd = new FrameLayout.LayoutParams(bgSizeAdd, bgSizeAdd);
+            addBg.setLayoutParams(bgParamsAdd);
+            addBg.setBackgroundResource(R.drawable.bg_icon_round_primary_2);
+
+            ImageView ivAdd = new ImageView(requireContext());
+            ivAdd.setImageResource(android.R.drawable.ic_input_add);
+            ivAdd.setColorFilter(Color.WHITE);
+            int iconSizeAdd = (int) (20 * getResources().getDisplayMetrics().density);
+            FrameLayout.LayoutParams iconLpAdd = new FrameLayout.LayoutParams(iconSizeAdd, iconSizeAdd);
+            iconLpAdd.gravity = Gravity.CENTER;
+            ivAdd.setLayoutParams(iconLpAdd);
+            addBg.addView(ivAdd);
+
+            TextView tvAdd = new TextView(requireContext());
+            tvAdd.setText("Thêm");
+            tvAdd.setGravity(Gravity.CENTER);
+            tvAdd.setTextSize(12);
+            tvAdd.setMaxLines(1);
+
+            addItem.addView(addBg);
+            addItem.addView(tvAdd);
+
+            addItem.setOnClickListener(v -> showAddSubcategoryDialog(cws, dialog));
+
+            GridLayout.LayoutParams paramsAdd = new GridLayout.LayoutParams();
+            paramsAdd.width = 0;
+            paramsAdd.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
+            addItem.setLayoutParams(paramsAdd);
+            grid.addView(addItem);
+
+            LinearLayout.LayoutParams gridLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            gridLp.bottomMargin = (int) (12 * getResources().getDisplayMetrics().density);
+            grid.setLayoutParams(gridLp);
+            container.addView(grid);
         }
 
-        if (btnAdd != null) {
-            btnAdd.setOnClickListener(v -> showAddCategoryDialog(dialog));
-        }
+        // Nút thêm nhóm mới (duy nhất, đặt cuối sheet)
+        Button btnAddGroup = new Button(requireContext());
+        btnAddGroup.setText("Thêm nhóm mới");
+        LinearLayout.LayoutParams btnGroupLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        btnGroupLp.topMargin = (int) (8 * getResources().getDisplayMetrics().density);
+        btnAddGroup.setLayoutParams(btnGroupLp);
+        btnAddGroup.setOnClickListener(v -> showAddCategoryGroupDialog(dialog));
+        container.addView(btnAddGroup);
 
+        dialog.setContentView(scrollView);
         dialog.show();
+    }
+
+    private void showAddSubcategoryDialog(CategoryWithSubcategories cws, BottomSheetDialog parentSheet) {
+        if (cws == null || cws.category == null) return;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        LinearLayout layout = new LinearLayout(requireContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        int pad = (int) (16 * getResources().getDisplayMetrics().density);
+        layout.setPadding(pad, pad, pad, pad);
+
+        TextView tvGroup = new TextView(requireContext());
+        tvGroup.setText("Nhóm: " + cws.category.name);
+        layout.addView(tvGroup);
+
+        TextView tvName = new TextView(requireContext());
+        tvName.setText("Tên danh mục");
+        layout.addView(tvName);
+
+        EditText etName = new EditText(requireContext());
+        etName.setHint("Nhập tên danh mục");
+        layout.addView(etName);
+
+        TextView tvIcon = new TextView(requireContext());
+        tvIcon.setText("Chọn icon");
+        layout.addView(tvIcon);
+
+        RecyclerView rvIcons = new RecyclerView(requireContext());
+        rvIcons.setLayoutManager(new GridLayoutManager(requireContext(), 5));
+        tempSelectedIconName = selectedIconName;
+        IconAdapter iconAdapter = new IconAdapter(AVAILABLE_ICONS, iconName -> tempSelectedIconName = iconName);
+        rvIcons.setAdapter(iconAdapter);
+        layout.addView(rvIcons);
+
+        builder.setView(layout);
+        builder.setPositiveButton("Lưu", (d, w) -> {
+            String name = etName.getText().toString().trim();
+            if (name.isEmpty()) {
+                Toast.makeText(getContext(), "Vui lòng nhập tên danh mục", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            viewModel.addNewSubcategory(cws.category.id, name, tempSelectedIconName);
+            Toast.makeText(getContext(), "Đã thêm: " + name, Toast.LENGTH_SHORT).show();
+            parentSheet.dismiss();
+        });
+        builder.setNegativeButton("Hủy", null);
+        builder.show();
+    }
+
+    private void showAddCategoryGroupDialog(BottomSheetDialog parentSheet) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        LinearLayout layout = new LinearLayout(requireContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        int pad = (int) (16 * getResources().getDisplayMetrics().density);
+        layout.setPadding(pad, pad, pad, pad);
+
+        TextView tvName = new TextView(requireContext());
+        tvName.setText("Tên nhóm");
+        layout.addView(tvName);
+
+        EditText etName = new EditText(requireContext());
+        etName.setHint("Nhập tên nhóm");
+        layout.addView(etName);
+
+        builder.setView(layout);
+        builder.setPositiveButton("Lưu", (d, w) -> {
+            String name = etName.getText().toString().trim();
+            if (name.isEmpty()) {
+                Toast.makeText(getContext(), "Vui lòng nhập tên nhóm", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // Dùng icon mặc định cho nhóm mới
+            viewModel.addNewCategory(name, "ic_category");
+            Toast.makeText(getContext(), "Đã thêm nhóm: " + name, Toast.LENGTH_SHORT).show();
+            parentSheet.dismiss();
+        });
+        builder.setNegativeButton("Hủy", null);
+        builder.show();
     }
 
     private void showAddCategoryDialog(BottomSheetDialog parentSheet) {
@@ -416,16 +560,6 @@ public class AddTransactionFragment extends Fragment {
         });
 
         dialog.show();
-    }
-
-    private void bindCat(View root, BottomSheetDialog d, int id, String name, String icon) {
-        View v = root.findViewById(id);
-        if (v != null) {
-            v.setOnClickListener(view -> {
-                viewModel.category.setValue(new Category(name, icon));
-                d.dismiss();
-            });
-        }
     }
 
     private void updateMethodUI(boolean isCash) {

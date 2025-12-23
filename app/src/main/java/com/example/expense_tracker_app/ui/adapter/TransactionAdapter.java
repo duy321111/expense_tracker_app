@@ -54,7 +54,9 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         h.tvDate.setText(String.format("%02d", tx.date.getDayOfMonth()));
 
         // --- 2. DANH MỤC (SỬA LỖI TIẾNG ANH Ở ĐÂY) ---
-        String catName = tx.category.name;
+        String catName = (tx.subcategoryName != null && !tx.subcategoryName.trim().isEmpty())
+            ? tx.subcategoryName
+            : tx.category.name;
         // Kiểm tra nếu tên là tiếng Anh (do lưu mặc định) thì hiển thị tiếng Việt
         if (catName != null) {
             switch (catName) {
@@ -84,8 +86,11 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         h.tvAmount.setTextColor(context.getResources().getColor(colorRes, null));
 
         // --- 5. ICON ---
-        if (tx.category.icon != null) {
-            int resId = context.getResources().getIdentifier(tx.category.icon, "drawable", context.getPackageName());
+        String iconName = tx.subcategoryIcon != null && !tx.subcategoryIcon.isEmpty()
+                ? tx.subcategoryIcon
+                : tx.category.icon;
+        if (iconName != null) {
+            int resId = context.getResources().getIdentifier(iconName, "drawable", context.getPackageName());
             if (resId != 0) h.ivCatIcon.setImageResource(resId);
             else h.ivCatIcon.setImageResource(R.drawable.ic_category);
         }

@@ -8,6 +8,8 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.expense_tracker_app.data.database.AppDatabase;
 import com.example.expense_tracker_app.data.database.WalletDao;
 import com.example.expense_tracker_app.data.model.Category;
+import com.example.expense_tracker_app.data.model.CategoryWithSubcategories;
+import com.example.expense_tracker_app.data.model.Subcategory;
 import com.example.expense_tracker_app.data.model.Transaction;
 import com.example.expense_tracker_app.data.model.TxType;
 import com.example.expense_tracker_app.data.repository.TransactionRepository;
@@ -15,6 +17,7 @@ import com.example.expense_tracker_app.data.repository.TransactionRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 
 public class AddTxViewModel extends AndroidViewModel {
 
@@ -24,6 +27,8 @@ public class AddTxViewModel extends AndroidViewModel {
     // Các biến LiveData binding với UI
     public final MutableLiveData<TxType> type = new MutableLiveData<>(TxType.EXPENSE);
     public final MutableLiveData<Category> category = new MutableLiveData<>();
+    public final MutableLiveData<Subcategory> subcategory = new MutableLiveData<>();
+    public final MutableLiveData<Integer> subcategoryId = new MutableLiveData<>(0);
     public final MutableLiveData<String> method = new MutableLiveData<>("Tiền mặt");
     public final MutableLiveData<String> amount = new MutableLiveData<>("");
     public final MutableLiveData<LocalDate> date = new MutableLiveData<>(LocalDate.now());
@@ -32,16 +37,26 @@ public class AddTxViewModel extends AndroidViewModel {
     public final MutableLiveData<String> location = new MutableLiveData<>("");
     public final MutableLiveData<Boolean> excludeReport = new MutableLiveData<>(false);
     public final MutableLiveData<String> imagePath = new MutableLiveData<>("");
+    public final MutableLiveData<List<CategoryWithSubcategories>> categories = new MutableLiveData<>();
+
+    private final ExecutorService ioExecutor = Executors.newSingleThreadExecutor();
 
     public AddTxViewModel(@NonNull Application application) {
         super(application);
         repo = new TransactionRepository(application);
         // Khởi tạo WalletDao
         walletDao = AppDatabase.getInstance(application).walletDao();
+
+        repo.ensureDefaultCategories();
+        refreshCategories();
     }
 
-    public List<Category> categories(){
-        return repo.categoriesBy(type.getValue());
+    public void refreshCategories() {
+        TxType current = type.getValue() == null ? TxType.EXPENSE : type.getValue();
+        ioExecutor.execute(() -> {
+            List<CategoryWithSubcategories> data = repo.categoriesWithSubcategories(current);
+            categories.postValue(data);
+        });
     }
 
     public void submit() {
@@ -57,6 +72,11 @@ public class AddTxViewModel extends AndroidViewModel {
         // Fallback icon mặc định nếu chưa chọn category
         if (finalCat == null) finalCat = new Category(type.getValue().name(), "ic_category");
 
+        Subcategory pickedSub = subcategory.getValue();
+        int pickedSubId = pickedSub != null ? pickedSub.id : 0;
+        String pickedSubName = pickedSub != null ? pickedSub.name : "";
+        String pickedSubIcon = pickedSub != null && pickedSub.icon != null ? pickedSub.icon : finalCat.icon;
+
         String finalNote = note.getValue();
         if (Boolean.TRUE.equals(excludeReport.getValue())) {
             finalNote += " [Không tính báo cáo]";
@@ -68,15 +88,18 @@ public class AddTxViewModel extends AndroidViewModel {
 
         // Tạo đối tượng Transaction
         Transaction newTx = new Transaction(
-                0, 1,
-                type.getValue(),
-                finalCat,
-                amountVal,
-                method.getValue(),
-                date.getValue(),
-                finalNote,
-                locationVal,
-                imagePathVal
+            0, 1,
+            type.getValue(),
+            finalCat,
+            pickedSubId,
+            pickedSubName,
+            pickedSubIcon,
+            amountVal,
+            method.getValue(),
+            date.getValue(),
+            finalNote,
+            locationVal,
+            imagePathVal
         );
 
         // --- LOGIC CẬP NHẬT VÍ ---
@@ -117,10 +140,21 @@ public class AddTxViewModel extends AndroidViewModel {
 
     public void addNewCategory(String name, String icon) {
         Category newCat = new Category(name, icon);
-        new Thread(() -> repo.insertCategory(newCat)).start();
+        ioExecutor.execute(() -> {
+            repo.insertCategory(newCat);
+            refreshCategories();
+        });
     }
 
-    public List<Category> getCustomCategories() {
+    public List<Category> getCustomCategories() { // legacy use
         return repo.getCustomCategories();
+    }
+
+    public void addNewSubcategory(int categoryId, String name, String icon) {
+        Subcategory sub = new Subcategory(categoryId, name, icon);
+        ioExecutor.execute(() -> {
+            repo.insertSubcategory(sub);
+            refreshCategories();
+        });
     }
 }
