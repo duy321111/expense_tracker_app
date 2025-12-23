@@ -127,4 +127,36 @@
     <string name="nav_budget_title">Ngân sách</string>
     <string name="nav_profile_title">Cá nhân</string>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <string name="terms_privacy_content_plain">
+    Chào mừng bạn đến với ứng dụng Quản lý Chi tiêu. Chúng tôi hiểu rằng sự riêng tư và bảo mật dữ liệu cá nhân là vô cùng quan trọng đối với bạn, và chúng tôi cam kết bảo vệ những thông tin này với tiêu chuẩn cao nhất. Khi bạn quyết định cài đặt và sử dụng Ứng dụng, đồng nghĩa với việc bạn đã tin tưởng và đồng ý với các quy định trong chính sách này.\n\n
+    Để hỗ trợ bạn quản lý tài chính hiệu quả, Ứng dụng sẽ ghi nhận các dữ liệu giao dịch mà bạn nhập vào, bao gồm số tiền, hạng mục chi tiêu, ghi chú cá nhân và thời gian thực hiện. Nếu bạn sử dụng tính năng đính kèm hóa đơn, các hình ảnh này sẽ được lưu trữ cục bộ ngay trên thiết bị của bạn để đảm bảo tính riêng tư. Chúng tôi khẳng định rằng toàn bộ dữ liệu này chỉ được sử dụng duy nhất cho mục đích tính toán số dư, lập báo cáo thống kê và giúp bạn theo dõi dòng tiền cá nhân.\n\n
+    Chúng tôi cam kết tuyệt đối không chia sẻ, bán, hoặc tiết lộ dữ liệu tài chính của bạn cho bất kỳ bên thứ ba nào, dù là cá nhân hay tổ chức, trừ khi có yêu cầu bắt buộc từ cơ quan pháp luật có thẩm quyền. Các biện pháp kỹ thuật tiên tiến luôn được chúng tôi áp dụng để ngăn chặn mọi hành vi truy cập trái phép, chỉnh sửa hoặc đánh cắp dữ liệu.\n\n
+    Là người dùng, bạn nắm giữ toàn quyền kiểm soát đối với thông tin của mình. Bạn có thể tự do xem lại, chỉnh sửa hoặc xóa vĩnh viễn bất kỳ giao dịch nào vào bất cứ lúc nào. Khi bạn chọn xóa dữ liệu hoặc gỡ cài đặt ứng dụng, các thông tin liên quan sẽ được loại bỏ hoàn toàn khỏi hệ thống lưu trữ trên thiết bị.\n\n
+    Chính sách này có thể được chúng tôi cập nhật theo thời gian để phù hợp với các quy định pháp luật mới hoặc khi ứng dụng có thêm tính năng. Chúng tôi khuyến khích bạn thỉnh thoảng xem lại nội dung này để nắm bắt những thay đổi mới nhất. Mọi thắc mắc xin vui lòng liên hệ với bộ phận hỗ trợ của chúng tôi.
+</string>
+
+
+
+
+
+
+
+
+
 </resources>

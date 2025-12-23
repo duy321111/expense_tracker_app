@@ -149,6 +149,11 @@ public class AddTransactionFragment extends Fragment {
                 }
             }
         }
+
+        // --- SỬA LOGIC KHỞI TẠO: Set trạng thái ban đầu của nút Save ---
+        // Mặc định ban đầu chưa có tiền -> Nút mờ đi (alpha 0.5) nhưng VẪN CLICK ĐƯỢC
+        btnSave.setAlpha(0.5f);
+        btnSave.setEnabled(true);
     }
 
     private void setupEvents() {
@@ -156,10 +161,15 @@ public class AddTransactionFragment extends Fragment {
 
         etAmount.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                 viewModel.amount.setValue(s.toString());
                 boolean hasMoney = s.length() > 0;
-                btnSave.setEnabled(hasMoney);
+
+                // --- SỬA LOGIC Ở ĐÂY ---
+                // Luôn cho phép bấm nút (setEnabled = true)
+                btnSave.setEnabled(true);
+                // Chỉ thay đổi độ mờ để báo hiệu trạng thái
                 btnSave.setAlpha(hasMoney ? 1.0f : 0.5f);
             }
             @Override public void afterTextChanged(Editable s) {}
@@ -169,25 +179,23 @@ public class AddTransactionFragment extends Fragment {
         rowCategory.setOnClickListener(v -> showCategoryPickerDialog());
         rowDate.setOnClickListener(v -> showDatePicker());
 
-        // --- SỬA LOGIC CHỌN VÍ ---
         optCash.setOnClickListener(v -> {
             viewModel.method.setValue("Tiền mặt");
             updateMethodUI(true);
         });
 
         optTransfer.setOnClickListener(v -> {
-            viewModel.method.setValue("Chuyển khoản"); // Đảm bảo tên này khớp với ví bạn tạo
+            viewModel.method.setValue("Chuyển khoản");
             updateMethodUI(false);
         });
-        // -------------------------
 
         btnToggleDetail.setOnClickListener(v -> {
             if (layoutDetail.getVisibility() == View.VISIBLE) {
                 layoutDetail.setVisibility(View.GONE);
-                btnToggleDetail.setText("Hiển thị chi tiết ⌄");
+                btnToggleDetail.setText("Chi tiết");
             } else {
                 layoutDetail.setVisibility(View.VISIBLE);
-                btnToggleDetail.setText("Ẩn chi tiết ⌃");
+                btnToggleDetail.setText("Ẩn chi tiết");
             }
         });
 
@@ -217,18 +225,39 @@ public class AddTransactionFragment extends Fragment {
             if(isChecked) tvReportHint.setText("Giao dịch này sẽ không tính vào báo cáo.");
         });
 
-        btnSave.setOnClickListener(v -> viewModel.submit());
+        // --- SỬA LOGIC CLICK NÚT LƯU ---
+        btnSave.setOnClickListener(v -> {
+            // Kiểm tra xem đã nhập tiền chưa
+            String currentAmount = etAmount.getText().toString();
+            if (currentAmount.isEmpty()) {
+                // Nếu chưa nhập -> Hiện thông báo
+                Toast.makeText(getContext(), "Vui lòng nhập số tiền", Toast.LENGTH_SHORT).show();
+            } else {
+                // Nếu đã nhập -> Thực hiện lưu
+                viewModel.submit();
+            }
+        });
     }
 
     private void observeViewModel() {
         viewModel.date.observe(getViewLifecycleOwner(), d -> tvDate.setText(d.getDayOfMonth() + "/" + d.getMonthValue() + "/" + d.getYear()));
+
         viewModel.type.observe(getViewLifecycleOwner(), t -> {
-            String s = "Chi tiêu"; if (t == TxType.INCOME) s = "Thu nhập";
-            tvType.setText(s); tvCategory.setText("Chọn danh mục");
+            String s = "Chi tiêu";
+            if (t == TxType.INCOME) {
+                s = "Thu nhập";
+            } else if (t == TxType.BORROW) {
+                s = "Đi vay";
+            } else if (t == TxType.LEND) {
+                s = "Cho vay";
+            }
+            tvType.setText(s);
+            tvCategory.setText("Chọn danh mục");
+            viewModel.category.setValue(null);
         });
+
         viewModel.category.observe(getViewLifecycleOwner(), c -> { if (c != null) tvCategory.setText(c.name); });
 
-        // Cập nhật UI nút ví khi viewModel thay đổi
         viewModel.method.observe(getViewLifecycleOwner(), m -> updateMethodUI("Tiền mặt".equals(m)));
 
         viewModel.imagePath.observe(getViewLifecycleOwner(), path -> {
@@ -401,8 +430,8 @@ public class AddTransactionFragment extends Fragment {
 
     private void updateMethodUI(boolean isCash) {
         if (optCash == null) return;
-        optCash.setBackgroundResource(isCash ? R.drawable.bg_rounded_primary_1 : R.drawable.bg_card_neutral_50);
-        optTransfer.setBackgroundResource(!isCash ? R.drawable.bg_rounded_primary_1 : R.drawable.bg_card_neutral_50);
+        optCash.setBackgroundResource(isCash ? R.drawable.bg_icon_round_neutral_100 : R.drawable.bg_card_neutral_50);
+        optTransfer.setBackgroundResource(!isCash ? R.drawable.bg_icon_round_neutral_100 : R.drawable.bg_card_neutral_50);
     }
 
     private void showDatePicker() {
