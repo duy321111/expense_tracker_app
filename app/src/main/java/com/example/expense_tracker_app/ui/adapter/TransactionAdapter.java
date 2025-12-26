@@ -22,7 +22,7 @@ import com.example.expense_tracker_app.data.model.Transaction;
 import com.example.expense_tracker_app.data.model.TxType;
 import com.example.expense_tracker_app.utils.CurrencyUtils;
 
-import java.io.InputStream; // Import thêm
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,27 +50,54 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     public void onBindViewHolder(@NonNull TxViewHolder h, int pos) {
         Transaction tx = data.get(pos);
 
-        // --- THÔNG TIN CƠ BẢN ---
+        // --- 1. NGÀY THÁNG ---
         h.tvDate.setText(String.format("%02d", tx.date.getDayOfMonth()));
-        h.tvCat.setText(tx.category.name);
+
+        // --- 2. DANH MỤC (SỬA LỖI TIẾNG ANH Ở ĐÂY) ---
+        String catName = (tx.subcategoryName != null && !tx.subcategoryName.trim().isEmpty())
+            ? tx.subcategoryName
+            : tx.category.name;
+        // Kiểm tra nếu tên là tiếng Anh (do lưu mặc định) thì hiển thị tiếng Việt
+        if (catName != null) {
+            switch (catName) {
+                case "INCOME": catName = "Thu nhập"; break;
+                case "EXPENSE": catName = "Chi tiêu"; break;
+                case "BORROW": catName = "Đi vay"; break;
+                case "LEND": catName = "Cho vay"; break;
+            }
+        }
+        h.tvCat.setText(catName);
+
+        // --- 3. PHƯƠNG THỨC (VÍ) ---
         h.tvMethod.setText(tx.method);
 
-        String prefix = (tx.type == TxType.INCOME) ? "+" : "-";
-        try { h.tvAmount.setText(prefix + CurrencyUtils.vnd(tx.amount)); }
-        catch (Exception e) { h.tvAmount.setText(prefix + tx.amount); }
+        // --- 4. SỐ TIỀN & MÀU SẮC ---
+        boolean isPositive = (tx.type == TxType.INCOME || tx.type == TxType.BORROW);
 
-        int colorRes = (tx.type == TxType.INCOME) ? R.color.success_1 : R.color.accent_1;
+        String prefix = isPositive ? "+" : "-";
+        int colorRes = isPositive ? R.color.success_1 : R.color.accent_1;
+
+        try {
+            h.tvAmount.setText(prefix + CurrencyUtils.vnd(Math.abs(tx.amount)));
+        } catch (Exception e) {
+            h.tvAmount.setText(prefix + Math.abs(tx.amount));
+        }
+
         h.tvAmount.setTextColor(context.getResources().getColor(colorRes, null));
 
-        if (tx.category.icon != null) {
-            int resId = context.getResources().getIdentifier(tx.category.icon, "drawable", context.getPackageName());
+        // --- 5. ICON ---
+        String iconName = tx.subcategoryIcon != null && !tx.subcategoryIcon.isEmpty()
+                ? tx.subcategoryIcon
+                : tx.category.icon;
+        if (iconName != null) {
+            int resId = context.getResources().getIdentifier(iconName, "drawable", context.getPackageName());
             if (resId != 0) h.ivCatIcon.setImageResource(resId);
             else h.ivCatIcon.setImageResource(R.drawable.ic_category);
         }
 
         // --- HIỂN THỊ CHI TIẾT ---
 
-        // 1. Ghi chú
+        // 6. Ghi chú
         if (tx.note != null && !tx.note.trim().isEmpty()) {
             h.tvNote.setVisibility(View.VISIBLE);
             h.tvNote.setText(tx.note);
@@ -78,7 +105,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             h.tvNote.setVisibility(View.GONE);
         }
 
-        // 2. Địa điểm
+        // 7. Địa điểm
         if (tx.location != null && !tx.location.trim().isEmpty()) {
             h.tvLocation.setVisibility(View.VISIBLE);
             h.tvLocation.setText("📍 " + tx.location);
@@ -86,10 +113,10 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             h.tvLocation.setVisibility(View.GONE);
         }
 
-        // 3. Ảnh
+        // 8. Ảnh
         if (tx.imagePath != null && !tx.imagePath.trim().isEmpty()) {
             h.tvImageLink.setVisibility(View.VISIBLE);
-            h.tvImageLink.setText("Ảnh đính kèm");
+            h.tvImageLink.setText("Xem ảnh đính kèm");
             h.tvImageLink.setPaintFlags(h.tvImageLink.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
             h.tvImageLink.setOnClickListener(v -> showImagePopup(tx.imagePath));
@@ -97,7 +124,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             h.tvImageLink.setVisibility(View.GONE);
         }
 
-        // Header ngày
+        // 9. Header ngày
         if (pos > 0 && data.get(pos - 1).date.isEqual(tx.date)) {
             h.tvDateHeader.setVisibility(View.GONE);
         } else {
@@ -106,7 +133,6 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         }
     }
 
-    // --- SỬA LỖI CRASH Ở ĐÂY ---
     private void showImagePopup(String imageUriStr) {
         Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -121,25 +147,17 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
         try {
             Uri uri = Uri.parse(imageUriStr);
-
-            // Bước 1: Thử mở luồng đọc file để kiểm tra quyền
-            // Nếu không có quyền, dòng này sẽ ném SecurityException ngay lập tức
             InputStream inputStream = context.getContentResolver().openInputStream(uri);
-
-            // Bước 2: Nếu mở được, giải mã thành Bitmap và hiển thị
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
             ivFull.setImageBitmap(bitmap);
-
             if (inputStream != null) inputStream.close();
-
         } catch (SecurityException e) {
-            // Bắt lỗi quyền truy cập (Ảnh cũ/Lỗi permission)
             e.printStackTrace();
-            Toast.makeText(context, "Không thể mở ảnh cũ (Mất quyền truy cập)", Toast.LENGTH_SHORT).show();
-            ivFull.setImageResource(R.drawable.ic_image); // Hiển thị ảnh thay thế
+            Toast.makeText(context, "Không thể mở ảnh (Mất quyền truy cập file)", Toast.LENGTH_SHORT).show();
+            ivFull.setImageResource(R.drawable.ic_image);
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(context, "Lỗi tải ảnh", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Lỗi khi tải ảnh", Toast.LENGTH_SHORT).show();
         }
 
         ivFull.setOnClickListener(v -> dialog.dismiss());

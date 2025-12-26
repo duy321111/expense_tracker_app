@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.expense_tracker_app.R;
-import com.example.expense_tracker_app.ui.Auth.Login; // Import màn hình Login
+import com.example.expense_tracker_app.ui.Auth.Login;
 import com.example.expense_tracker_app.viewmodel.ProfileViewModel;
 
 public class ProfileFragment extends Fragment {
@@ -25,7 +25,7 @@ public class ProfileFragment extends Fragment {
 
     private ImageView imgAvatar;
     private TextView tvName, tvEmail;
-    private View btnAccountInfo, btnTransactionHistory, btnMyWallets, btnLogout;
+    private View btnAccountInfo, btnTransactionHistory, btnMyWallets, btnTermsPrivacy, btnReferFriend, btnRateApp, btnLogout;
 
     @Nullable
     @Override
@@ -36,9 +36,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
-
         initViews(view);
         observeUserData();
         setupEvents();
@@ -52,6 +50,9 @@ public class ProfileFragment extends Fragment {
         btnAccountInfo = view.findViewById(R.id.btn_account_info);
         btnTransactionHistory = view.findViewById(R.id.btn_transaction_history);
         btnMyWallets = view.findViewById(R.id.btn_my_wallets);
+        btnTermsPrivacy = view.findViewById(R.id.btn_terms_privacy);
+        btnReferFriend = view.findViewById(R.id.btn_refer_friend);
+        btnRateApp = view.findViewById(R.id.btn_rate_app);
         btnLogout = view.findViewById(R.id.btn_logout);
     }
 
@@ -63,14 +64,17 @@ public class ProfileFragment extends Fragment {
 
                 if (user.email != null) tvEmail.setText(user.email);
 
+                // Hiển thị ảnh
                 if (user.profileImagePath != null && !user.profileImagePath.isEmpty()) {
                     try {
+                        // Vô hiệu hóa cache bằng cách gán null trước (nếu cần thiết)
+                        imgAvatar.setImageDrawable(null);
                         imgAvatar.setImageURI(Uri.parse(user.profileImagePath));
                     } catch (Exception e) {
-                        imgAvatar.setImageResource(R.drawable.bg_icon_round_accent_1);
+                        imgAvatar.setImageResource(R.drawable.cute); // Ảnh mặc định
                     }
                 } else {
-                    imgAvatar.setImageResource(R.drawable.bg_icon_round_accent_1);
+                    imgAvatar.setImageResource(R.drawable.cute);
                 }
             }
         });
@@ -78,22 +82,32 @@ public class ProfileFragment extends Fragment {
 
     private void setupEvents() {
         btnAccountInfo.setOnClickListener(v -> startActivity(new Intent(getActivity(), AccountInfoFragment.class)));
-
-        // Lưu ý: Đảm bảo TransactionHistoryFragment/MyWalletsFragment là Activity hoặc sửa Intent cho phù hợp
         btnTransactionHistory.setOnClickListener(v -> startActivity(new Intent(getActivity(), TransactionHistoryFragment.class)));
         btnMyWallets.setOnClickListener(v -> startActivity(new Intent(getActivity(), MyWalletsFragment.class)));
 
-        // --- SỬA PHẦN ĐĂNG XUẤT ---
+        if (btnTermsPrivacy != null) {
+            btnTermsPrivacy.setOnClickListener(v -> startActivity(new Intent(getActivity(), TermsPrivacyActivity.class)));
+        }
+
+        if (btnReferFriend != null) {
+            btnReferFriend.setOnClickListener(v -> {
+                String githubUrl = "https://github.com/duy321111/expense_tracker_app.git";
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(githubUrl));
+                startActivity(browserIntent);
+            });
+        }
+
+        if (btnRateApp != null) {
+            btnRateApp.setOnClickListener(v -> {
+                Intent intent = new Intent(getActivity(), FeedbackActivity.class);
+                startActivity(intent);
+            });
+        }
+
         btnLogout.setOnClickListener(v -> {
-            // 1. Gọi ViewModel để xóa dữ liệu lưu trữ (SharedPreferences)
             viewModel.logout();
-
-            // 2. Chuyển về màn hình Login (activity_login)
             Intent intent = new Intent(requireActivity(), Login.class);
-
-            // Cờ này giúp xóa sạch các màn hình cũ, người dùng không thể bấm Back để quay lại
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
             startActivity(intent);
         });
     }

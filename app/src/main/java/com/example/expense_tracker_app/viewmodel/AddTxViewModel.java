@@ -8,6 +8,8 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.expense_tracker_app.data.database.AppDatabase;
 import com.example.expense_tracker_app.data.database.WalletDao;
 import com.example.expense_tracker_app.data.model.Category;
+import com.example.expense_tracker_app.data.model.CategoryWithSubcategories;
+import com.example.expense_tracker_app.data.model.Subcategory;
 import com.example.expense_tracker_app.data.model.Transaction;
 import com.example.expense_tracker_app.data.model.TxType;
 import com.example.expense_tracker_app.data.repository.TransactionRepository;
@@ -15,16 +17,19 @@ import com.example.expense_tracker_app.data.repository.TransactionRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 
 public class AddTxViewModel extends AndroidViewModel {
 
     private final TransactionRepository repo;
-    private final WalletDao walletDao; // 1. Khai báo WalletDao
+    private final WalletDao walletDao;
 
     // Các biến LiveData binding với UI
     public final MutableLiveData<TxType> type = new MutableLiveData<>(TxType.EXPENSE);
     public final MutableLiveData<Category> category = new MutableLiveData<>();
-    public final MutableLiveData<String> method = new MutableLiveData<>("Tiền mặt"); // Mặc định là Tiền mặt
+    public final MutableLiveData<Subcategory> subcategory = new MutableLiveData<>();
+    public final MutableLiveData<Integer> subcategoryId = new MutableLiveData<>(0);
+    public final MutableLiveData<String> method = new MutableLiveData<>("Tiền mặt");
     public final MutableLiveData<String> amount = new MutableLiveData<>("");
     public final MutableLiveData<LocalDate> date = new MutableLiveData<>(LocalDate.now());
     public final MutableLiveData<Boolean> done = new MutableLiveData<>(false);
@@ -32,16 +37,26 @@ public class AddTxViewModel extends AndroidViewModel {
     public final MutableLiveData<String> location = new MutableLiveData<>("");
     public final MutableLiveData<Boolean> excludeReport = new MutableLiveData<>(false);
     public final MutableLiveData<String> imagePath = new MutableLiveData<>("");
+    public final MutableLiveData<List<CategoryWithSubcategories>> categories = new MutableLiveData<>();
+
+    private final ExecutorService ioExecutor = Executors.newSingleThreadExecutor();
 
     public AddTxViewModel(@NonNull Application application) {
         super(application);
         repo = new TransactionRepository(application);
-        // 2. Khởi tạo WalletDao từ Database
+        // Khởi tạo WalletDao
         walletDao = AppDatabase.getInstance(application).walletDao();
+
+        repo.ensureDefaultCategories();
+        refreshCategories();
     }
 
-    public List<Category> categories(){
-        return repo.categoriesBy(type.getValue());
+    public void refreshCategories() {
+        TxType current = type.getValue() == null ? TxType.EXPENSE : type.getValue();
+        ioExecutor.execute(() -> {
+            List<CategoryWithSubcategories> data = repo.categoriesWithSubcategories(current);
+            categories.postValue(data);
+        });
     }
 
     public void submit() {
@@ -54,7 +69,13 @@ public class AddTxViewModel extends AndroidViewModel {
         } catch (NumberFormatException e) { return; }
 
         Category finalCat = category.getValue();
+        // Fallback icon mặc định nếu chưa chọn category
         if (finalCat == null) finalCat = new Category(type.getValue().name(), "ic_category");
+
+        Subcategory pickedSub = subcategory.getValue();
+        int pickedSubId = pickedSub != null ? pickedSub.id : 0;
+        String pickedSubName = pickedSub != null ? pickedSub.name : "";
+        String pickedSubIcon = pickedSub != null && pickedSub.icon != null ? pickedSub.icon : finalCat.icon;
 
         String finalNote = note.getValue();
         if (Boolean.TRUE.equals(excludeReport.getValue())) {
@@ -67,55 +88,73 @@ public class AddTxViewModel extends AndroidViewModel {
 
         // Tạo đối tượng Transaction
         Transaction newTx = new Transaction(
-                0, 1,
-                type.getValue(),
-                finalCat,
-                amountVal,
-                method.getValue(), // Đây là tên Ví ("Tiền mặt" hoặc "Chuyển khoản")
-                date.getValue(),
-                finalNote,
-                locationVal,
-                imagePathVal
+            0, 1,
+            type.getValue(),
+            finalCat,
+            pickedSubId,
+            pickedSubName,
+            pickedSubIcon,
+            amountVal,
+            method.getValue(),
+            date.getValue(),
+            finalNote,
+            locationVal,
+            imagePathVal
         );
 
-        // --- LOGIC QUAN TRỌNG: Cập nhật Ví & Lưu Giao dịch ---
+        // --- LOGIC CẬP NHẬT VÍ ---
         final long finalAmount = amountVal;
 
         Executors.newSingleThreadExecutor().execute(() -> {
-            // 1. Lưu giao dịch vào bảng transactions
+            // 1. Lưu giao dịch
             repo.insertTransaction(newTx);
 
-            // 2. Tính toán số tiền thay đổi (Dương hoặc Âm)
+            // 2. Tính toán thay đổi số dư
             double changeAmount = 0;
             TxType currentType = type.getValue();
 
+            // Logic quan trọng bạn yêu cầu:
             if (currentType == TxType.EXPENSE) {
-                changeAmount = -finalAmount; // Chi tiêu -> Trừ tiền
+                // Chi tiêu: Tiền đi ra -> Trừ
+                changeAmount = -finalAmount;
             } else if (currentType == TxType.INCOME) {
-                changeAmount = finalAmount;  // Thu nhập -> Cộng tiền
+                // Thu nhập: Tiền đi vào -> Cộng
+                changeAmount = finalAmount;
             } else if (currentType == TxType.BORROW) {
-                changeAmount = finalAmount;  // Đi vay -> Tiền vào ví -> Cộng tiền
+                // Đi vay: Mình cầm tiền về -> Ví tăng -> Cộng
+                changeAmount = finalAmount;
             } else if (currentType == TxType.LEND) {
-                changeAmount = -finalAmount; // Cho vay -> Tiền ra khỏi ví -> Trừ tiền
+                // Cho vay: Mình đưa tiền cho người khác -> Ví giảm -> Trừ
+                changeAmount = -finalAmount;
             }
 
-            // 3. Cập nhật vào Ví (dựa theo tên ví: "Tiền mặt" hoặc "Chuyển khoản")
-            // method.getValue() sẽ trả về đúng chuỗi mà người dùng chọn ở UI
+            // 3. Cập nhật vào Ví (nếu có thay đổi)
             if (changeAmount != 0) {
                 walletDao.updateBalance(method.getValue(), changeAmount);
             }
 
-            // 4. Báo xong để UI quay về màn hình trước
+            // 4. Hoàn tất
             done.postValue(true);
         });
     }
 
     public void addNewCategory(String name, String icon) {
         Category newCat = new Category(name, icon);
-        new Thread(() -> repo.insertCategory(newCat)).start();
+        ioExecutor.execute(() -> {
+            repo.insertCategory(newCat);
+            refreshCategories();
+        });
     }
 
-    public List<Category> getCustomCategories() {
+    public List<Category> getCustomCategories() { // legacy use
         return repo.getCustomCategories();
+    }
+
+    public void addNewSubcategory(int categoryId, String name, String icon) {
+        Subcategory sub = new Subcategory(categoryId, name, icon);
+        ioExecutor.execute(() -> {
+            repo.insertSubcategory(sub);
+            refreshCategories();
+        });
     }
 }
