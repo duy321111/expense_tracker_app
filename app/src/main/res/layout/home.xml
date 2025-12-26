@@ -60,7 +60,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/user_name_placeholder"
-                        android:textColor="@color/neutral_800"/>
+                        android:textColor="@color/neutral_800" />
                 </LinearLayout>
 
                 <ImageButton
@@ -100,56 +100,85 @@
             <!-- Thẻ ngân hàng -->
             <LinearLayout
                 android:layout_width="340dp"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:layout_height="278dp"
                 android:layout_gravity="center"
-                android:padding="4dp"
-                android:background="@drawable/rounded_bg">
+                android:background="@drawable/rounded_bg"
+                android:orientation="vertical"
+                android:padding="4dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:orientation="vertical"
-                    android:padding="16dp"
+                    android:layout_height="290dp"
                     android:background="@drawable/bg_wallet_home"
+                    android:clipToOutline="true"
                     android:elevation="6dp"
-                    android:clipToOutline="true">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
                     <TextView
                         android:id="@+id/Title_wallet"
                         style="@style/Heading5"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
                         android:text="@string/title_wallet_info"
-                        android:textColor="@color/primary_1"
-                        android:layout_marginTop="8dp"/>
+                        android:textColor="@color/primary_1" />
 
+                    <!-- CHỈ SỬA PHẦN VÍ: bỏ entries để Spinner nhận data từ DB -->
                     <Spinner
                         android:id="@+id/spinner_wallet"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
-                        android:spinnerMode="dropdown"
                         android:paddingTop="8dp"
                         android:paddingBottom="8dp"
-                        android:entries="@array/wallet_array"/>
+                        android:spinnerMode="dropdown" />
 
                     <TextView
                         android:id="@+id/tv_wallet_owner"
-                        style="@style/Body2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/wallet_owner_placeholder"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"/>
-
-                    <TextView
-                        android:id="@+id/tv_wallet_balance"
                         style="@style/Body1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/wallet_balance_placeholder"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginStart="8dp"/>
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/wallet_owner_placeholder" />
+
+                    <!-- Số dư của ví đang chọn -->
+                    <TextView
+                        style="@style/Body2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="12dp"
+                        android:text="Số dư ví" />
+
+                    <TextView
+                        android:id="@+id/tv_wallet_balance"
+                        style="@style/Heading5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="0 VND"
+                        android:textColor="@color/black" />
+
+                    <!-- Tổng số dư tất cả ví -->
+                    <TextView
+                        style="@style/Body2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="12dp"
+                        android:text="Tổng số dư" />
+
+                    <TextView
+                        android:id="@+id/tv_total_balance"
+                        style="@style/Heading5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="0 VND"
+                        android:textColor="@color/black" />
+
+
                 </LinearLayout>
 
             </LinearLayout>
@@ -489,7 +518,6 @@
                         android:drawableTint="@color/neutral_800"
                         android:clickable="true"
                         android:focusable="true"/>
-
                 </LinearLayout>
 
                 <LinearLayout

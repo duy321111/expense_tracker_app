@@ -27,4 +27,12 @@ public interface WalletDao {
     // --- SỬA LỖI: Thêm hàm Delete ---
     @Delete
     void deleteWallet(Wallet wallet);
+
+    @Query("SELECT * FROM wallets WHERE userId = :userId")
+    List<Wallet> getWalletsByUser(int userId);
+
+    @Query("SELECT SUM(balance) FROM wallets WHERE userId = :userId")
+    Double getTotalBalanceByUser(int userId);
+
+
 }

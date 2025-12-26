@@ -1,5 +1,6 @@
 package com.example.expense_tracker_app.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,19 +13,28 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.util.Log;
+
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.expense_tracker_app.R;
+import com.example.expense_tracker_app.data.database.AppDatabase;
+import com.example.expense_tracker_app.data.model.Wallet;
 import com.example.expense_tracker_app.ui.Loan.LoanTrackingActivity;
 import com.example.expense_tracker_app.ui.Notification.NotificationActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.Executors;
+
 
 public class Home extends Fragment {
 
@@ -35,7 +45,6 @@ public class Home extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        // Inflate layout
         return inflater.inflate(R.layout.home, container, false);
     }
 
@@ -43,9 +52,10 @@ public class Home extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        //seedWalletForTest();
+
         // --- Toolbar ---
         MaterialToolbar tb = view.findViewById(R.id.toolbar);
-        // Nếu muốn Toolbar fragment quản lý, dùng: ((AppCompatActivity)getActivity()).setSupportActionBar(tb);
 
         // --- Avatar ---
         view.findViewById(R.id.imgAvatar).setOnClickListener(v ->
@@ -55,6 +65,21 @@ public class Home extends Fragment {
         view.findViewById(R.id.btnNotification).setOnClickListener(
                 v -> startActivity(new Intent(requireContext(), NotificationActivity.class))
         );
+
+
+        // --- Wallet UI ---
+        Spinner spinnerWallet = view.findViewById(R.id.spinner_wallet);
+        TextView tvWalletOwner = view.findViewById(R.id.tv_wallet_owner);
+        loadLoggedInUser(tvWalletOwner);
+
+        TextView tvWalletBalance = view.findViewById(R.id.tv_wallet_balance);
+        TextView tvTotalBalance  = view.findViewById(R.id.tv_total_balance);
+
+        // spinner đổi ví -> set tvWalletBalance
+        loadWalletFromDb(spinnerWallet, tvWalletBalance, tvTotalBalance);
+
+        // tổng số dư
+        //loadTotalBalance(tvTotalBalance);
 
 
         // --- Biểu đồ thu chi ---
@@ -148,29 +173,84 @@ public class Home extends Fragment {
         ((TextView) view.findViewById(R.id.tvDebtEnd))
                 .setText(two(end.get(Calendar.DAY_OF_MONTH)) + "/" + two(m + 1));
 
-        // --- Spinner chọn ví ---
-        Spinner spinnerWallet = view.findViewById(R.id.spinner_wallet);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                getActivity(),
-                R.array.wallet_array,
-                android.R.layout.simple_spinner_item
-        );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerWallet.setAdapter(adapter);
-
-        spinnerWallet.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view1, int position, long id) {
-                String selectedWallet = parent.getItemAtPosition(position).toString();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) { }
-        });
-
-        // --- NAVIGATION BAR (nếu muốn logic ở fragment) ---
-        // Có thể không cần, vì DashboardActivity quản lý
     }
+
+    private void loadWalletFromDb(Spinner spinnerWallet,
+                                  TextView tvWalletBalance,
+                                  TextView tvTotalBalance) {
+        int userId = requireActivity()
+                .getSharedPreferences("session", Context.MODE_PRIVATE)
+                .getInt("user_id", -1);
+
+        if (userId == -1) {
+            tvWalletBalance.setText("0 VND");
+            tvTotalBalance.setText("0 VND");
+            spinnerWallet.setAdapter(null);
+            return;
+        }
+
+        Executors.newSingleThreadExecutor().execute(() -> {
+            AppDatabase db = AppDatabase.getInstance(requireContext());
+            List<Wallet> wallets = db.walletDao().getWalletsByUser(userId);
+
+            requireActivity().runOnUiThread(() -> {
+                if (wallets == null || wallets.isEmpty()) {
+                    tvWalletBalance.setText("0 VND");
+                    tvTotalBalance.setText("0 VND");
+                    spinnerWallet.setAdapter(null);
+                    return;
+                }
+
+                ArrayAdapter<Wallet> adapter = new ArrayAdapter<>(
+                        requireContext(),
+                        android.R.layout.simple_spinner_item,
+                        wallets
+                ) {
+                    @NonNull
+                    @Override
+                    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+                        View v = super.getView(position, convertView, parent);
+                        ((TextView) v.findViewById(android.R.id.text1)).setText(wallets.get(position).name);
+                        return v;
+                    }
+
+                    @NonNull
+                    @Override
+                    public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
+                        View v = super.getDropDownView(position, convertView, parent);
+                        ((TextView) v.findViewById(android.R.id.text1)).setText(wallets.get(position).name);
+                        return v;
+                    }
+                };
+
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerWallet.setAdapter(adapter);
+
+                // ví mặc định
+                Wallet first = wallets.get(0);
+                tvWalletBalance.setText(formatVnd(first.balance));
+
+                // load tổng ngay sau khi có data
+                loadTotalBalance(tvTotalBalance);
+
+                spinnerWallet.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        Wallet selected = (Wallet) parent.getItemAtPosition(position);
+                        tvWalletBalance.setText(formatVnd(selected.balance));
+
+                        // tổng không đổi khi đổi ví, nhưng gọi lại cũng không sao
+                        loadTotalBalance(tvTotalBalance);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) { }
+                });
+            });
+        });
+    }
+
+
 
     // --- HELPER ---
     private String two(int n) { return (n < 10 ? "0" : "") + n; }
@@ -180,4 +260,80 @@ public class Home extends Fragment {
         symbols.setGroupingSeparator('.');
         return new DecimalFormat("#,###", symbols).format(value);
     }
+
+    private String formatVnd(double amount) {
+        NumberFormat nf = NumberFormat.getInstance(new Locale("vi", "VN"));
+        return nf.format(amount) + " VND";
+    }
+
+
+
+
+
+    private void loadLoggedInUser(TextView tvWalletOwner) {
+        int userId = requireActivity()
+                .getSharedPreferences("session", Context.MODE_PRIVATE)
+                .getInt("user_id", -1);
+
+        if (userId <= 0) { // 0 hoặc -1
+            tvWalletOwner.setText("Chưa có user đăng nhập");
+            return;
+        }
+
+        AppDatabase db = AppDatabase.getInstance(requireContext());
+        db.userDao().getUserById(userId).observe(getViewLifecycleOwner(), user -> {
+            if (user != null) tvWalletOwner.setText(user.fullName);
+        });
+    }
+
+    private void loadTotalBalance(TextView tvTotalBalance) {
+        int userId = requireActivity()
+                .getSharedPreferences("session", Context.MODE_PRIVATE)
+                .getInt("user_id", -1);
+
+        if (userId == -1) {
+            tvTotalBalance.setText("0 VND");
+            return;
+        }
+
+        Executors.newSingleThreadExecutor().execute(() -> {
+            AppDatabase db = AppDatabase.getInstance(requireContext());
+            Double total = db.walletDao().getTotalBalanceByUser(userId);
+
+            final double finalTotal = (total == null) ? 0.0 : total;
+
+            requireActivity().runOnUiThread(() -> {
+                tvTotalBalance.setText(formatVnd(finalTotal));
+            });
+        });
+    }
+
+
+
+
+
+    private void seedWalletForTest() {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            AppDatabase db = AppDatabase.getInstance(requireContext());
+
+            // chỉ insert nếu chưa có ví
+            if (db.walletDao().getWalletCount() == 0) {
+
+                int userId = 1; // test cứng
+
+                db.walletDao().insertWallet(
+                        new Wallet(userId, "Tiền mặt", 2_000_000, "ic_wallet")
+                );
+
+                db.walletDao().insertWallet(
+                        new Wallet(userId, "Chuyển khoản", 5_000_000, "ic_settings")
+                );
+            }
+        });
+    }
+
+
+
+
+
 }

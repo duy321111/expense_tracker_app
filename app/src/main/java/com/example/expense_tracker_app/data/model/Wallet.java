@@ -8,14 +8,21 @@ public class Wallet {
     @PrimaryKey(autoGenerate = true)
     public int id;
 
+    public int userId;   // THÊM
+
     public String name;
     public double balance;
-    public String icon; // Icon ví (ví dụ: ic_wallet, ic_cash)
+    public String icon;
 
-    // Constructor dùng để tạo ví mới
-    public Wallet(String name, double balance, String icon) {
+    public Wallet(int userId, String name, double balance, String icon) {
+        this.userId = userId;
         this.name = name;
         this.balance = balance;
         this.icon = icon;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }
