@@ -15,9 +15,19 @@ public interface WalletDao {
     @Insert
     void insertWallet(Wallet wallet);
 
+    // Lấy tất cả ví của một user theo userId
+    @Query("SELECT * FROM wallets WHERE userId = :userId")
+    LiveData<List<Wallet>> getWalletsByUserId(int userId);
+
+    // Lấy tất cả ví (giữ lại cho compatibility)
     @Query("SELECT * FROM wallets")
     LiveData<List<Wallet>> getAllWallets();
 
+    // Đếm ví của một user cụ thể
+    @Query("SELECT COUNT(*) FROM wallets WHERE userId = :userId")
+    int getWalletCountByUserId(int userId);
+
+    // Đếm tất cả ví
     @Query("SELECT COUNT(*) FROM wallets")
     int getWalletCount();
 

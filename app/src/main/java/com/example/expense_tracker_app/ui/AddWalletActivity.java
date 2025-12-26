@@ -11,7 +11,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.expense_tracker_app.R;
 import com.example.expense_tracker_app.data.database.AppDatabase;
+import com.example.expense_tracker_app.data.model.User;
 import com.example.expense_tracker_app.data.model.Wallet;
+import com.example.expense_tracker_app.data.repository.UserRepository;
 import com.google.android.material.appbar.MaterialToolbar;
 import java.util.concurrent.Executors;
 
@@ -59,8 +61,17 @@ public class AddWalletActivity extends AppCompatActivity {
                 }
             }
 
-            // 3. Lưu vào Database
-            Wallet newWallet = new Wallet(walletName, initialBalance, iconName);
+            // 3. Lấy user hiện tại
+            UserRepository userRepository = new UserRepository(this);
+            User currentUser = userRepository.getLoggedInUser();
+            
+            if (currentUser == null) {
+                Toast.makeText(AddWalletActivity.this, "Lỗi: Không tìm thấy user đang đăng nhập", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
+            // 4. Lưu vào Database cùng với userId
+            Wallet newWallet = new Wallet(walletName, initialBalance, iconName, currentUser.id);
 
             Executors.newSingleThreadExecutor().execute(() -> {
                 AppDatabase db = AppDatabase.getInstance(getApplicationContext());

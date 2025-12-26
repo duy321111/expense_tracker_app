@@ -35,7 +35,7 @@
         <activity android:name=".ui.Auth.OTPVerification" android:exported="true"/>
         <activity android:name=".ui.Auth.ResetPassword" android:exported="true"/>
         <activity android:name=".ui.AddWalletActivity" android:exported="true"/>
-        <activity android:name=".ui.MyWalletsFragment" android:exported="true"/>
+        <activity android:name=".ui.MyWalletsActivity" android:exported="true"/>
         <activity android:name=".ui.TransactionHistoryFragment" android:exported="true"/>
         <activity android:name=".ui.AccountInfoFragment" android:exported="true"/>
         <activity android:name=".ui.TransactionDetail" android:exported="false"/>

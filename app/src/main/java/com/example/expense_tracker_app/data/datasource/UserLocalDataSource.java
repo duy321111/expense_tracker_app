@@ -16,6 +16,7 @@ public class UserLocalDataSource {
         if (user == null) return;
         prefs.edit()
                 // --- SỬA Ở ĐÂY: Gọi trực tiếp tên biến ---
+                .putInt("id", user.id)
                 .putString("fullName", user.fullName)
                 .putString("email", user.email)
                 .putString("password", user.password)
@@ -25,16 +26,16 @@ public class UserLocalDataSource {
     }
 
     public User getLoggedInUser() {
+        int id = prefs.getInt("id", -1);
         String fullName = prefs.getString("fullName", null);
         String email = prefs.getString("email", null);
         String password = prefs.getString("password", null);
         String imagePath = prefs.getString("profileImagePath", "");
 
-        if (fullName == null || email == null || password == null) return null;
+        if (id == -1 || fullName == null || email == null || password == null) return null;
 
         // Tạo lại User từ dữ liệu đã lưu
-        User user = new User(fullName, email, password);
-        user.profileImagePath = imagePath;
+        User user = new User(id, fullName, email, password, imagePath);
         return user;
     }
 

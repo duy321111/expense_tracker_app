@@ -35,12 +35,18 @@ public class LoginViewModel extends AndroidViewModel {
             boolean success = repository.checkLogin(email, password);
 
             if (success) {
-                // 2. Nếu đăng nhập đúng -> Kiểm tra xem đã có ví nào chưa
-                int walletCount = walletDao.getWalletCount();
-                if (walletCount > 0) {
-                    loginResult.postValue(1); // Đã có ví -> Vào Dashboard
+                // 2. Lấy user vừa đăng nhập
+                var loggedUser = repository.getLoggedInUser();
+                if (loggedUser != null) {
+                    // 3. Kiểm tra xem user này có ví nào chưa
+                    int walletCount = walletDao.getWalletCountByUserId(loggedUser.id);
+                    if (walletCount > 0) {
+                        loginResult.postValue(1); // Đã có ví -> Vào Dashboard
+                    } else {
+                        loginResult.postValue(2); // Chưa có ví -> Vào AddWallet
+                    }
                 } else {
-                    loginResult.postValue(2); // Chưa có ví -> Vào AddWallet
+                    loginResult.postValue(0); // Lỗi: không thể lấy user
                 }
             } else {
                 loginResult.postValue(0); // Sai thông tin đăng nhập

@@ -15,13 +15,14 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.expense_tracker_app.R;
+import com.example.expense_tracker_app.data.repository.UserRepository;
 import com.example.expense_tracker_app.ui.Auth.Login;
 import com.example.expense_tracker_app.viewmodel.ProfileViewModel;
 
 public class ProfileFragment extends Fragment {
 
     private ProfileViewModel viewModel;
-    private int userId = 1;
+    private int userId;
 
     private ImageView imgAvatar;
     private TextView tvName, tvEmail;
@@ -37,6 +38,11 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+        
+        // Lấy userId của người dùng hiện tại
+        UserRepository userRepository = new UserRepository(getActivity());
+        userId = userRepository.getLoggedInUser() != null ? userRepository.getLoggedInUser().id : -1;
+        
         initViews(view);
         observeUserData();
         setupEvents();
@@ -83,7 +89,7 @@ public class ProfileFragment extends Fragment {
     private void setupEvents() {
         btnAccountInfo.setOnClickListener(v -> startActivity(new Intent(getActivity(), AccountInfoFragment.class)));
         btnTransactionHistory.setOnClickListener(v -> startActivity(new Intent(getActivity(), TransactionHistoryFragment.class)));
-        btnMyWallets.setOnClickListener(v -> startActivity(new Intent(getActivity(), MyWalletsFragment.class)));
+        btnMyWallets.setOnClickListener(v -> startActivity(new Intent(getActivity(), MyWalletsActivity.class)));
 
         if (btnTermsPrivacy != null) {
             btnTermsPrivacy.setOnClickListener(v -> startActivity(new Intent(getActivity(), TermsPrivacyActivity.class)));
