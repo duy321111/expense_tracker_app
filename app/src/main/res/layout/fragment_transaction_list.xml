@@ -1,39 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/neutral_50"
-    android:padding="12dp">
-
+    android:orientation="vertical"
+    android:background="#F5F5F5">
+    <!-- Header -->
+    <!-- Header -->
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="8dp">
-
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:background="@android:color/white"
+    android:elevation="2dp"
+    android:padding="12dp">
+        <!-- Nút Back bên trái -->
         <ImageButton
-            android:id="@+id/btnBack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_back"
-            android:background="@android:color/transparent"
-            android:contentDescription="Quay lại"/>
-
+        android:id="@+id/btnBack"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Back"
+        android:src="@drawable/ic_back"
+        android:scaleType="centerInside"
+        android:padding="8dp"
+        app:tint="@color/primary_1"/>
+        <!-- Title ở giữa -->
         <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="Chi tiết giao dịch"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="@color/neutral_900"/>
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="Chi tiết giao dịch"
+        android:textColor="#212121"
+        android:textSize="18sp"
+        android:textStyle="bold"/>
+        <!-- Nút Export bên phải -->
+        <ImageButton
+        android:id="@+id/btnExport"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Export"
+        android:src="@drawable/ic_download"
+        android:scaleType="centerInside"
+        android:padding="8dp"
+        app:tint="@color/primary_1"/>
     </RelativeLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvList"
+    <!-- THÊM MỚI: Month Strip -->
+    <FrameLayout
+        android:id="@+id/monthSection"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
+        android:layout_height="72dp"
+        android:background="@android:color/white"
+        android:paddingVertical="8dp"
+        android:elevation="1dp">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvMonths"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            android:clipToPadding="false"/>
+    </FrameLayout>
+    <!-- Content Area -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <!-- RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:padding="12dp"/>
+        <!-- Empty State -->
+        <TextView
+            android:id="@+id/tvEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:lineSpacingExtra="6dp"
+            android:padding="32dp"
+            android:text="💸 Ví trống rỗng..."
+            android:textAlignment="center"
+            android:textColor="#757575"
+            android:textSize="16sp"
+            android:visibility="gone"/>
+    </FrameLayout>
 </LinearLayout>
