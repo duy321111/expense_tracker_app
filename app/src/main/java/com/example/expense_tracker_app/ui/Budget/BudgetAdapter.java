@@ -1,108 +1,124 @@
-package com.example.expense_tracker_app.ui.Budget;
+package com.example.expense_tracker_app.ui.Budget; // Hoặc package adapter của bạn
 
-import android.content.Intent;
+import android.app.Application;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
-
+import com.example.expense_tracker_app.data.model.Subcategory;
+import com.example.expense_tracker_app.data.repository.TransactionRepository;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.expense_tracker_app.R;
 import com.example.expense_tracker_app.data.model.Budget;
-import com.example.expense_tracker_app.ui.Budget.BudgetDetail;
-
-import java.text.NumberFormat;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.BudgetViewHolder> {
-    private final List<Budget> budgets;
-    private final Map<String, Integer> categoryIconMap = new HashMap<>();
-    private final NumberFormat currencyFormat =
-            NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
 
-    public BudgetAdapter(List<Budget> budgets) {
-        this.budgets = budgets;
-        initCategoryIconMap();
+    private List<Budget> budgetList;
+    private int userId;
+
+    // --- PHẦN 1: KHAI BÁO INTERFACE & BIẾN LISTENER (THÊM VÀO ĐÂY) ---
+    private OnItemClickListener listener;
+
+    public interface OnItemClickListener {
+        void onItemClick(Budget budget);
     }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+    // ------------------------------------------------------------------
+
+    public BudgetAdapter(List<Budget> budgetList, int userId) {
+        this.budgetList = budgetList;
+        this.userId = userId;
+    }
+
     @NonNull
     @Override
     public BudgetViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_budget, parent, false);
         return new BudgetViewHolder(view);
     }
+
     @Override
     public void onBindViewHolder(@NonNull BudgetViewHolder holder, int position) {
-        Budget budget = budgets.get(position);
+        Budget budget = budgetList.get(position);
 
-        // --- bind text & progress ---
         holder.tvBudgetName.setText(budget.getName());
 
-        if (budget.getCategories() != null && !budget.getCategories().isEmpty()) {
-            holder.tvCategories.setText(String.join(", ", budget.getCategories()));
-            Integer icon = categoryIconMap.get(budget.getCategories().get(0));
-            holder.ivIcon.setImageResource(icon != null ? icon : R.drawable.ic_cat_food);
+        // Hiển thị tên các subcategory
+        List<Integer> subIds = budget.getSubcategoryIds();
+        StringBuilder subNames = new StringBuilder();
+        double totalSpent = 0;
+        if (subIds != null && !subIds.isEmpty()) {
+            TransactionRepository repo = new TransactionRepository((Application) holder.itemView.getContext().getApplicationContext());
+            for (int i = 0; i < subIds.size(); i++) {
+                Subcategory sub = repo.findSubcategory(subIds.get(i));
+                if (sub != null) {
+                    subNames.append(sub.name);
+                    if (i < subIds.size() - 1) subNames.append(", ");
+                }
+            }
+            // Tính tổng đã chi cho các subcategory này trong tháng/năm ngân sách (dùng epoch day)
+            java.time.LocalDate firstDayOfMonth = java.time.LocalDate.of(budget.getYear(), budget.getMonth(), 1);
+            java.time.LocalDate lastDayOfMonth = firstDayOfMonth.withDayOfMonth(firstDayOfMonth.lengthOfMonth());
+            long startEpochDay = firstDayOfMonth.toEpochDay();
+            long endEpochDay = lastDayOfMonth.toEpochDay();
+            totalSpent = repo.getTotalSpentBySubcategories(userId, startEpochDay, endEpochDay, subIds);
+        }
+        holder.tvCategories.setText(subNames.length() > 0 ? subNames.toString() : "");
+
+        // Hiển thị số tiền đã chi / hạn mức
+        String spentStr = String.format("%,.0f đ", totalSpent);
+        String limitStr = String.format("%,.0f đ", budget.getAmount());
+        String spentInfo = "Đã chi " + spentStr + " / " + limitStr;
+        holder.tvSpentInfo.setText(spentInfo);
+        // Tô đỏ chỉ phần số tiền đã chi nếu vượt hạn mức, còn số giới hạn giữ nguyên màu mặc định
+        if (budget.getAmount() > 0 && totalSpent > budget.getAmount()) {
+            // Tô đỏ phần "Đã chi ... đ"
+            int start = spentInfo.indexOf(spentStr);
+            int end = start + spentStr.length();
+            android.text.Spannable spannable = new android.text.SpannableString(spentInfo);
+            spannable.setSpan(new android.text.style.ForegroundColorSpan(
+                holder.itemView.getContext().getResources().getColor(R.color.error_1)),
+                start, end, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            holder.tvSpentInfo.setText(spannable);
         } else {
-            holder.tvCategories.setText("Không có danh mục");
-            holder.ivIcon.setImageResource(R.drawable.ic_cat_food);
+            // Bình thường để xanh lá (success_1)
+            int start = spentInfo.indexOf(spentStr);
+            int end = start + spentStr.length();
+            android.text.Spannable spannable = new android.text.SpannableString(spentInfo);
+            spannable.setSpan(new android.text.style.ForegroundColorSpan(
+                holder.itemView.getContext().getResources().getColor(R.color.success_1)),
+                start, end, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            holder.tvSpentInfo.setText(spannable);
         }
 
-        String spentInfo = holder.itemView.getContext().getString(
-                R.string.budget_spent_pattern,
-                formatCurrency(budget.getSpentAmount()),
-                formatCurrency(budget.getAmount())
-        );
-        holder.tvSpentInfo.setText(spentInfo);
-
-        int progress = budget.getAmount() <= 0 ? 0 :
-                (int) Math.min(100, Math.round((budget.getSpentAmount() / budget.getAmount()) * 100));
-        holder.pbProgress.setProgress(progress);
-
-        // --- click: open detail screen (BudgetDetail dùng layout budget_detail.xml) ---
+        // --- PHẦN 2: GẮN SỰ KIỆN CLICK (THÊM VÀO ĐÂY) ---
         holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(v.getContext(), BudgetDetail.class);
-            intent.putExtra("budget_id", budget.getId());
-            intent.putExtra("budget_name", budget.getName());
-            intent.putExtra("budget_limit", budget.getAmount());
-            intent.putExtra("budget_spent", budget.getSpentAmount());
-            intent.putExtra("budget_month", budget.getMonth());
-            intent.putExtra("budget_year", budget.getYear());
-            v.getContext().startActivity(intent);
+            if (listener != null) {
+                listener.onItemClick(budget);
+            }
         });
+        // ------------------------------------------------
     }
+
     @Override
-    public int getItemCount() { return budgets.size(); }
-    private void initCategoryIconMap() {
-        categoryIconMap.put("Ăn uống", R.drawable.ic_cat_food);
-        categoryIconMap.put("Cà phê", R.drawable.ic_cat_coffee);
-        categoryIconMap.put("Đi chợ / Siêu thị", R.drawable.ic_cat_groceries);
-        categoryIconMap.put("Điện", R.drawable.ic_cat_electric);
-        categoryIconMap.put("Nước", R.drawable.ic_cat_water);
-        categoryIconMap.put("Internet", R.drawable.ic_cat_internet);
-        categoryIconMap.put("Di chuyển", R.drawable.ic_cat_transport);
-        categoryIconMap.put("GAS", R.drawable.ic_cat_gas);
+    public int getItemCount() {
+        return budgetList.size();
     }
 
-    private String formatCurrency(double value) {
-        return currencyFormat.format(value).replace("₫", "đ");
-    }
-
-    static class BudgetViewHolder extends RecyclerView.ViewHolder {
+    // ViewHolder class
+    public static class BudgetViewHolder extends RecyclerView.ViewHolder {
         TextView tvBudgetName, tvCategories, tvSpentInfo;
-        ImageView ivIcon;
-        android.widget.ProgressBar pbProgress;
+
         public BudgetViewHolder(@NonNull View itemView) {
             super(itemView);
             tvBudgetName = itemView.findViewById(R.id.tvBudgetName);
             tvCategories = itemView.findViewById(R.id.tvCategories);
             tvSpentInfo = itemView.findViewById(R.id.tvSpentInfo);
-            ivIcon = itemView.findViewById(R.id.ivCategoryIcon);
-            pbProgress = itemView.findViewById(R.id.pbProgress);
         }
     }
 }

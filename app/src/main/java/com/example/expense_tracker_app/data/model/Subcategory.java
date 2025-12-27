@@ -23,6 +23,7 @@ public class Subcategory {
     public int categoryId;
     public String name;
     public String icon;
+    public int userId; // Thêm userId để lọc theo user
 
     public Subcategory() {}
 

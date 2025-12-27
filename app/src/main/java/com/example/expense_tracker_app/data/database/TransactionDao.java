@@ -1,4 +1,5 @@
-package com.example.expense_tracker_app.data.database;
+package com.example.expense_tracker_app.data.database;    // Lấy giao dịch theo user, tháng/năm, và list subcategoryId
+
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -28,14 +29,14 @@ public interface TransactionDao {
     long insertSubcategory(Subcategory subcategory);
 
     @androidx.room.Transaction
-    @Query("SELECT * FROM categories WHERE type = :type")
-    List<CategoryWithSubcategories> getCategoriesWithSubcategories(TxType type);
+    @Query("SELECT * FROM categories WHERE type = :type AND userId = :userId")
+    List<CategoryWithSubcategories> getCategoriesWithSubcategories(TxType type, int userId);
 
-    @Query("SELECT * FROM categories")
-    List<Category> getAllCategories();
+    @Query("SELECT * FROM categories WHERE userId = :userId")
+    List<Category> getAllCategories(int userId);
 
-    @Query("SELECT * FROM subcategories WHERE categoryId = :categoryId")
-    List<Subcategory> getSubcategoriesByCategory(int categoryId);
+    @Query("SELECT * FROM subcategories WHERE categoryId = :categoryId AND userId = :userId")
+    List<Subcategory> getSubcategoriesByCategory(int categoryId, int userId);
 
     @Query("SELECT * FROM subcategories WHERE id = :id LIMIT 1")
     Subcategory findSubcategoryById(int id);
@@ -54,4 +55,8 @@ public interface TransactionDao {
     // Lấy theo khoảng thời gian
     @Query("SELECT * FROM transactions WHERE userId = :userId AND date >= :startDate AND date <= :endDate ORDER BY date DESC, id DESC")
     LiveData<List<Transaction>> getTransactionsByDateRange(int userId, LocalDate startDate, LocalDate endDate);
+    // Lấy giao dịch theo user, khoảng ngày (epoch day), và list subcategoryId
+    @Query("SELECT * FROM transactions WHERE userId = :userId AND subcategoryId IN (:subcategoryIds) AND type = 'EXPENSE' AND date >= :startEpochDay AND date <= :endEpochDay ORDER BY date DESC, id DESC")
+    List<Transaction> getTransactionsBySubcategories(int userId, long startEpochDay, long endEpochDay, List<Integer> subcategoryIds);
+
 }

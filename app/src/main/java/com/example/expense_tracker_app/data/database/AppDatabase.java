@@ -15,8 +15,8 @@ import com.example.expense_tracker_app.data.model.Wallet; // Import Wallet
 import com.example.expense_tracker_app.data.model.converter.Converters;
 import com.example.expense_tracker_app.data.model.converter.StringListConverter;
 
-// NHỚ: Tăng version lên 7
-@Database(entities = {User.class, Budget.class, Transaction.class, Category.class, Subcategory.class, Wallet.class}, version = 7)
+// NHỚ: Tăng version lên 8 để thêm userId vào categories và subcategories
+@Database(entities = {User.class, Budget.class, Transaction.class, Category.class, Subcategory.class, Wallet.class}, version = 8)
 @TypeConverters({StringListConverter.class, Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 

@@ -12,7 +12,10 @@ import com.example.expense_tracker_app.data.model.CategoryWithSubcategories;
 import com.example.expense_tracker_app.data.model.Subcategory;
 import com.example.expense_tracker_app.data.model.Transaction;
 import com.example.expense_tracker_app.data.model.TxType;
+import com.example.expense_tracker_app.data.model.User;
 import com.example.expense_tracker_app.data.repository.TransactionRepository;
+import com.example.expense_tracker_app.data.repository.UserRepository;
+
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,6 +26,7 @@ public class AddTxViewModel extends AndroidViewModel {
 
     private final TransactionRepository repo;
     private final WalletDao walletDao;
+    private final UserRepository userRepository;
 
     // Các biến LiveData binding với UI
     public final MutableLiveData<TxType> type = new MutableLiveData<>(TxType.EXPENSE);
@@ -46,15 +50,17 @@ public class AddTxViewModel extends AndroidViewModel {
         repo = new TransactionRepository(application);
         // Khởi tạo WalletDao
         walletDao = AppDatabase.getInstance(application).walletDao();
+        // Khởi tạo UserRepository để lấy thông tin user
+        userRepository = new UserRepository(application);
 
-        repo.ensureDefaultCategories();
+        repo.ensureDefaultCategories(getUserId());
         refreshCategories();
     }
 
     public void refreshCategories() {
         TxType current = type.getValue() == null ? TxType.EXPENSE : type.getValue();
         ioExecutor.execute(() -> {
-            List<CategoryWithSubcategories> data = repo.categoriesWithSubcategories(current);
+            List<CategoryWithSubcategories> data = repo.categoriesWithSubcategories(current, getUserId());
             categories.postValue(data);
         });
     }
@@ -87,8 +93,12 @@ public class AddTxViewModel extends AndroidViewModel {
         if (imagePathVal == null) imagePathVal = "";
 
         // Tạo đối tượng Transaction
+        int userId = getUserId();
+        LocalDate txDate = date.getValue();
+        int month = txDate != null ? txDate.getMonthValue() : LocalDate.now().getMonthValue();
+        int year = txDate != null ? txDate.getYear() : LocalDate.now().getYear();
         Transaction newTx = new Transaction(
-            0, 1,
+            0, userId,
             type.getValue(),
             finalCat,
             pickedSubId,
@@ -109,26 +119,21 @@ public class AddTxViewModel extends AndroidViewModel {
             // 1. Lưu giao dịch
             repo.insertTransaction(newTx);
 
-            // 2. Tính toán thay đổi số dư
+            // 2. Tạm thời bỏ cập nhật spent_amount cho các budget liên quan
+            // BudgetSpentUpdater.updateAllBudgetsSpent(getApplication(), userId, month, year);
+
+            // 3. Tính toán thay đổi số dư
             double changeAmount = 0;
             TxType currentType = type.getValue();
-
-            // Logic quan trọng bạn yêu cầu:
             if (currentType == TxType.EXPENSE) {
-                // Chi tiêu: Tiền đi ra -> Trừ
                 changeAmount = -finalAmount;
             } else if (currentType == TxType.INCOME) {
-                // Thu nhập: Tiền đi vào -> Cộng
                 changeAmount = finalAmount;
             } else if (currentType == TxType.BORROW) {
-                // Đi vay: Mình cầm tiền về -> Ví tăng -> Cộng
                 changeAmount = finalAmount;
             } else if (currentType == TxType.LEND) {
-                // Cho vay: Mình đưa tiền cho người khác -> Ví giảm -> Trừ
                 changeAmount = -finalAmount;
             }
-
-            // 3. Cập nhật vào Ví (nếu có thay đổi)
             if (changeAmount != 0) {
                 walletDao.updateBalance(method.getValue(), changeAmount);
             }
@@ -140,6 +145,7 @@ public class AddTxViewModel extends AndroidViewModel {
 
     public void addNewCategory(String name, String icon) {
         Category newCat = new Category(name, icon);
+        newCat.userId = getUserId(); // Gán userId cho category
         ioExecutor.execute(() -> {
             repo.insertCategory(newCat);
             refreshCategories();
@@ -147,14 +153,25 @@ public class AddTxViewModel extends AndroidViewModel {
     }
 
     public List<Category> getCustomCategories() { // legacy use
-        return repo.getCustomCategories();
+        return repo.getCustomCategories(getUserId());
     }
 
     public void addNewSubcategory(int categoryId, String name, String icon) {
         Subcategory sub = new Subcategory(categoryId, name, icon);
+        sub.userId = getUserId(); // Gán userId cho subcategory
         ioExecutor.execute(() -> {
             repo.insertSubcategory(sub);
+            // Gọi refreshCategories sau khi insert thành công
             refreshCategories();
         });
+    }
+
+    private int getUserId() {
+        try {
+            User loggedUser = userRepository.getLoggedInUser();
+            return loggedUser != null ? loggedUser.id : 1; // Default userId = 1 nếu không tìm thấy
+        } catch (Exception e) {
+            return 1; // Default userId = 1 nếu có lỗi
+        }
     }
 }

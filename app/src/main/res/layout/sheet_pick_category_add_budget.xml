@@ -18,6 +18,14 @@
             android:text="Chọn danh mục"
             android:textColor="@color/neutral_900" />
 
+        <!-- Container động cho danh mục, phục vụ EditBudget -->
+        <LinearLayout
+            android:id="@+id/container_categories"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="8dp"/>
+
         <!-- ===== Chi tiêu hằng ngày ===== -->
         <LinearLayout
             android:layout_width="match_parent"
