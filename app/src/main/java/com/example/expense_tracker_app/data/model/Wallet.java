@@ -11,16 +11,20 @@ public class Wallet {
 
     public String name;
     public double balance;
-    public String icon; // Icon ví (ví dụ: ic_wallet, ic_cash)
-    
-    @ColumnInfo(name = "userId")
-    public int userId; // ID của user sở hữu ví này
+    public String icon;
 
-    // Constructor dùng để tạo ví mới
-    public Wallet(String name, double balance, String icon, int userId) {
+    // --- THÊM TRƯỜNG NÀY ---
+    public String type; // "CASH" hoặc "BANK"
+
+    @ColumnInfo(name = "userId")
+    public int userId;
+
+    // Constructor cập nhật thêm type
+    public Wallet(String name, double balance, String icon, String type, int userId) {
         this.name = name;
         this.balance = balance;
         this.icon = icon;
+        this.type = type;
         this.userId = userId;
     }
 }

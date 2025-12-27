@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 9,
-    "identityHash": "29b6e9a4cffb82094f9ea6e06a34c2c1",
+    "identityHash": "64327c2f4f6d9b597b5cd92bd90017b9",
     "entities": [
       {
         "tableName": "users",
@@ -50,8 +50,14 @@
       },
       {
         "tableName": "budgets",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `categories` TEXT, `subcategory_ids` TEXT, `amount` REAL NOT NULL, `spent_amount` REAL NOT NULL, `period` TEXT, `created_at` INTEGER NOT NULL, `month` INTEGER NOT NULL, `year` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userId` INTEGER NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `categories` TEXT, `subcategory_ids` TEXT, `amount` REAL NOT NULL, `spent_amount` REAL NOT NULL, `period` TEXT, `created_at` INTEGER NOT NULL, `month` INTEGER NOT NULL, `year` INTEGER NOT NULL)",
         "fields": [
+          {
+            "fieldPath": "userId",
+            "columnName": "userId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
           {
             "fieldPath": "id",
             "columnName": "id",
@@ -326,7 +332,7 @@
       },
       {
         "tableName": "wallets",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `balance` REAL NOT NULL, `icon` TEXT, `userId` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `balance` REAL NOT NULL, `icon` TEXT, `type` TEXT, `userId` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -353,6 +359,12 @@
             "notNull": false
           },
           {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
             "fieldPath": "userId",
             "columnName": "userId",
             "affinity": "INTEGER",
@@ -372,7 +384,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '29b6e9a4cffb82094f9ea6e06a34c2c1')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '64327c2f4f6d9b597b5cd92bd90017b9')"
     ]
   }
 }

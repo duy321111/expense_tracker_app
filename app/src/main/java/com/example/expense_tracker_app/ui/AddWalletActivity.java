@@ -8,6 +8,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 
 import com.example.expense_tracker_app.R;
 import com.example.expense_tracker_app.data.database.AppDatabase;
@@ -15,9 +16,16 @@ import com.example.expense_tracker_app.data.model.User;
 import com.example.expense_tracker_app.data.model.Wallet;
 import com.example.expense_tracker_app.data.repository.UserRepository;
 import com.google.android.material.appbar.MaterialToolbar;
+
+import java.util.List;
 import java.util.concurrent.Executors;
 
 public class AddWalletActivity extends AppCompatActivity {
+
+    private boolean hasCashWallet = false;
+    private boolean hasBankWallet = false;
+    private RadioButton radioCash, radioTransfer;
+    private Button btnCreate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,59 +35,89 @@ public class AddWalletActivity extends AppCompatActivity {
         MaterialToolbar toolbar = findViewById(R.id.toolbar_add_wallet);
         toolbar.setNavigationOnClickListener(v -> finish());
 
-        // Views
+        // 1. Ánh xạ View
         RadioGroup radioGroup = findViewById(R.id.radioGroupWalletType);
-        RadioButton radioCash = findViewById(R.id.radio_cash);
-        // RadioButton radioTransfer = findViewById(R.id.radio_transfer);
+        radioCash = findViewById(R.id.radio_cash);
+        radioTransfer = findViewById(R.id.radio_transfer);
 
         EditText etInitialBalance = findViewById(R.id.et_initial_balance);
-        Button btnCreateWallet = findViewById(R.id.btn_create_wallet);
+        btnCreate = findViewById(R.id.btn_create_wallet);
 
-        btnCreateWallet.setOnClickListener(v -> {
-            String initialBalanceStr = etInitialBalance.getText().toString().trim();
+        // 2. Lấy user hiện tại
+        UserRepository userRepository = new UserRepository(this);
+        User currentUser = userRepository.getLoggedInUser();
 
-            // 1. Xác định tên ví và Icon dựa trên lựa chọn
-            String walletName;
-            String iconName;
+        if (currentUser == null) {
+            Toast.makeText(this, "Lỗi: Không tìm thấy user", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-            if (radioCash.isChecked()) {
-                walletName = "Tiền mặt";
-                iconName = "ic_wallet"; // Đảm bảo icon này có trong drawable
-            } else {
-                walletName = "Chuyển khoản";
-                iconName = "ic_settings"; // Hoặc icon ngân hàng nếu bạn có
+        // --- 3. LOGIC MỚI: KIỂM TRA VÍ ĐÃ TỒN TẠI CHƯA ---
+        AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+        db.walletDao().getWalletsByUserId(currentUser.id).observe(this, new Observer<List<Wallet>>() {
+            @Override
+            public void onChanged(List<Wallet> wallets) {
+                hasCashWallet = false;
+                hasBankWallet = false;
+
+                if (wallets != null) {
+                    for (Wallet w : wallets) {
+                        if ("CASH".equals(w.type)) hasCashWallet = true;
+                            // Các ví cũ (type null) hoặc ví mới type BANK đều tính là ví ngân hàng
+                        else hasBankWallet = true;
+                    }
+                }
+                updateUIState();
             }
+        });
 
-            // 2. Parse số dư
-            double initialBalance = 0.0;
-            if (!initialBalanceStr.isEmpty()) {
+        // Xử lý sự kiện bấm nút Tạo Ví
+        btnCreate.setOnClickListener(v -> {
+            String balanceStr = etInitialBalance.getText().toString().trim();
+
+            double initialBalance = 0;
+            if (!balanceStr.isEmpty()) {
                 try {
-                    initialBalance = Double.parseDouble(initialBalanceStr);
+                    initialBalance = Double.parseDouble(balanceStr);
                 } catch (NumberFormatException e) {
-                    etInitialBalance.setError("Số dư không hợp lệ!");
+                    Toast.makeText(AddWalletActivity.this, "Số tiền không hợp lệ", Toast.LENGTH_SHORT).show();
                     return;
                 }
             }
 
-            // 3. Lấy user hiện tại
-            UserRepository userRepository = new UserRepository(this);
-            User currentUser = userRepository.getLoggedInUser();
-            
-            if (currentUser == null) {
-                Toast.makeText(AddWalletActivity.this, "Lỗi: Không tìm thấy user đang đăng nhập", Toast.LENGTH_SHORT).show();
-                return;
+            // Logic xác định Tên, Type và Icon
+            String walletName;
+            String type;
+            String icon;
+
+            int selectedId = radioGroup.getCheckedRadioButtonId();
+
+            if (selectedId == R.id.radio_cash) {
+                // Kiểm tra lại lần cuối cho chắc
+                if (hasCashWallet) {
+                    Toast.makeText(this, "Bạn đã có ví tiền mặt rồi!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                walletName = "Tiền mặt";
+                type = "CASH";
+                icon = "ic_cash";
+            } else {
+                if (hasBankWallet) {
+                    Toast.makeText(this, "Bạn đã có ví chuyển khoản rồi!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                walletName = "Chuyển khoản";
+                type = "BANK";
+                icon = "ic_wallet";
             }
-            
-            // 4. Lưu vào Database cùng với userId
-            Wallet newWallet = new Wallet(walletName, initialBalance, iconName, currentUser.id);
+
+            // Lưu vào Database
+            Wallet newWallet = new Wallet(walletName, initialBalance, icon, type, currentUser.id);
 
             Executors.newSingleThreadExecutor().execute(() -> {
-                AppDatabase db = AppDatabase.getInstance(getApplicationContext());
                 db.walletDao().insertWallet(newWallet);
-
                 runOnUiThread(() -> {
-                    Toast.makeText(AddWalletActivity.this, "Đã thêm ví: " + walletName, Toast.LENGTH_SHORT).show();
-
+                    Toast.makeText(AddWalletActivity.this, "Đã thêm ví: " + newWallet.name, Toast.LENGTH_SHORT).show();
                     boolean isFirstRun = getIntent().getBooleanExtra("IS_FIRST_RUN", false);
                     if (isFirstRun) {
                         Intent intent = new Intent(AddWalletActivity.this, DashBoardActivity.class);
@@ -92,5 +130,31 @@ public class AddWalletActivity extends AppCompatActivity {
                 });
             });
         });
+    }
+
+    // Hàm cập nhật trạng thái các nút chọn
+    private void updateUIState() {
+        // Disable nút Tiền mặt nếu đã có
+        radioCash.setEnabled(!hasCashWallet);
+        radioCash.setAlpha(hasCashWallet ? 0.5f : 1.0f);
+
+        // Disable nút Chuyển khoản nếu đã có
+        radioTransfer.setEnabled(!hasBankWallet);
+        radioTransfer.setAlpha(hasBankWallet ? 0.5f : 1.0f);
+
+        // Tự động chuyển vùng chọn nếu cái hiện tại bị disable
+        if (hasCashWallet && radioCash.isChecked()) {
+            radioTransfer.setChecked(true);
+        }
+        if (hasBankWallet && radioTransfer.isChecked()) {
+            radioCash.setChecked(true);
+        }
+
+        // Nếu cả 2 đều có -> Chặn nút tạo luôn
+        if (hasCashWallet && hasBankWallet) {
+            btnCreate.setEnabled(false);
+            btnCreate.setText("Đã đủ số lượng ví (Tối đa 2)");
+            btnCreate.setBackgroundColor(getResources().getColor(R.color.neutral_400));
+        }
     }
 }
