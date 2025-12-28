@@ -111,7 +111,7 @@ public class TransactionHistoryFragment extends AppCompatActivity {
         // 2. Lấy LiveData mới theo userId và ngày đã chọn
         currentLiveData = repository.getTransactionsByMonth(currentUserId, selectedDate);
 
-        // 3. Đăng ký theo dõi mới
+        // 3. Đăng ký theo dõi m
         currentLiveData.observe(this, transactions -> {
             if (transactions != null) {
                 adapter.setData(transactions);

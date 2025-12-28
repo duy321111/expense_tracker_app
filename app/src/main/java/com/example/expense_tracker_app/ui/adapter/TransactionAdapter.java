@@ -35,26 +35,20 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     private final Context context;
     private OnTransactionClickListener listener;
 
-    // Interface cho sự kiện click
     public interface OnTransactionClickListener {
         void onClick(Transaction transaction);
     }
 
-    // Constructor nhận thêm listener (Dùng cho màn hình Lịch sử để xóa)
     public TransactionAdapter(Context context, OnTransactionClickListener listener) {
         this.context = context;
         this.listener = listener;
     }
 
-    // --- THÊM LẠI CONSTRUCTOR NÀY ---
-    // Để tránh lỗi "Expected 2 arguments but found 1" ở các màn hình khác (như BudgetDetail)
     public TransactionAdapter(Context context) {
         this(context, null);
     }
-    // --------------------------------
 
     public void setListener(Listener listener) {
-  
         if (listener instanceof OnTransactionClickListener) {
             this.listener = (OnTransactionClickListener) listener;
         }
@@ -64,6 +58,11 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         data.clear();
         data.addAll(newData);
         notifyDataSetChanged();
+    }
+
+    // ✅ THÊM METHOD NÀY
+    public List<Transaction> getData() {
+        return new ArrayList<>(data); // Return copy để tránh modify trực tiếp
     }
 
     @NonNull @Override
@@ -93,8 +92,6 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         h.tvCat.setText(catName);
         h.tvMethod.setText(tx.method);
 
-        // --- SỬA LOGIC HIỂN THỊ DẤU VÀ MÀU ---
-        // Thêm DEBT_COLLECTION (Thu hồi nợ) vào nhóm Dương (+)
         boolean isPositive = (tx.type == TxType.INCOME
                 || tx.type == TxType.BORROW
                 || tx.type == TxType.DEBT_COLLECTION);
@@ -108,7 +105,6 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             h.tvAmount.setText(prefix + Math.abs(tx.amount));
         }
         h.tvAmount.setTextColor(context.getResources().getColor(colorRes, null));
-        // -------------------------------------
 
         String iconName = (tx.subcategoryIcon != null && !tx.subcategoryIcon.isEmpty())
                 ? tx.subcategoryIcon
@@ -150,7 +146,6 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             h.tvDateHeader.setText("Ngày " + tx.date.getDayOfMonth() + " tháng " + tx.date.getMonthValue() + " " + tx.date.getYear());
         }
 
-        // Bắt sự kiện click vào item
         h.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onClick(tx);
         });
