@@ -1,7 +1,9 @@
 package com.example.expense_tracker_app.data.repository;
 
 import android.app.Application;
+
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.example.expense_tracker_app.data.database.AppDatabase;
 import com.example.expense_tracker_app.data.database.TransactionDao;
@@ -12,13 +14,14 @@ import com.example.expense_tracker_app.data.model.Subcategory;
 import com.example.expense_tracker_app.data.model.Transaction;
 import com.example.expense_tracker_app.data.model.TxType;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.time.LocalDate;
 
 public class TransactionRepository {
+
     private final TransactionDao transactionDao;
     private final WalletDao walletDao;
     private final ExecutorService executor;
@@ -68,6 +71,23 @@ public class TransactionRepository {
         return transactionDao.getTransactionsByDateRange(userId, startDate, endDate);
     }
 
+    // ✅ CHỈ BORROW + LEND
+    public LiveData<List<Transaction>> getLoanTransactionsByMonth(int userId, LocalDate monthAnyDay) {
+        LocalDate start = monthAnyDay.withDayOfMonth(1);
+        LocalDate end = monthAnyDay.withDayOfMonth(monthAnyDay.lengthOfMonth());
+
+        // dùng transactionDao đã init sẵn
+        return transactionDao.getLoanTransactionsByDateRange(
+                userId,
+                start,
+                end,
+                TxType.BORROW,
+                TxType.LEND
+        );
+    }
+
+    // --- CATEGORY / SUBCATEGORY ---
+
     public void insertCategory(Category category) {
         executor.execute(() -> {
             try {
@@ -102,6 +122,9 @@ public class TransactionRepository {
         });
     }
 
+    public List<Category> getCustomCategories() {
+        try {
+            return transactionDao.getAllCategories();
     public List<Category> getCustomCategories(int userId) {
         try {
             return transactionDao.getAllCategories(userId);
@@ -210,6 +233,40 @@ public class TransactionRepository {
         }
     }
 
+    public class DebtSummary {
+        public long totalBorrow;
+        public long totalPaid;
+
+        public DebtSummary(long totalBorrow, long totalPaid) {
+            this.totalBorrow = totalBorrow;
+            this.totalPaid = totalPaid;
+        }
+    }
+
+
+    public LiveData<DebtSummary> getDebtSummaryByMonth(
+            int userId,
+            LocalDate anyDayInMonth
+    ) {
+        MutableLiveData<DebtSummary> live = new MutableLiveData<>();
+
+        executor.execute(() -> {
+            LocalDate start = anyDayInMonth.withDayOfMonth(1);
+            LocalDate end = anyDayInMonth.withDayOfMonth(anyDayInMonth.lengthOfMonth());
+
+            long borrow = transactionDao.getTotalBorrowInMonth(
+                    userId, TxType.BORROW, start, end);
+
+            long paid = transactionDao.getTotalDebtPaidInMonth(
+                    userId, TxType.EXPENSE, TxType.BORROW, start, end);
+
+            live.postValue(new DebtSummary(borrow, paid));
+        });
+
+        return live;
+    }
+
+}
     public List<Transaction> getTransactionsBySubcategories(int userId, long startEpochDay, long endEpochDay, List<Integer> subcategoryIds) {
         try {
             return transactionDao.getTransactionsBySubcategories(userId, startEpochDay, endEpochDay, subcategoryIds);

@@ -63,6 +63,59 @@ public interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE userId = :userId AND date >= :startDate AND date <= :endDate ORDER BY date DESC, id DESC")
     LiveData<List<Transaction>> getTransactionsByDateRange(int userId, LocalDate startDate, LocalDate endDate);
 
+    // Xóa giao dịch
+    @Query("DELETE FROM transactions WHERE id = :txId")
+    int deleteById(int txId);
+
+    @Query("SELECT * FROM transactions " +
+            "WHERE userId = :userId " +
+            "AND date >= :startDate AND date <= :endDate " +
+            "AND (type = :borrow OR type = :lend) " +
+            "ORDER BY date DESC, id DESC")
+    LiveData<List<Transaction>> getLoanTransactionsByDateRange(
+            int userId,
+            LocalDate startDate,
+            LocalDate endDate,
+            TxType borrow,
+            TxType lend
+    );
+
+    // ✅ FIX: thêm khoảng trắng + BETWEEN chuẩn
+    @Query("SELECT IFNULL(SUM(amount), 0) " +
+            "FROM transactions " +
+            "WHERE userId = :userId " +
+            "AND type = :borrow " +
+            "AND date BETWEEN :start AND :end")
+    long getTotalBorrowInMonth(
+            int userId,
+            TxType borrow,
+            LocalDate start,
+            LocalDate end
+    );
+
+    /**
+     * ✅ FIX: không dùng t.categoryId nữa
+     * "Đã trả nợ" = các giao dịch EXPENSE nhưng thuộc nhóm category BORROW
+     * (nhận diện bằng subcategoryId -> subcategories -> categories.type)
+     */
+    @Query("SELECT IFNULL(SUM(t.amount), 0) " +
+            "FROM transactions t " +
+            "JOIN subcategories s ON t.subcategoryId = s.id " +
+            "JOIN categories c ON s.categoryId = c.id " +
+            "WHERE t.userId = :userId " +
+            "AND t.type = :expense " +
+            "AND c.type = :borrow " +
+            "AND t.date BETWEEN :start AND :end")
+    long getTotalDebtPaidInMonth(
+            int userId,
+            TxType expense,
+            TxType borrow,
+            LocalDate start,
+            LocalDate end
+    );
+
+
+
     @Query("SELECT * FROM transactions WHERE userId = :userId AND subcategoryId IN (:subcategoryIds) AND type = 'EXPENSE' AND date >= :startEpochDay AND date <= :endEpochDay AND excludeFromReport = 0 ORDER BY date DESC, id DESC")
     List<Transaction> getTransactionsBySubcategories(int userId, long startEpochDay, long endEpochDay, List<Integer> subcategoryIds);
 }

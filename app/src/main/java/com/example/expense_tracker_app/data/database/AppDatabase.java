@@ -30,6 +30,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract TransactionDao transactionDao();
     public abstract WalletDao walletDao();
 
+
     private static volatile AppDatabase INSTANCE;
 
     // Migration cũ (giữ nguyên)

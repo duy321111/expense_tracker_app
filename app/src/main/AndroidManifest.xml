@@ -65,5 +65,9 @@
         <activity android:name=".ui.Transactions" android:exported="true"/>
         <activity android:name=".ui.TermsPrivacyActivity" android:exported="false"/>
 
+        <activity android:name=".ui.BudgetLimitEditActivity" />
+        <activity android:name=".ui.BudgetListActivity" />
+
+
     </application>
 </manifest>

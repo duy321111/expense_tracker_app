@@ -28,6 +28,10 @@ import java.util.List;
 
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.TxViewHolder> {
     private final List<Transaction> data = new ArrayList<>();
+
+    public interface Listener {
+        void onLongClickDelete(Transaction tx);
+    }
     private final Context context;
     private final OnTransactionClickListener listener;
 
@@ -48,6 +52,10 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         this(context, null);
     }
     // --------------------------------
+
+    public void setListener(Listener listener) {
+        this.listener = listener;
+    }
 
     public void setData(List<Transaction> newData) {
         data.clear();
