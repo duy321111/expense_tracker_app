@@ -256,29 +256,33 @@ public class Home extends Fragment {
     // ===================== RECENT TX =====================
 
     private void loadRecentTransactions(TransactionAdapter adapter, TextView tvEmpty) {
-        int uid = requireActivity()
-                .getSharedPreferences("session", Context.MODE_PRIVATE)
-                .getInt("user_id", -1);
 
-        if (uid <= 0) {
+        // Fragment chưa attach Activity
+        if (!isAdded() || getActivity() == null) {
+            return;
+        }
+
+        // userId đã lấy sẵn trong Home
+        if (userId <= 0) {
             adapter.setData(java.util.Collections.emptyList());
             tvEmpty.setVisibility(View.VISIBLE);
             return;
         }
 
-        TransactionRepository repo = new TransactionRepository(requireActivity().getApplication());
         LocalDate now = LocalDate.now();
 
-        repo.getTransactionsByMonth(uid, now).observe(getViewLifecycleOwner(), list -> {
-            if (list == null || list.isEmpty()) {
-                adapter.setData(java.util.Collections.emptyList());
-                tvEmpty.setVisibility(View.VISIBLE);
-            } else {
-                int end = Math.min(3, list.size());
-                adapter.setData(list.subList(0, end));
-                tvEmpty.setVisibility(View.GONE);
-            }
-        });
+        transactionRepository
+                .getTransactionsByMonth(userId, now)
+                .observe(getViewLifecycleOwner(), list -> {
+
+                    if (list == null || list.isEmpty()) {
+                        adapter.setData(java.util.Collections.emptyList());
+                        tvEmpty.setVisibility(View.VISIBLE);
+                    } else {
+                        adapter.setData(list.subList(0, Math.min(3, list.size())));
+                        tvEmpty.setVisibility(View.GONE);
+                    }
+                });
     }
 
     // ===================== LOAN TRACKING SUMMARY (CARD HOME) =====================
