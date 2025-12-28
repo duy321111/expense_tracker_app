@@ -33,7 +33,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         void onLongClickDelete(Transaction tx);
     }
     private final Context context;
-    private final OnTransactionClickListener listener;
+    private OnTransactionClickListener listener;
 
     // Interface cho sự kiện click
     public interface OnTransactionClickListener {
@@ -54,7 +54,10 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     // --------------------------------
 
     public void setListener(Listener listener) {
-        this.listener = listener;
+  
+        if (listener instanceof OnTransactionClickListener) {
+            this.listener = (OnTransactionClickListener) listener;
+        }
     }
 
     public void setData(List<Transaction> newData) {

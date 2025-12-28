@@ -122,9 +122,7 @@ public class TransactionRepository {
         });
     }
 
-    public List<Category> getCustomCategories() {
-        try {
-            return transactionDao.getAllCategories();
+
     public List<Category> getCustomCategories(int userId) {
         try {
             return transactionDao.getAllCategories(userId);
@@ -266,7 +264,7 @@ public class TransactionRepository {
         return live;
     }
 
-}
+
     public List<Transaction> getTransactionsBySubcategories(int userId, long startEpochDay, long endEpochDay, List<Integer> subcategoryIds) {
         try {
             return transactionDao.getTransactionsBySubcategories(userId, startEpochDay, endEpochDay, subcategoryIds);
