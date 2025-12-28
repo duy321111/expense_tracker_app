@@ -1,6 +1,5 @@
 package com.example.expense_tracker_app.ui;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,8 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -21,6 +20,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.expense_tracker_app.R;
+import com.example.expense_tracker_app.data.model.Transaction;
+import com.example.expense_tracker_app.data.model.TxType;
 import com.example.expense_tracker_app.data.model.Wallet;
 import com.example.expense_tracker_app.data.repository.TransactionRepository;
 import com.example.expense_tracker_app.data.repository.UserRepository;
@@ -33,9 +34,10 @@ import com.google.android.material.appbar.MaterialToolbar;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.time.LocalDate;              // ✅ FIX: import LocalDate
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 
 public class Home extends Fragment {
@@ -56,13 +58,12 @@ public class Home extends Fragment {
     private final List<Wallet> walletList = new ArrayList<>();
     private ArrayAdapter<String> walletNameAdapter;
 
-    // debt card (loan tracking summary)
-    private TextView tvDebtRatio;
-    private ProgressBar pbDebt;
-    private TextView tvDebtMeta;
-
-    // ✅ FIX: repository dùng cho debt summary
+    // recent tx
     private TransactionRepository transactionRepository;
+
+    // debt cards (RecyclerView dùng item_budget, tối đa 2 thẻ)
+    private RecyclerView rvDebtCards;
+    private DebtCardAdapter debtAdapter;
 
     @Nullable
     @Override
@@ -76,14 +77,11 @@ public class Home extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // --- ViewModels ---
         profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         walletViewModel = new ViewModelProvider(this).get(WalletViewModel.class);
 
-        // ✅ FIX: init TransactionRepository 1 lần
         transactionRepository = new TransactionRepository(requireActivity().getApplication());
 
-        // --- userId (1 nguồn) ---
         UserRepository userRepository = new UserRepository(requireActivity());
         userId = (userRepository.getLoggedInUser() != null) ? userRepository.getLoggedInUser().id : -1;
 
@@ -97,11 +95,9 @@ public class Home extends Fragment {
         spinnerWallet = view.findViewById(R.id.spinner_wallet);
         tvTotalWalletBalance = view.findViewById(R.id.tv_total_wallet_balance);
 
-        tvDebtRatio = view.findViewById(R.id.tvDebtRatio);
-        pbDebt = view.findViewById(R.id.pbDebt);
-        tvDebtMeta = view.findViewById(R.id.tvDebtMeta);
-        setupDebtCard();
-
+        // ✅ RecyclerView debt cards (nếu XML có)
+        rvDebtCards = view.findViewById(R.id.rv_debt_cards);
+        setupDebtCards();
 
         // --- user name ---
         observeUserName();
@@ -110,19 +106,23 @@ public class Home extends Fragment {
         setupWalletSpinner();
         observeWalletsUsingExistingViewModel();
 
-        // ✅ FIX: gọi setupDebtCard để load DB lên progress
-        setupDebtCard();
-
         // --- events ---
-        view.findViewById(R.id.btnReload).setOnClickListener(v -> requireActivity().recreate());
-        view.findViewById(R.id.btnNotification).setOnClickListener(
-                v -> startActivity(new Intent(requireContext(), NotificationActivity.class))
-        );
+        View btnReload = view.findViewById(R.id.btnReload);
+        if (btnReload != null) btnReload.setOnClickListener(v -> requireActivity().recreate());
 
-        view.findViewById(R.id.tvDebtDetail).setOnClickListener(v ->
-                startActivity(new Intent(getActivity(), LoanTrackingActivity.class))
-        );
+        View btnNotification = view.findViewById(R.id.btnNotification);
+        if (btnNotification != null) {
+            btnNotification.setOnClickListener(v ->
+                    startActivity(new Intent(requireContext(), NotificationActivity.class))
+            );
+        }
 
+        View tvDebtDetail = view.findViewById(R.id.tvDebtDetail);
+        if (tvDebtDetail != null) {
+            tvDebtDetail.setOnClickListener(v ->
+                    startActivity(new Intent(getActivity(), LoanTrackingActivity.class))
+            );
+        }
 
         // --- chart (real data) ---
         View barIncome = view.findViewById(R.id.barIncome);
@@ -143,54 +143,53 @@ public class Home extends Fragment {
                 .observe(getViewLifecycleOwner(), list -> {
                     float income = 0f;
                     float spending = 0f;
+
                     if (list != null) {
-                        for (com.example.expense_tracker_app.data.model.Transaction t : list) {
-                            if (t.type == com.example.expense_tracker_app.data.model.TxType.INCOME) {
-                                income += t.amount;
-                            } else if (t.type == com.example.expense_tracker_app.data.model.TxType.EXPENSE) {
-                                spending += t.amount;
-                            }
+                        for (Transaction t : list) {
+                            if (t == null || t.type == null) continue;
+                            if (t.type == TxType.INCOME) income += t.amount;
+                            else if (t.type == TxType.EXPENSE) spending += t.amount;
                         }
                     }
+
                     float maxValue = Math.max(income, spending);
                     if (maxValue == 0) maxValue = 1f;
-                    int incomeHeight = Math.round(chartMaxDp * (income / maxValue) * density);
-                    int spendingHeight = Math.round(chartMaxDp * (spending / maxValue) * density);
 
-                    LinearLayout.LayoutParams lpIncome = (LinearLayout.LayoutParams) barIncome.getLayoutParams();
-                    lpIncome.height = incomeHeight;
-                    barIncome.setLayoutParams(lpIncome);
-
-                    LinearLayout.LayoutParams lpSpending = (LinearLayout.LayoutParams) barSpending.getLayoutParams();
-                    lpSpending.height = spendingHeight;
-                    barSpending.setLayoutParams(lpSpending);
-
-                    if (maxValue < 1_000_000f) {
-                        // Đơn vị nghìn (k)
-                        y0.setText("0");
-                        y25.setText(String.format("%.0fk", (maxValue * 0.25f) / 1_000f));
-                        y50.setText(String.format("%.0fk", (maxValue * 0.50f) / 1_000f));
-                        y75.setText(String.format("%.0fk", (maxValue * 0.75f) / 1_000f));
-                        y100.setText(String.format("%.0fk", maxValue / 1_000f));
-                    } else {
-                        // Đơn vị triệu (m)
-                        y0.setText("0");
-                        y25.setText(String.format("%.1fm", (maxValue * 0.25f) / 1_000_000f));
-                        y50.setText(String.format("%.1fm", (maxValue * 0.50f) / 1_000_000f));
-                        y75.setText(String.format("%.1fm", (maxValue * 0.75f) / 1_000_000f));
-                        y100.setText(String.format("%.1fm", maxValue / 1_000_000f));
+                    if (barIncome != null) {
+                        int incomeHeight = Math.round(chartMaxDp * (income / maxValue) * density);
+                        LinearLayout.LayoutParams lpIncome = (LinearLayout.LayoutParams) barIncome.getLayoutParams();
+                        lpIncome.height = incomeHeight;
+                        barIncome.setLayoutParams(lpIncome);
                     }
 
-                    // Hiển thị số thu nhập/chi tiêu thực tế
-                    if (tvIncomeAmount != null) {
-                        tvIncomeAmount.setText(formatMoneyDouble(income) + " đ");
+                    if (barSpending != null) {
+                        int spendingHeight = Math.round(chartMaxDp * (spending / maxValue) * density);
+                        LinearLayout.LayoutParams lpSpending = (LinearLayout.LayoutParams) barSpending.getLayoutParams();
+                        lpSpending.height = spendingHeight;
+                        barSpending.setLayoutParams(lpSpending);
                     }
-                    if (tvSpendingAmount != null) {
-                        tvSpendingAmount.setText(formatMoneyDouble(spending) + " đ");
+
+                    if (y0 != null && y25 != null && y50 != null && y75 != null && y100 != null) {
+                        if (maxValue < 1_000_000f) {
+                            y0.setText("0");
+                            y25.setText(String.format("%.0fk", (maxValue * 0.25f) / 1_000f));
+                            y50.setText(String.format("%.0fk", (maxValue * 0.50f) / 1_000f));
+                            y75.setText(String.format("%.0fk", (maxValue * 0.75f) / 1_000f));
+                            y100.setText(String.format("%.0fk", maxValue / 1_000f));
+                        } else {
+                            y0.setText("0");
+                            y25.setText(String.format("%.1fm", (maxValue * 0.25f) / 1_000_000f));
+                            y50.setText(String.format("%.1fm", (maxValue * 0.50f) / 1_000_000f));
+                            y75.setText(String.format("%.1fm", (maxValue * 0.75f) / 1_000_000f));
+                            y100.setText(String.format("%.1fm", maxValue / 1_000_000f));
+                        }
                     }
+
+                    if (tvIncomeAmount != null) tvIncomeAmount.setText(formatMoneyDouble(income) + " đ");
+                    if (tvSpendingAmount != null) tvSpendingAmount.setText(formatMoneyDouble(spending) + " đ");
                 });
 
-        // --- month range text ---
+        // --- month range text (giữ nguyên nếu bạn đang dùng chỗ khác) ---
         Calendar c = Calendar.getInstance();
         int yy = c.get(Calendar.YEAR);
         int mm = c.get(Calendar.MONTH);
@@ -201,18 +200,22 @@ public class Home extends Fragment {
         end.set(yy, mm, end.getActualMaximum(Calendar.DAY_OF_MONTH));
 
         // --- recent transactions ---
-        view.findViewById(R.id.tvSeeAll).setOnClickListener(v ->
-                startActivity(new Intent(getActivity(), Transactions.class))
-        );
+        View tvSeeAll = view.findViewById(R.id.tvSeeAll);
+        if (tvSeeAll != null) {
+            tvSeeAll.setOnClickListener(v ->
+                    startActivity(new Intent(getActivity(), Transactions.class))
+            );
+        }
 
         RecyclerView rvRecent = view.findViewById(R.id.rv_recent_transactions);
         TextView tvEmpty = view.findViewById(R.id.tv_empty_recent);
 
-        rvRecent.setLayoutManager(new LinearLayoutManager(requireContext()));
-        TransactionAdapter recentAdapter = new TransactionAdapter(requireContext());
-        rvRecent.setAdapter(recentAdapter);
-
-        loadRecentTransactions(recentAdapter, tvEmpty);
+        if (rvRecent != null) {
+            rvRecent.setLayoutManager(new LinearLayoutManager(requireContext()));
+            TransactionAdapter recentAdapter = new TransactionAdapter(requireContext());
+            rvRecent.setAdapter(recentAdapter);
+            loadRecentTransactions(recentAdapter, tvEmpty);
+        }
     }
 
     // ===================== WALLET =====================
@@ -224,22 +227,25 @@ public class Home extends Fragment {
                 new ArrayList<>()
         );
         walletNameAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerWallet.setAdapter(walletNameAdapter);
 
-        spinnerWallet.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view1, int position, long id) {
-                if (position >= 0 && position < walletList.size()) {
-                    Wallet w = walletList.get(position);
-                    tvWalletBalance.setText(formatMoneyDouble(w.balance) + " đ");
-                } else {
-                    tvWalletBalance.setText("0 đ");
+        if (spinnerWallet != null) spinnerWallet.setAdapter(walletNameAdapter);
+
+        if (spinnerWallet != null) {
+            spinnerWallet.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view1, int position, long id) {
+                    if (position >= 0 && position < walletList.size()) {
+                        Wallet w = walletList.get(position);
+                        if (tvWalletBalance != null) tvWalletBalance.setText(formatMoneyDouble(w.balance) + " đ");
+                    } else {
+                        if (tvWalletBalance != null) tvWalletBalance.setText("0 đ");
+                    }
                 }
-            }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) { }
-        });
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) { }
+            });
+        }
     }
 
     private void observeWalletsUsingExistingViewModel() {
@@ -250,10 +256,10 @@ public class Home extends Fragment {
             if (wallets != null && !wallets.isEmpty()) {
                 walletList.addAll(wallets);
                 for (Wallet w : wallets) walletNameAdapter.add(w.name);
-                tvWalletBalance.setText(formatMoneyDouble(walletList.get(0).balance) + " đ");
+                if (tvWalletBalance != null) tvWalletBalance.setText(formatMoneyDouble(walletList.get(0).balance) + " đ");
             } else {
                 walletNameAdapter.add("Chưa có ví");
-                tvWalletBalance.setText("0 đ");
+                if (tvWalletBalance != null) tvWalletBalance.setText("0 đ");
             }
 
             walletNameAdapter.notifyDataSetChanged();
@@ -270,6 +276,8 @@ public class Home extends Fragment {
     // ===================== USER =====================
 
     private void observeUserName() {
+        if (tvUserName == null || tvWalletOwner == null) return;
+
         if (userId == -1) {
             tvUserName.setText("Người dùng");
             tvWalletOwner.setText("Người dùng");
@@ -289,89 +297,199 @@ public class Home extends Fragment {
     // ===================== RECENT TX =====================
 
     private void loadRecentTransactions(TransactionAdapter adapter, TextView tvEmpty) {
+        if (!isAdded() || getActivity() == null) return;
 
-        // Fragment chưa attach Activity
-        if (!isAdded() || getActivity() == null) {
-            return;
-        }
-
-        // userId đã lấy sẵn trong Home
         if (userId <= 0) {
-            adapter.setData(java.util.Collections.emptyList());
-            tvEmpty.setVisibility(View.VISIBLE);
+            adapter.setData(Collections.emptyList());
+            if (tvEmpty != null) tvEmpty.setVisibility(View.VISIBLE);
             return;
         }
 
         LocalDate now = LocalDate.now();
 
-        transactionRepository
-                .getTransactionsByMonth(userId, now)
+        transactionRepository.getTransactionsByMonth(userId, now)
                 .observe(getViewLifecycleOwner(), list -> {
-
                     if (list == null || list.isEmpty()) {
-                        adapter.setData(java.util.Collections.emptyList());
-                        tvEmpty.setVisibility(View.VISIBLE);
+                        adapter.setData(Collections.emptyList());
+                        if (tvEmpty != null) tvEmpty.setVisibility(View.VISIBLE);
                     } else {
                         adapter.setData(list.subList(0, Math.min(3, list.size())));
-                        tvEmpty.setVisibility(View.GONE);
+                        if (tvEmpty != null) tvEmpty.setVisibility(View.GONE);
                     }
                 });
     }
 
-    // ===================== LOAN TRACKING SUMMARY (CARD HOME) =====================
+    // ===================== DEBT CARDS (item_budget as RecyclerView) =====================
 
-    private void setupDebtCard() {
-        if (tvDebtRatio == null || pbDebt == null || tvDebtMeta == null) return;
+    private void setupDebtCards() {
+        if (rvDebtCards == null) return;
+
+        rvDebtCards.setLayoutManager(new LinearLayoutManager(requireContext()));
+        debtAdapter = new DebtCardAdapter(tx -> {
+            // Click thẻ -> mở LoanTrackingActivity và lọc theo nhóm
+            Intent i = new Intent(getActivity(), LoanTrackingActivity.class);
+
+            // Dùng TxType để biết nhóm nào:
+            // BORROW -> (BORROW, LOAN_REPAYMENT)
+            // LEND   -> (LEND, DEBT_COLLECTION)
+            i.putExtra(LoanTrackingActivity.EXTRA_DEBT_KIND,
+                    tx.type == TxType.BORROW ? "BORROW" : "LEND");
+
+            startActivity(i);
+        });
+
+        rvDebtCards.setAdapter(debtAdapter);
+
+        loadDebtCards();
+    }
+
+    private void loadDebtCards() {
+        if (debtAdapter == null) return;
 
         if (userId <= 0) {
-            renderDebtEmpty();
+            debtAdapter.setData(Collections.emptyList());
             return;
         }
 
-        LocalDate now = LocalDate.now();
+        // ✅ lấy tất cả giao dịch vay/nợ (4 loại) từ repo hiện tại của bạn
+        transactionRepository.getLoanTransactions(userId)
+                .observe(getViewLifecycleOwner(), list -> {
+                    if (list == null) list = Collections.emptyList();
 
-        // YÊU CẦU: TransactionRepository phải có getDebtSummaryByMonth(userId, now)
-        transactionRepository.getDebtSummaryByMonth(userId, now)
-                .observe(getViewLifecycleOwner(), summary -> {
-                    if (summary == null) {
-                        renderDebtEmpty();
-                        return;
+                    long borrowTotal = 0L;     // y
+                    long repayTotal = 0L;      // x
+
+                    long lendTotal = 0L;       // y
+                    long collectTotal = 0L;    // x
+
+                    boolean hasBorrowGroup = false;
+                    boolean hasLendGroup = false;
+
+                    for (Transaction t : list) {
+                        if (t == null || t.type == null) continue;
+
+                        switch (t.type) {
+                            case BORROW:
+                                hasBorrowGroup = true;
+                                borrowTotal += Math.abs(t.amount);
+                                break;
+                            case LOAN_REPAYMENT:
+                                hasBorrowGroup = true;
+                                repayTotal += Math.abs(t.amount);
+                                break;
+                            case LEND:
+                                hasLendGroup = true;
+                                lendTotal += Math.abs(t.amount);
+                                break;
+                            case DEBT_COLLECTION:
+                                hasLendGroup = true;
+                                collectTotal += Math.abs(t.amount);
+                                break;
+                        }
                     }
 
-                    long total = summary.totalBorrow;
-                    long paid = summary.totalPaid;
+                    ArrayList<Transaction> cards = new ArrayList<>(2);
 
-                    if (total <= 0) {
-                        renderDebtEmpty();
-                        return;
+                    if (hasBorrowGroup) {
+                        Transaction cardBorrow = new Transaction();
+                        cardBorrow.type = TxType.BORROW;
+                        cardBorrow.amount = borrowTotal;           // y
+                        cardBorrow.note = String.valueOf(repayTotal); // x (nhét vào note)
+                        cards.add(cardBorrow);
                     }
 
-                    tvDebtRatio.setText(formatMoneyLong(paid) + " / " + formatMoneyLong(total));
+                    if (hasLendGroup) {
+                        Transaction cardLend = new Transaction();
+                        cardLend.type = TxType.LEND;
+                        cardLend.amount = lendTotal;                 // y
+                        cardLend.note = String.valueOf(collectTotal); // x
+                        cards.add(cardLend);
+                    }
 
-                    int safeMax = (int) Math.min(Integer.MAX_VALUE, Math.max(1, total));
-                    int safeProg = (int) Math.min(safeMax, Math.min(Integer.MAX_VALUE, Math.max(0, paid)));
-
-                    pbDebt.setMax(safeMax);
-                    pbDebt.setProgress(safeProg);
-
-                    tvDebtMeta.setText("Đã trả " + formatMoneyLong(paid) + " trên tổng nợ " + formatMoneyLong(total));
+                    debtAdapter.setData(cards);
                 });
     }
 
-    private void renderDebtEmpty() {
-        tvDebtRatio.setText("0 / 0");
-        pbDebt.setMax(100);
-        pbDebt.setProgress(0);
-        tvDebtMeta.setText("Chưa phát sinh khoản vay trong tháng");
+    // Adapter dùng item_budget, nhưng model vẫn là Transaction (không tạo model riêng)
+    private static class DebtCardAdapter extends RecyclerView.Adapter<DebtCardAdapter.VH> {
+
+        interface ClickListener {
+            void onClick(Transaction tx);
+        }
+
+        private final List<Transaction> data = new ArrayList<>();
+        private final ClickListener clickListener;
+
+        DebtCardAdapter(ClickListener clickListener) {
+            this.clickListener = clickListener;
+        }
+
+        void setData(List<Transaction> list) {
+            data.clear();
+            if (list != null) data.addAll(list);
+            notifyDataSetChanged();
+        }
+
+        @NonNull
+        @Override
+        public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_budget, parent, false);
+            return new VH(v);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull VH h, int position) {
+            Transaction card = data.get(position);
+
+            long y = Math.abs(card.amount);
+            long x = 0L;
+            try {
+                x = Long.parseLong(card.note == null ? "0" : card.note);
+            } catch (Exception ignored) {}
+
+            if (card.type == TxType.BORROW) {
+                h.ivCategoryIcon.setImageResource(R.drawable.ic_cat_debt_return);
+                h.tvBudgetName.setText("ĐI VAY");
+                h.tvCategories.setText("Đi vay - Đã trả");
+                h.tvSpentInfo.setText("Đã trả " + formatMoneyLong(x) + " đ / " + formatMoneyLong(y) + " đ");
+            } else {
+                h.ivCategoryIcon.setImageResource(R.drawable.ic_cat_lend);
+                h.tvBudgetName.setText("CHO VAY");
+                h.tvCategories.setText("Cho vay - Đã thu hồi");
+                h.tvSpentInfo.setText("Đã thu hồi " + formatMoneyLong(x) + " đ / " + formatMoneyLong(y) + " đ");
+            }
+
+            h.itemView.setOnClickListener(v -> {
+                if (clickListener != null) clickListener.onClick(card);
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return data.size();
+        }
+
+        static class VH extends RecyclerView.ViewHolder {
+            ImageView ivCategoryIcon;
+            TextView tvBudgetName, tvCategories, tvSpentInfo;
+
+            VH(@NonNull View itemView) {
+                super(itemView);
+                ivCategoryIcon = itemView.findViewById(R.id.ivCategoryIcon);
+                tvBudgetName = itemView.findViewById(R.id.tvBudgetName);
+                tvCategories = itemView.findViewById(R.id.tvCategories);
+                tvSpentInfo = itemView.findViewById(R.id.tvSpentInfo);
+            }
+        }
+
+        private static String formatMoneyLong(long value) {
+            DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+            symbols.setGroupingSeparator('.');
+            return new DecimalFormat("#,###", symbols).format(value);
+        }
     }
 
     // ===================== HELPERS =====================
-
-    private String formatMoneyLong(long value) {  // ✅ FIX: thêm hàm này
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-        symbols.setGroupingSeparator('.');
-        return new DecimalFormat("#,###", symbols).format(value);
-    }
 
     private String formatMoneyDouble(double value) {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols();
