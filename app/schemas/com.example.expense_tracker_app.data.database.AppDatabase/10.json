@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 9,
-    "identityHash": "64327c2f4f6d9b597b5cd92bd90017b9",
+    "version": 10,
+    "identityHash": "95949b3d1397c72d97a189d77056fb17",
     "entities": [
       {
         "tableName": "users",
@@ -130,7 +130,7 @@
       },
       {
         "tableName": "transactions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userId` INTEGER NOT NULL, `type` TEXT, `category` TEXT, `subcategoryId` INTEGER NOT NULL, `subcategoryName` TEXT, `subcategoryIcon` TEXT, `amount` INTEGER NOT NULL, `method` TEXT, `date` INTEGER, `note` TEXT, `location` TEXT, `imagePath` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userId` INTEGER NOT NULL, `type` TEXT, `category` TEXT, `subcategoryId` INTEGER NOT NULL, `subcategoryName` TEXT, `subcategoryIcon` TEXT, `amount` INTEGER NOT NULL, `method` TEXT, `date` INTEGER, `note` TEXT, `location` TEXT, `imagePath` TEXT, `excludeFromReport` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -209,6 +209,12 @@
             "columnName": "imagePath",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "excludeFromReport",
+            "columnName": "excludeFromReport",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -384,7 +390,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '64327c2f4f6d9b597b5cd92bd90017b9')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '95949b3d1397c72d97a189d77056fb17')"
     ]
   }
 }

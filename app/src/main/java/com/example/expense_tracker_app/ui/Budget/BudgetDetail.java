@@ -71,7 +71,7 @@ public class BudgetDetail extends AppCompatActivity {
         rvBudgetList.setLayoutManager(new LinearLayoutManager(this));
 
         // Khởi tạo Adapter
-        adapter = new TransactionAdapter(this);
+        adapter = new TransactionAdapter(this, null);
         rvBudgetList.setAdapter(adapter);
 
         // Populate dữ liệu

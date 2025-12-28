@@ -26,13 +26,12 @@ public class Transaction {
     public String method;
     public LocalDate date;
     public String note;
-
-    // Hai trường mới thêm
     public String location;
     public String imagePath;
 
-    // 1. Constructor đầy đủ nhất (Room sẽ dùng cái này để đọc/ghi dữ liệu)
-    // Lưu ý: Phải nhận đủ tham số location và imagePath
+    // --- MỚI: Thêm cột này ---
+    public boolean excludeFromReport;
+
     public Transaction(int id,
                        int userId,
                        TxType type,
@@ -45,7 +44,8 @@ public class Transaction {
                        LocalDate date,
                        String note,
                        String location,
-                       String imagePath) {
+                       String imagePath,
+                       boolean excludeFromReport) { // Cập nhật constructor
         this.id = id;
         this.userId = userId;
         this.type = type;
@@ -59,39 +59,36 @@ public class Transaction {
         this.note = note;
         this.location = location;
         this.imagePath = imagePath;
+        this.excludeFromReport = excludeFromReport;
     }
 
-    // 2. Constructor phụ (Tương thích code cũ - Mặc định location/image rỗng)
     @Ignore
     public Transaction(int id, TxType type, Category category, long amount, String method, LocalDate date, String note, int userId) {
-        // Gọi sang constructor chính với location và imagePath là chuỗi rỗng
-        this(id, userId, type, category, 0, "", "", amount, method, date, note, "", "");
+        this(id, userId, type, category, 0, "", "", amount, method, date, note, "", "", false);
     }
 
-    // 3. Constructor mặc định (Cho các trường hợp khởi tạo nhanh)
     @Ignore
     public Transaction() {
-        this(0, 1, TxType.EXPENSE, new Category("Khác"), 0, "", "", 0L, "Tiền mặt", LocalDate.now(), "", "", "");
+        this(0, 1, TxType.EXPENSE, new Category("Khác"), 0, "", "", 0L, "Tiền mặt", LocalDate.now(), "", "", "", false);
     }
 
-    // 4. Hàm tạo data ảo (Fake data)
     public static Transaction fake(String name, long amount, TxType type, String method){
         Category fakeCat = new Category(name);
-
         return new Transaction(
-            new Random().nextInt(1000), // ID ngẫu nhiên
-            1,
-            type,
-            fakeCat,
-            0,
-            fakeCat.name,
-            fakeCat.icon,
-            amount,
-            method,
-            LocalDate.now(),
-            "", // Note rỗng
-            "",
-            ""
+                new Random().nextInt(1000),
+                1,
+                type,
+                fakeCat,
+                0,
+                fakeCat.name,
+                fakeCat.icon,
+                amount,
+                method,
+                LocalDate.now(),
+                "",
+                "",
+                "",
+                false
         );
     }
 }

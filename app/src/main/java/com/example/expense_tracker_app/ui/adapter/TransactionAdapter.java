@@ -29,10 +29,25 @@ import java.util.List;
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.TxViewHolder> {
     private final List<Transaction> data = new ArrayList<>();
     private final Context context;
+    private final OnTransactionClickListener listener;
 
-    public TransactionAdapter(Context context) {
-        this.context = context;
+    // Interface cho sự kiện click
+    public interface OnTransactionClickListener {
+        void onClick(Transaction transaction);
     }
+
+    // Constructor nhận thêm listener (Dùng cho màn hình Lịch sử để xóa)
+    public TransactionAdapter(Context context, OnTransactionClickListener listener) {
+        this.context = context;
+        this.listener = listener;
+    }
+
+    // --- THÊM LẠI CONSTRUCTOR NÀY ---
+    // Để tránh lỗi "Expected 2 arguments but found 1" ở các màn hình khác (như BudgetDetail)
+    public TransactionAdapter(Context context) {
+        this(context, null);
+    }
+    // --------------------------------
 
     public void setData(List<Transaction> newData) {
         data.clear();
@@ -50,14 +65,12 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     public void onBindViewHolder(@NonNull TxViewHolder h, int pos) {
         Transaction tx = data.get(pos);
 
-        // --- 1. NGÀY THÁNG ---
         h.tvDate.setText(String.format("%02d", tx.date.getDayOfMonth()));
 
-        // --- 2. DANH MỤC (SỬA LỖI TIẾNG ANH Ở ĐÂY) ---
         String catName = (tx.subcategoryName != null && !tx.subcategoryName.trim().isEmpty())
-            ? tx.subcategoryName
-            : tx.category.name;
-        // Kiểm tra nếu tên là tiếng Anh (do lưu mặc định) thì hiển thị tiếng Việt
+                ? tx.subcategoryName
+                : (tx.category != null ? tx.category.name : "");
+
         if (catName != null) {
             switch (catName) {
                 case "INCOME": catName = "Thu nhập"; break;
@@ -67,12 +80,13 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             }
         }
         h.tvCat.setText(catName);
-
-        // --- 3. PHƯƠNG THỨC (VÍ) ---
         h.tvMethod.setText(tx.method);
 
-        // --- 4. SỐ TIỀN & MÀU SẮC ---
-        boolean isPositive = (tx.type == TxType.INCOME || tx.type == TxType.BORROW);
+        // --- SỬA LOGIC HIỂN THỊ DẤU VÀ MÀU ---
+        // Thêm DEBT_COLLECTION (Thu hồi nợ) vào nhóm Dương (+)
+        boolean isPositive = (tx.type == TxType.INCOME
+                || tx.type == TxType.BORROW
+                || tx.type == TxType.DEBT_COLLECTION);
 
         String prefix = isPositive ? "+" : "-";
         int colorRes = isPositive ? R.color.success_1 : R.color.accent_1;
@@ -82,22 +96,19 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         } catch (Exception e) {
             h.tvAmount.setText(prefix + Math.abs(tx.amount));
         }
-
         h.tvAmount.setTextColor(context.getResources().getColor(colorRes, null));
+        // -------------------------------------
 
-        // --- 5. ICON ---
-        String iconName = tx.subcategoryIcon != null && !tx.subcategoryIcon.isEmpty()
+        String iconName = (tx.subcategoryIcon != null && !tx.subcategoryIcon.isEmpty())
                 ? tx.subcategoryIcon
-                : tx.category.icon;
+                : (tx.category != null ? tx.category.icon : "ic_category");
+
         if (iconName != null) {
             int resId = context.getResources().getIdentifier(iconName, "drawable", context.getPackageName());
             if (resId != 0) h.ivCatIcon.setImageResource(resId);
             else h.ivCatIcon.setImageResource(R.drawable.ic_category);
         }
 
-        // --- HIỂN THỊ CHI TIẾT ---
-
-        // 6. Ghi chú
         if (tx.note != null && !tx.note.trim().isEmpty()) {
             h.tvNote.setVisibility(View.VISIBLE);
             h.tvNote.setText(tx.note);
@@ -105,7 +116,6 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             h.tvNote.setVisibility(View.GONE);
         }
 
-        // 7. Địa điểm
         if (tx.location != null && !tx.location.trim().isEmpty()) {
             h.tvLocation.setVisibility(View.VISIBLE);
             h.tvLocation.setText("📍 " + tx.location);
@@ -113,24 +123,26 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             h.tvLocation.setVisibility(View.GONE);
         }
 
-        // 8. Ảnh
         if (tx.imagePath != null && !tx.imagePath.trim().isEmpty()) {
             h.tvImageLink.setVisibility(View.VISIBLE);
             h.tvImageLink.setText("Xem ảnh đính kèm");
             h.tvImageLink.setPaintFlags(h.tvImageLink.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-
             h.tvImageLink.setOnClickListener(v -> showImagePopup(tx.imagePath));
         } else {
             h.tvImageLink.setVisibility(View.GONE);
         }
 
-        // 9. Header ngày
         if (pos > 0 && data.get(pos - 1).date.isEqual(tx.date)) {
             h.tvDateHeader.setVisibility(View.GONE);
         } else {
             h.tvDateHeader.setVisibility(View.VISIBLE);
             h.tvDateHeader.setText("Ngày " + tx.date.getDayOfMonth() + " tháng " + tx.date.getMonthValue() + " " + tx.date.getYear());
         }
+
+        // Bắt sự kiện click vào item
+        h.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onClick(tx);
+        });
     }
 
     private void showImagePopup(String imageUriStr) {
@@ -144,22 +156,15 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         }
 
         ImageView ivFull = dialog.findViewById(R.id.ivFullImage);
-
         try {
             Uri uri = Uri.parse(imageUriStr);
             InputStream inputStream = context.getContentResolver().openInputStream(uri);
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
             ivFull.setImageBitmap(bitmap);
             if (inputStream != null) inputStream.close();
-        } catch (SecurityException e) {
-            e.printStackTrace();
-            Toast.makeText(context, "Không thể mở ảnh (Mất quyền truy cập file)", Toast.LENGTH_SHORT).show();
-            ivFull.setImageResource(R.drawable.ic_image);
         } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(context, "Lỗi khi tải ảnh", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Không thể tải ảnh", Toast.LENGTH_SHORT).show();
         }
-
         ivFull.setOnClickListener(v -> dialog.dismiss());
         dialog.show();
     }

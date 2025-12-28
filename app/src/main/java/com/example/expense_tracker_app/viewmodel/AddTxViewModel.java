@@ -3,7 +3,9 @@ package com.example.expense_tracker_app.viewmodel;
 import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import com.example.expense_tracker_app.data.database.AppDatabase;
 import com.example.expense_tracker_app.data.database.WalletDao;
@@ -13,14 +15,14 @@ import com.example.expense_tracker_app.data.model.Subcategory;
 import com.example.expense_tracker_app.data.model.Transaction;
 import com.example.expense_tracker_app.data.model.TxType;
 import com.example.expense_tracker_app.data.model.User;
+import com.example.expense_tracker_app.data.model.Wallet;
 import com.example.expense_tracker_app.data.repository.TransactionRepository;
 import com.example.expense_tracker_app.data.repository.UserRepository;
 
-
 import java.time.LocalDate;
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class AddTxViewModel extends AndroidViewModel {
 
@@ -28,7 +30,6 @@ public class AddTxViewModel extends AndroidViewModel {
     private final WalletDao walletDao;
     private final UserRepository userRepository;
 
-    // Các biến LiveData binding với UI
     public final MutableLiveData<TxType> type = new MutableLiveData<>(TxType.EXPENSE);
     public final MutableLiveData<Category> category = new MutableLiveData<>();
     public final MutableLiveData<Subcategory> subcategory = new MutableLiveData<>();
@@ -43,18 +44,40 @@ public class AddTxViewModel extends AndroidViewModel {
     public final MutableLiveData<String> imagePath = new MutableLiveData<>("");
     public final MutableLiveData<List<CategoryWithSubcategories>> categories = new MutableLiveData<>();
 
+    public final MutableLiveData<Boolean> hasCashWallet = new MutableLiveData<>(false);
+    public final MutableLiveData<Boolean> hasBankWallet = new MutableLiveData<>(false);
+    private LiveData<List<Wallet>> walletListLiveData;
+
     private final ExecutorService ioExecutor = Executors.newSingleThreadExecutor();
 
     public AddTxViewModel(@NonNull Application application) {
         super(application);
         repo = new TransactionRepository(application);
-        // Khởi tạo WalletDao
         walletDao = AppDatabase.getInstance(application).walletDao();
-        // Khởi tạo UserRepository để lấy thông tin user
         userRepository = new UserRepository(application);
 
         repo.ensureDefaultCategories(getUserId());
         refreshCategories();
+        checkWallets();
+    }
+
+    private void checkWallets() {
+        walletListLiveData = walletDao.getWalletsByUserId(getUserId());
+        walletListLiveData.observeForever(wallets -> {
+            boolean cash = false;
+            boolean bank = false;
+            if (wallets != null) {
+                for (Wallet w : wallets) {
+                    if ("CASH".equals(w.type)) cash = true;
+                    else bank = true;
+                }
+            }
+            hasCashWallet.setValue(cash);
+            hasBankWallet.setValue(bank);
+
+            if (cash && !bank) method.setValue("Tiền mặt");
+            else if (!cash && bank) method.setValue("Chuyển khoản");
+        });
     }
 
     public void refreshCategories() {
@@ -65,18 +88,31 @@ public class AddTxViewModel extends AndroidViewModel {
         });
     }
 
+    public void resetInput() {
+        amount.setValue("");
+        note.setValue("");
+        location.setValue("");
+        imagePath.setValue("");
+        excludeReport.setValue(false);
+        date.setValue(LocalDate.now());
+        done.setValue(false);
+    }
+
     public void submit() {
         long amountVal = 0;
         try {
             String cleanAmount = amount.getValue();
             if (cleanAmount == null || cleanAmount.isEmpty()) return;
-            // Xóa hết ký tự không phải số để parse
             amountVal = Long.parseLong(cleanAmount.replaceAll("[^0-9]", ""));
         } catch (NumberFormatException e) { return; }
 
         Category finalCat = category.getValue();
-        // Fallback icon mặc định nếu chưa chọn category
         if (finalCat == null) finalCat = new Category(type.getValue().name(), "ic_category");
+
+        TxType finalType = type.getValue();
+        if (finalCat.type != null) {
+            finalType = finalCat.type;
+        }
 
         Subcategory pickedSub = subcategory.getValue();
         int pickedSubId = pickedSub != null ? pickedSub.id : 0;
@@ -84,47 +120,36 @@ public class AddTxViewModel extends AndroidViewModel {
         String pickedSubIcon = pickedSub != null && pickedSub.icon != null ? pickedSub.icon : finalCat.icon;
 
         String finalNote = note.getValue();
-        if (Boolean.TRUE.equals(excludeReport.getValue())) {
-            finalNote += " [Không tính báo cáo]";
-        }
-
         String locationVal = location.getValue();
         String imagePathVal = imagePath.getValue();
         if (imagePathVal == null) imagePathVal = "";
+        boolean isExcluded = Boolean.TRUE.equals(excludeReport.getValue());
 
-        // Tạo đối tượng Transaction
         int userId = getUserId();
-        LocalDate txDate = date.getValue();
-        int month = txDate != null ? txDate.getMonthValue() : LocalDate.now().getMonthValue();
-        int year = txDate != null ? txDate.getYear() : LocalDate.now().getYear();
+
         Transaction newTx = new Transaction(
-            0, userId,
-            type.getValue(),
-            finalCat,
-            pickedSubId,
-            pickedSubName,
-            pickedSubIcon,
-            amountVal,
-            method.getValue(),
-            date.getValue(),
-            finalNote,
-            locationVal,
-            imagePathVal
+                0, userId,
+                finalType,
+                finalCat,
+                pickedSubId,
+                pickedSubName,
+                pickedSubIcon,
+                amountVal,
+                method.getValue(),
+                date.getValue(),
+                finalNote,
+                locationVal,
+                imagePathVal,
+                isExcluded
         );
 
-        // --- LOGIC CẬP NHẬT VÍ ---
         final long finalAmount = amountVal;
+        final TxType currentType = finalType;
 
         Executors.newSingleThreadExecutor().execute(() -> {
-            // 1. Lưu giao dịch
             repo.insertTransaction(newTx);
-
-            // 2. Tạm thời bỏ cập nhật spent_amount cho các budget liên quan
-            // BudgetSpentUpdater.updateAllBudgetsSpent(getApplication(), userId, month, year);
-
-            // 3. Tính toán thay đổi số dư
             double changeAmount = 0;
-            TxType currentType = type.getValue();
+
             if (currentType == TxType.EXPENSE) {
                 changeAmount = -finalAmount;
             } else if (currentType == TxType.INCOME) {
@@ -133,35 +158,78 @@ public class AddTxViewModel extends AndroidViewModel {
                 changeAmount = finalAmount;
             } else if (currentType == TxType.LEND) {
                 changeAmount = -finalAmount;
+            } else if (currentType == TxType.DEBT_COLLECTION) {
+                changeAmount = finalAmount;
+            } else if (currentType == TxType.LOAN_REPAYMENT) {
+                changeAmount = -finalAmount;
             }
+
             if (changeAmount != 0) {
                 walletDao.updateBalance(method.getValue(), changeAmount);
             }
-
-            // 4. Hoàn tất
             done.postValue(true);
         });
     }
 
-    public void addNewCategory(String name, String icon) {
-        Category newCat = new Category(name, icon);
-        newCat.userId = getUserId(); // Gán userId cho category
+    // --- HÀM MỚI: Thêm nhóm danh mục đơn giản ---
+    public void addNewGroup(String name) {
+        // Mặc định icon chung chung vì user không chọn
+        Category newCat = new Category(name, "ic_category");
+        newCat.userId = getUserId();
+        // Quan trọng: Gán đúng Type (Thu/Chi) đang chọn
+        newCat.type = type.getValue();
+
         ioExecutor.execute(() -> {
-            repo.insertCategory(newCat);
+            // Dùng Sync để đảm bảo lưu xong mới Refresh
+            repo.insertCategorySync(newCat);
+            refreshCategories();
+        });
+    }
+    // --------------------------------------------
+
+    public void addNewCategory(String name, String icon, TxType txType) {
+        Category newCat = new Category(name, icon);
+        newCat.userId = getUserId();
+        newCat.type = txType;
+        ioExecutor.execute(() -> {
+            repo.insertCategorySync(newCat);
             refreshCategories();
         });
     }
 
-    public List<Category> getCustomCategories() { // legacy use
+    public List<Category> getCustomCategories() {
         return repo.getCustomCategories(getUserId());
     }
 
     public void addNewSubcategory(int categoryId, String name, String icon) {
         Subcategory sub = new Subcategory(categoryId, name, icon);
-        sub.userId = getUserId(); // Gán userId cho subcategory
+        sub.userId = getUserId();
         ioExecutor.execute(() -> {
-            repo.insertSubcategory(sub);
-            // Gọi refreshCategories sau khi insert thành công
+            repo.insertSubcategorySync(sub);
+            refreshCategories();
+        });
+    }
+
+    public void addNewSubcategoryToGroup(String groupName, String subName, String icon) {
+        ioExecutor.execute(() -> {
+            List<Category> cats = repo.getCustomCategories(getUserId());
+            int parentId = -1;
+            for (Category c : cats) {
+                if (c.name.contains(groupName) || groupName.contains(c.name)) {
+                    parentId = c.id;
+                    break;
+                }
+            }
+            if (parentId == -1) {
+                Category newGroup = new Category(groupName, "ic_category");
+                newGroup.userId = getUserId();
+                newGroup.type = type.getValue();
+                repo.insertCategorySync(newGroup);
+                parentId = newGroup.id;
+            }
+            Subcategory sub = new Subcategory(parentId, subName, icon);
+            sub.userId = getUserId();
+            repo.insertSubcategorySync(sub);
             refreshCategories();
         });
     }
@@ -169,9 +237,9 @@ public class AddTxViewModel extends AndroidViewModel {
     private int getUserId() {
         try {
             User loggedUser = userRepository.getLoggedInUser();
-            return loggedUser != null ? loggedUser.id : 1; // Default userId = 1 nếu không tìm thấy
+            return loggedUser != null ? loggedUser.id : 1;
         } catch (Exception e) {
-            return 1; // Default userId = 1 nếu có lỗi
+            return 1;
         }
     }
 }

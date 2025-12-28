@@ -1,5 +1,6 @@
 package com.example.expense_tracker_app.ui;
 
+import android.app.AlertDialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -9,96 +10,135 @@ import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData; // Import thêm cái này
+import androidx.lifecycle.Observer; // Import thêm cái này
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.expense_tracker_app.R;
+import com.example.expense_tracker_app.data.model.Transaction;
+import com.example.expense_tracker_app.data.model.User;
 import com.example.expense_tracker_app.data.repository.TransactionRepository;
+import com.example.expense_tracker_app.data.repository.UserRepository;
 import com.example.expense_tracker_app.ui.adapter.TransactionAdapter;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class TransactionHistoryFragment extends AppCompatActivity {
 
     private RecyclerView rvTransactions;
     private ImageView btnBack;
-    private LinearLayout layoutDatePicker; // Layout nút bấm chọn tháng
-    private TextView tvCurrentMonthDisplay; // Text hiển thị "Tháng 12, 2025"
+    private LinearLayout layoutDatePicker;
+    private TextView tvCurrentMonthDisplay;
 
     private TransactionAdapter adapter;
     private TransactionRepository repository;
+    private UserRepository userRepository;
 
-    // Biến lưu tháng đang chọn để hiển thị dữ liệu
     private LocalDate selectedDate = LocalDate.now();
+    private int currentUserId = 1; // Mặc định là 1
+
+    // --- BIẾN QUẢN LÝ OBSERVER ĐỂ TRÁNH LỖI CHỒNG CHÉO ---
+    private LiveData<List<Transaction>> currentLiveData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_transaction_history);
 
-        // 1. Ánh xạ View
         rvTransactions = findViewById(R.id.rv_transactions);
         btnBack = findViewById(R.id.btn_back);
         layoutDatePicker = findViewById(R.id.layout_date_picker);
         tvCurrentMonthDisplay = findViewById(R.id.tv_current_month_display);
 
-        // 2. Setup RecyclerView
         rvTransactions.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new TransactionAdapter(this);
+
+        adapter = new TransactionAdapter(this, this::showDeleteDialog);
         rvTransactions.setAdapter(adapter);
 
-        // 3. Khởi tạo Repository
         repository = new TransactionRepository(getApplication());
+        userRepository = new UserRepository(getApplication());
 
-        // 4. Xử lý sự kiện
         btnBack.setOnClickListener(v -> finish());
-
-        // Sự kiện bấm vào thanh chọn tháng
         layoutDatePicker.setOnClickListener(v -> showMonthPicker());
 
-        // 5. Tải dữ liệu ban đầu
         updateMonthDisplay();
-        loadDataForSelectedMonth();
+
+        // SỬA: Không gọi loadData ở đây nữa, mà đợi loadUser xong mới gọi
+        loadCurrentUser();
     }
 
-    // Cập nhật text trên màn hình chính
+    private void showDeleteDialog(Transaction transaction) {
+        new AlertDialog.Builder(this)
+                .setTitle("Xóa giao dịch")
+                .setMessage("Bạn có chắc muốn xóa giao dịch này? Số tiền sẽ được hoàn lại vào ví.")
+                .setPositiveButton("Xóa", (dialog, which) -> {
+                    repository.deleteTransaction(transaction);
+                    Toast.makeText(this, "Đã xóa giao dịch", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    private void loadCurrentUser() {
+        new Thread(() -> {
+            User user = userRepository.getLoggedInUser();
+            if (user != null) {
+                currentUserId = user.id;
+            }
+            // Dù có user hay không cũng phải load dữ liệu (trên UI Thread)
+            runOnUiThread(this::loadDataForSelectedMonth);
+        }).start();
+    }
+
     private void updateMonthDisplay() {
         String formattedDate = String.format("%02d-%d", selectedDate.getMonthValue(), selectedDate.getYear());
         tvCurrentMonthDisplay.setText(formattedDate);
     }
 
+    // --- SỬA: Hàm load dữ liệu xử lý thông minh hơn ---
     private void loadDataForSelectedMonth() {
-        repository.getTransactionsByMonth(1, selectedDate).observe(this, transactions -> {
+        // 1. Hủy theo dõi (Observer) cũ nếu có, để tránh bị double dữ liệu
+        if (currentLiveData != null) {
+            currentLiveData.removeObservers(this);
+        }
+
+        // 2. Lấy LiveData mới theo userId và ngày đã chọn
+        currentLiveData = repository.getTransactionsByMonth(currentUserId, selectedDate);
+
+        // 3. Đăng ký theo dõi mới
+        currentLiveData.observe(this, transactions -> {
             if (transactions != null) {
                 adapter.setData(transactions);
+                // Nếu muốn hiện thông báo khi trống:
+                // if (transactions.isEmpty()) { ... hiển thị text trống ... }
             }
         });
     }
+    // --------------------------------------------------
 
-    // --- LOGIC HIỂN THỊ POPUP CHỌN THÁNG ---
     private void showMonthPicker() {
         BottomSheetDialog dialog = new BottomSheetDialog(this);
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_month_picker, null);
         dialog.setContentView(view);
 
-        // Ánh xạ View trong Dialog
         ImageView btnPrevYear = view.findViewById(R.id.btn_prev_year);
         ImageView btnNextYear = view.findViewById(R.id.btn_next_year);
         TextView tvDialogYear = view.findViewById(R.id.tv_dialog_year);
         GridLayout gridMonths = view.findViewById(R.id.grid_months);
 
-        // Biến tạm để lưu năm đang chọn trong dialog (không ảnh hưởng selectedDate chính cho đến khi chọn tháng)
         final int[] dialogYear = {selectedDate.getYear()};
         tvDialogYear.setText(String.valueOf(dialogYear[0]));
 
-        // Xử lý chuyển năm
         btnPrevYear.setOnClickListener(v -> {
             dialogYear[0]--;
             tvDialogYear.setText(String.valueOf(dialogYear[0]));
-            renderMonthGrid(dialog, gridMonths, dialogYear[0]); // Vẽ lại lưới tháng
+            renderMonthGrid(dialog, gridMonths, dialogYear[0]);
         });
 
         btnNextYear.setOnClickListener(v -> {
@@ -107,56 +147,43 @@ public class TransactionHistoryFragment extends AppCompatActivity {
             renderMonthGrid(dialog, gridMonths, dialogYear[0]);
         });
 
-        // Vẽ lưới 12 tháng lần đầu
         renderMonthGrid(dialog, gridMonths, dialogYear[0]);
-
         dialog.show();
     }
 
     private void renderMonthGrid(BottomSheetDialog dialog, GridLayout grid, int year) {
-        grid.removeAllViews(); // Xóa view cũ
-
+        grid.removeAllViews();
         for (int i = 1; i <= 12; i++) {
             TextView tv = new TextView(this);
             tv.setText("Th. " + i);
             tv.setGravity(Gravity.CENTER);
             tv.setPadding(16, 24, 16, 24);
 
-            // Cấu hình LayoutParams cho Grid
             GridLayout.LayoutParams params = new GridLayout.LayoutParams();
             params.width = 0;
             params.height = GridLayout.LayoutParams.WRAP_CONTENT;
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f); // Chia đều 4 cột
+            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
             params.setMargins(8, 8, 8, 8);
             tv.setLayoutParams(params);
 
-            // Kiểm tra xem tháng này có phải tháng đang được chọn của App không
             boolean isSelected = (year == selectedDate.getYear() && i == selectedDate.getMonthValue());
 
             if (isSelected) {
-                // Style cho tháng đang chọn: Nền màu Tím/Xanh (Primary), chữ Trắng
-                tv.setBackgroundResource(R.drawable.bg_icon_round_primary_1); // Dùng drawable bo tròn màu primary
+                tv.setBackgroundResource(R.drawable.bg_icon_round_primary_1);
                 tv.setTextColor(Color.WHITE);
                 tv.setTypeface(null, android.graphics.Typeface.BOLD);
             } else {
-                // Style cho tháng thường: Nền xám nhạt, chữ đen
-                tv.setBackgroundResource(R.drawable.bg_card_neutral_50); // Dùng drawable bo tròn màu xám
+                tv.setBackgroundResource(R.drawable.bg_card_neutral_50);
                 tv.setTextColor(getColor(R.color.neutral_900));
             }
 
             int finalMonth = i;
             tv.setOnClickListener(v -> {
-                // Khi người dùng chọn tháng:
                 selectedDate = LocalDate.of(year, finalMonth, 1);
-
-                // 1. Cập nhật Text màn hình chính
                 updateMonthDisplay();
-                // 2. Tải lại dữ liệu
-                loadDataForSelectedMonth();
-                // 3. Đóng dialog
+                loadDataForSelectedMonth(); // Gọi lại hàm load đã sửa
                 dialog.dismiss();
             });
-
             grid.addView(tv);
         }
     }
