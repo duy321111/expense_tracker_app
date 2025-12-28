@@ -56,6 +56,7 @@ public class TransactionListActivity extends AppCompatActivity {
     
     private TxType filterType;
     private LocalDate selectedMonth;
+    private LocalDate fromMonth, toMonth;
     
     private final List<MonthItem> monthItems = new ArrayList<>();
     private List<Transaction> currentTransactions = new ArrayList<>();
@@ -69,9 +70,23 @@ public class TransactionListActivity extends AppCompatActivity {
         String typeStr = getIntent().getStringExtra("tx_type");
         filterType = (typeStr != null) ? TxType.valueOf(typeStr) : TxType.EXPENSE;
 
+
         int month = getIntent().getIntExtra("month", LocalDate.now().getMonthValue());
         int year = getIntent().getIntExtra("year", LocalDate.now().getYear());
         selectedMonth = LocalDate.of(year, month, 1);
+
+        // Nhận range tháng nếu có
+        int fromMonthValue = getIntent().getIntExtra("from_month", -1);
+        int fromYearValue = getIntent().getIntExtra("from_year", -1);
+        int toMonthValue = getIntent().getIntExtra("to_month", -1);
+        int toYearValue = getIntent().getIntExtra("to_year", -1);
+        if (fromMonthValue > 0 && fromYearValue > 0 && toMonthValue > 0 && toYearValue > 0) {
+            fromMonth = LocalDate.of(fromYearValue, fromMonthValue, 1);
+            toMonth = LocalDate.of(toYearValue, toMonthValue, 1);
+        } else {
+            fromMonth = null;
+            toMonth = null;
+        }
 
         // Init views
         repository = new TransactionRepository(getApplication());
@@ -99,13 +114,21 @@ public class TransactionListActivity extends AppCompatActivity {
         btnExport.setOnClickListener(v -> showExportDialog());
     }
 
+
     private void setupMonthStrip() {
         monthItems.clear();
-        
-        LocalDate now = LocalDate.now().minusMonths(24);
-        for (int i = 0; i <= 48; i++) {
-            LocalDate d = now.plusMonths(i);
-            monthItems.add(new MonthItem(d.getYear(), d.getMonthValue()));
+        if (fromMonth != null && toMonth != null && !fromMonth.isAfter(toMonth)) {
+            LocalDate iter = fromMonth;
+            while (!iter.isAfter(toMonth)) {
+                monthItems.add(new MonthItem(iter.getYear(), iter.getMonthValue()));
+                iter = iter.plusMonths(1);
+            }
+        } else {
+            LocalDate now = LocalDate.now().minusMonths(24);
+            for (int i = 0; i <= 48; i++) {
+                LocalDate d = now.plusMonths(i);
+                monthItems.add(new MonthItem(d.getYear(), d.getMonthValue()));
+            }
         }
 
         LinearLayoutManager lm = new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false);
@@ -113,6 +136,12 @@ public class TransactionListActivity extends AppCompatActivity {
         
         monthAdapter = new MonthAdapter(monthItems);
         rvMonths.setAdapter(monthAdapter);
+
+        // Callback khi chọn tháng (tap hoặc scroll)
+        monthAdapter.setOnMonthSelectedListener((pos, item) -> {
+            selectedMonth = LocalDate.of(item.year, item.month, 1);
+            loadTransactions();
+        });
 
         PagerSnapHelper snap = new PagerSnapHelper();
         snap.attachToRecyclerView(rvMonths);
@@ -123,7 +152,6 @@ public class TransactionListActivity extends AppCompatActivity {
             monthAdapter.selected = selectedIndex;
             rvMonths.scrollToPosition(selectedIndex);
             monthAdapter.notifyDataSetChanged();
-            
             loadTransactions();
         });
 
@@ -131,19 +159,14 @@ public class TransactionListActivity extends AppCompatActivity {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView r, int state) {
                 if (state != RecyclerView.SCROLL_STATE_IDLE) return;
-                
                 View v = snap.findSnapView(lm);
                 if (v == null) return;
-                
                 int idx = lm.getPosition(v);
                 if (idx == RecyclerView.NO_POSITION || idx == monthAdapter.selected) return;
-                
                 monthAdapter.selected = idx;
                 monthAdapter.notifyDataSetChanged();
-                
                 MonthItem cur = monthItems.get(idx);
                 selectedMonth = LocalDate.of(cur.year, cur.month, 1);
-                
                 loadTransactions();
             }
         });
@@ -215,7 +238,6 @@ public class TransactionListActivity extends AppCompatActivity {
         // Ánh xạ views
         View btnCloseDialog = view.findViewById(R.id.btnCloseDialog);
         LinearLayout btnExportData = view.findViewById(R.id.btnExportData);
-        LinearLayout btnShareData = view.findViewById(R.id.btnShareData);
 
         // Đóng dialog
         btnCloseDialog.setOnClickListener(v -> dialog.dismiss());
@@ -223,28 +245,18 @@ public class TransactionListActivity extends AppCompatActivity {
         // Xuất dữ liệu
         btnExportData.setOnClickListener(v -> {
             dialog.dismiss();
-            
             // Lấy danh sách transactions hiện tại từ adapter
             List<Transaction> currentTransactions = adapter.getData();
-            
             if (currentTransactions == null || currentTransactions.isEmpty()) {
                 Toast.makeText(this, "Không có dữ liệu để xuất", Toast.LENGTH_SHORT).show();
                 return;
             }
-            
             // Tạo tên file với timestamp
             String typePrefix = (filterType == TxType.INCOME) ? "ThuNhap" : "ChiTieu";
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
             String filename = typePrefix + "_" + timestamp + ".xlsx";
-            
             // Export
             exportToExcel(currentTransactions, filename);
-        });
-
-        // Chia sẻ dữ liệu
-        btnShareData.setOnClickListener(v -> {
-            dialog.dismiss();
-            shareData();
         });
 
         dialog.show();
@@ -359,79 +371,5 @@ public class TransactionListActivity extends AppCompatActivity {
         }
     }
 
-    private void shareData() {
-        if (currentTransactions.isEmpty()) {
-            Toast.makeText(this, "Không có dữ liệu để chia sẻ", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        try {
-            // Tạo file Excel tương tự như export
-            Workbook workbook = new XSSFWorkbook();
-            Sheet sheet = workbook.createSheet("Giao dịch");
-
-            CellStyle headerStyle = workbook.createCellStyle();
-            Font headerFont = workbook.createFont();
-            headerFont.setBold(true);
-            headerStyle.setFont(headerFont);
-
-            Row headerRow = sheet.createRow(0);
-            String[] headers = {"Ngày", "Danh mục", "Phương thức", "Số tiền", "Ghi chú", "Địa điểm"};
-            for (int i = 0; i < headers.length; i++) {
-                Cell cell = headerRow.createCell(i);
-                cell.setCellValue(headers[i]);
-                cell.setCellStyle(headerStyle);
-            }
-
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-            int rowNum = 1;
-            for (Transaction tx : currentTransactions) {
-                Row row = sheet.createRow(rowNum++);
-                
-                row.createCell(0).setCellValue(tx.date.format(dateFormatter));
-                row.createCell(1).setCellValue(tx.subcategoryName != null && !tx.subcategoryName.isEmpty() 
-                    ? tx.subcategoryName : tx.category.name);
-                row.createCell(2).setCellValue(tx.method);
-                row.createCell(3).setCellValue(tx.amount);
-                row.createCell(4).setCellValue(tx.note != null ? tx.note : "");
-                row.createCell(5).setCellValue(tx.location != null ? tx.location : "");
-            }
-
-            for (int i = 0; i < headers.length; i++) {
-                sheet.autoSizeColumn(i);
-            }
-
-            // Lưu file vào cache
-            String fileName = String.format("GiaoDich_%s_T%d_%d.xlsx", 
-                filterType == TxType.INCOME ? "ThuNhap" : "ChiTieu",
-                selectedMonth.getMonthValue(), 
-                selectedMonth.getYear());
-            
-            File cacheDir = getCacheDir();
-            File file = new File(cacheDir, fileName);
-
-            FileOutputStream outputStream = new FileOutputStream(file);
-            workbook.write(outputStream);
-            outputStream.close();
-            workbook.close();
-
-            // Chia sẻ file
-            Uri fileUri = FileProvider.getUriForFile(this, 
-                getApplicationContext().getPackageName() + ".fileprovider", file);
-
-            Intent shareIntent = new Intent(Intent.ACTION_SEND);
-            shareIntent.setType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
-            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Dữ liệu giao dịch - " + 
-                (filterType == TxType.INCOME ? "Thu nhập" : "Chi tiêu"));
-            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-            startActivity(Intent.createChooser(shareIntent, "Chia sẻ qua"));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Lỗi khi chia sẻ: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-    }
+    // Đã xoá chức năng chia sẻ dữ liệu
 }

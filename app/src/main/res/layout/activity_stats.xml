@@ -52,25 +52,43 @@
     </RelativeLayout>
 
     <!-- Năm + Tháng (RecyclerView) -->
-    <FrameLayout
+    <!-- Chọn khoảng tháng -->
+    <LinearLayout
         android:id="@+id/monthSection"
         android:layout_width="0dp"
         android:layout_height="72dp"
         android:background="@color/neutral_50"
-        android:paddingHorizontal="0dp"
+        android:paddingHorizontal="16dp"
         android:paddingVertical="8dp"
+        android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@id/rlHeader"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center_vertical">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvMonths"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:overScrollMode="never"
-            android:clipToPadding="false"
-            android:paddingHorizontal="0dp"/>
-    </FrameLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Từ: "
+            android:textColor="@color/text_primary"
+            android:layout_marginEnd="4dp"/>
+        <Spinner
+            android:id="@+id/spnMonthFrom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đến: "
+            android:textColor="@color/text_primary"
+            android:layout_marginEnd="4dp"/>
+        <Spinner
+            android:id="@+id/spnMonthTo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
 
     <!-- Section: Biểu đồ -->
     <com.google.android.material.card.MaterialCardView

@@ -1,5 +1,6 @@
-package com.example.expense_tracker_app.ui.stats;
 
+package com.example.expense_tracker_app.ui.stats;
+import android.util.Log;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,9 +16,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.PagerSnapHelper;
-import androidx.recyclerview.widget.RecyclerView;
+import android.widget.Spinner;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 
 import com.example.expense_tracker_app.R;
 import com.example.expense_tracker_app.data.model.TxType; 
@@ -31,11 +32,16 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import androidx.lifecycle.Observer;
+import com.example.expense_tracker_app.data.model.Transaction;
+import com.example.expense_tracker_app.data.repository.TransactionRepository;
+import android.app.Application;
 
-public class StatsActivity extends Fragment implements CalendarSheet.OnApplySelectionListener {
+
+public class StatsActivity extends Fragment {
 
     private ImageView ivBack, ivCalendar;
-    private RecyclerView rvMonths;
+    private Spinner spnMonthFrom, spnMonthTo;
     private LinearLayout chartContainer;
     private TextView tvIncomeTotal, tvExpenseTotal;
 
@@ -46,8 +52,12 @@ public class StatsActivity extends Fragment implements CalendarSheet.OnApplySele
 
     private MonthAdapter monthAdapter;
     private final List<MonthItem> monthItems = new ArrayList<>();
+    private TransactionRepository transactionRepository;
+
+    private int userId = 1; // TODO: lấy userId thực tế nếu có session
     private int selectedMonth, selectedYear;
-    private final List<CalendarSheet.Period> selectedPeriods = new ArrayList<>();
+    private final List<Object> selectedPeriods = new ArrayList<>(); // Dummy, to avoid errors
+    private List<Transaction> transactionsList = new ArrayList<>();
 
 
 @Override
@@ -58,7 +68,8 @@ public View onCreateView(@NonNull LayoutInflater inflater,
 
     ivBack = root.findViewById(R.id.ivBack);
     ivCalendar = root.findViewById(R.id.ivCalendar);
-    rvMonths = root.findViewById(R.id.rvMonths);
+    spnMonthFrom = root.findViewById(R.id.spnMonthFrom);
+    spnMonthTo = root.findViewById(R.id.spnMonthTo);
     chartContainer = root.findViewById(R.id.chartContainer);
     tvIncomeTotal = root.findViewById(R.id.tvIncomeTotal);
     tvExpenseTotal = root.findViewById(R.id.tvExpenseTotal);
@@ -69,14 +80,29 @@ public View onCreateView(@NonNull LayoutInflater inflater,
     cardIncome = root.findViewById(R.id.cardIncome);
     cardExpense = root.findViewById(R.id.cardExpense);
 
-    initCalendarDefaults();
-    setupMonthStrip();
-    setupClicks();
 
-    selectedPeriods.clear();
-    selectedPeriods.add(CalendarSheet.Period.forMonth(selectedYear, selectedMonth));
-    renderChartAndSummary();
-
+    transactionRepository = new TransactionRepository((Application) requireActivity().getApplication());
+    // Lấy min/max tháng từ giao dịch thực tế, chỉ observe 1 lần
+    transactionRepository.getAllTransactions(userId).observe(getViewLifecycleOwner(), new Observer<List<Transaction>>() {
+        @Override
+        public void onChanged(List<Transaction> transactions) {
+            transactionsList = (transactions == null) ? new ArrayList<>() : transactions;
+            if (transactionsList.isEmpty()) {
+                initCalendarDefaults();
+                setupMonthSpinnersWithRange(LocalDate.now(), LocalDate.now());
+            } else {
+                LocalDate minDate = transactionsList.get(0).date;
+                LocalDate maxDate = transactionsList.get(0).date;
+                for (Transaction t : transactionsList) {
+                    if (t.date.isBefore(minDate)) minDate = t.date;
+                    if (t.date.isAfter(maxDate)) maxDate = t.date;
+                }
+                initCalendarDefaults();
+                setupMonthSpinnersWithRange(minDate.withDayOfMonth(1), maxDate.withDayOfMonth(1));
+            }
+            setupClicks();
+        }
+    });
 
     return root;
 }
@@ -87,76 +113,90 @@ private void initCalendarDefaults() {
     selectedMonth = now.getMonthValue();
 }
 
-private void setupMonthStrip() {
+private void setupMonthSpinnersWithRange(LocalDate minMonth, LocalDate maxMonth) {
     monthItems.clear();
-    LocalDate now = LocalDate.now().minusMonths(24);
-    for (int i = 0; i <= 48; i++) {
-        LocalDate d = now.plusMonths(i);
-        monthItems.add(new MonthItem(d.getYear(), d.getMonthValue()));
+    LocalDate iter = minMonth.withDayOfMonth(1);
+    LocalDate end = maxMonth.withDayOfMonth(1);
+    while (!iter.isAfter(end)) {
+        monthItems.add(new MonthItem(iter.getYear(), iter.getMonthValue()));
+        iter = iter.plusMonths(1);
     }
 
-    LinearLayoutManager lm = new LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false);
-    rvMonths.setLayoutManager(lm);
-    monthAdapter = new MonthAdapter(monthItems);
-    rvMonths.setAdapter(monthAdapter);
+    List<String> monthLabels = new ArrayList<>();
+    for (MonthItem item : monthItems) {
+        monthLabels.add(String.format(Locale.getDefault(), "%02d/%d", item.month, item.year));
+    }
 
-    PagerSnapHelper snap = new PagerSnapHelper();
-    snap.attachToRecyclerView(rvMonths);
+    ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, monthLabels);
+    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    spnMonthFrom.setAdapter(adapter);
+    spnMonthTo.setAdapter(adapter);
 
-    int currentIndex = findIndexNow(monthItems);
-    rvMonths.post(() -> {
-        monthAdapter.selected = currentIndex;
-        rvMonths.scrollToPosition(currentIndex);
-        monthAdapter.notifyDataSetChanged();
+    // Default: chọn tháng cuối cùng (max) cho cả 2
+    int currentIndex = monthItems.size() - 1;
+    spnMonthFrom.setSelection(currentIndex);
+    spnMonthTo.setSelection(currentIndex);
 
-        MonthItem m = monthItems.get(currentIndex);
-        selectedYear = m.year;
-        selectedMonth = m.month;
-
-        selectedPeriods.clear();
-        selectedPeriods.add(CalendarSheet.Period.forMonth(selectedYear, selectedMonth));
-        renderChartAndSummary();
-    });
-
-    rvMonths.addOnScrollListener(new RecyclerView.OnScrollListener() {
+    AdapterView.OnItemSelectedListener listener = new AdapterView.OnItemSelectedListener() {
         @Override
-        public void onScrollStateChanged(@NonNull RecyclerView r, int state) {
-            if (state != RecyclerView.SCROLL_STATE_IDLE) return;
-            View v = snap.findSnapView(lm);
-            if (v == null) return;
-            int idx = lm.getPosition(v);
-            if (idx == RecyclerView.NO_POSITION || idx == monthAdapter.selected) return;
-            monthAdapter.selected = idx;
-            monthAdapter.notifyDataSetChanged();
-            MonthItem cur = monthItems.get(idx);
-            selectedYear = cur.year;
-            selectedMonth = cur.month;
-
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            int fromIdx = spnMonthFrom.getSelectedItemPosition();
+            int toIdx = spnMonthTo.getSelectedItemPosition();
+            if (fromIdx > toIdx) {
+                // Prevent invalid range: auto-correct
+                if (parent == spnMonthFrom) {
+                    spnMonthTo.setSelection(fromIdx);
+                } else {
+                    spnMonthFrom.setSelection(toIdx);
+                }
+                return;
+            }
             selectedPeriods.clear();
-            selectedPeriods.add(CalendarSheet.Period.forMonth(selectedYear, selectedMonth));
+            for (int i = fromIdx; i <= toIdx; i++) {
+                MonthItem m = monthItems.get(i);
+                selectedPeriods.add(m); // No need CalendarSheet.Period
+            }
             renderChartAndSummary();
         }
-    });
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {}
+    };
+    spnMonthFrom.setOnItemSelectedListener(listener);
+    spnMonthTo.setOnItemSelectedListener(listener);
 }
 
 private void setupClicks() {
     ivBack.setOnClickListener(v -> requireActivity().onBackPressed());
-    ivCalendar.setOnClickListener(v -> {
-        CalendarSheet sheet = CalendarSheet.newInstance(selectedPeriods);
-        sheet.show(getParentFragmentManager(), "CalendarSheet");
-    });
+    ivCalendar.setVisibility(View.GONE); // Ẩn luôn nút calendar
     cardIncome.setOnClickListener(v -> {
-            Intent intent = new Intent(requireContext(), TransactionListActivity.class);
-            intent.putExtra("tx_type", TxType.INCOME.name());
-            intent.putExtra("month", selectedMonth);
-            intent.putExtra("year", selectedYear);
-            startActivity(intent);
-        });
+        int fromIdx = spnMonthFrom.getSelectedItemPosition();
+        int toIdx = spnMonthTo.getSelectedItemPosition();
+        MonthItem from = monthItems.get(fromIdx);
+        MonthItem to = monthItems.get(toIdx);
+        Intent intent = new Intent(requireContext(), TransactionListActivity.class);
+        intent.putExtra("tx_type", TxType.INCOME.name());
+        intent.putExtra("month", selectedMonth);
+        intent.putExtra("year", selectedYear);
+        intent.putExtra("from_month", from.month);
+        intent.putExtra("from_year", from.year);
+        intent.putExtra("to_month", to.month);
+        intent.putExtra("to_year", to.year);
+        startActivity(intent);
+    });
     cardExpense.setOnClickListener(v -> {
+        int fromIdx = spnMonthFrom.getSelectedItemPosition();
+        int toIdx = spnMonthTo.getSelectedItemPosition();
+        MonthItem from = monthItems.get(fromIdx);
+        MonthItem to = monthItems.get(toIdx);
         Intent intent = new Intent(requireContext(), TransactionListActivity.class);
         intent.putExtra("tx_type", TxType.EXPENSE.name());
         intent.putExtra("month", selectedMonth);
         intent.putExtra("year", selectedYear);
+        intent.putExtra("from_month", from.month);
+        intent.putExtra("from_year", from.year);
+        intent.putExtra("to_month", to.month);
+        intent.putExtra("to_year", to.year);
         startActivity(intent);
     });
 }
@@ -176,33 +216,86 @@ private void renderChartAndSummary() {
     if (yAxis != null) yAxis.removeAllViews();
     if (gridLayer != null) gridLayer.removeAllViews();
 
-    List<CalendarSheet.Period> periods = sortedPeriodsAsc(selectedPeriods);
+    int fromIdx = spnMonthFrom.getSelectedItemPosition();
+    int toIdx = spnMonthTo.getSelectedItemPosition();
+    if (fromIdx > toIdx) return;
+    if (monthItems.isEmpty()) return;
+    LocalDate fromMonth = LocalDate.of(monthItems.get(fromIdx).year, monthItems.get(fromIdx).month, 1);
+    LocalDate toMonth = LocalDate.of(monthItems.get(toIdx).year, monthItems.get(toIdx).month, 1);
+    LocalDate startDate = fromMonth.withDayOfMonth(1);
+    LocalDate endDate = toMonth.withDayOfMonth(toMonth.lengthOfMonth());
 
     long incomeSum = 0, expenseSum = 0;
+    List<Transaction> filtered = new ArrayList<>();
+    for (Transaction t : transactionsList) {
+        if ((t.date.isEqual(startDate) || t.date.isAfter(startDate)) && (t.date.isEqual(endDate) || t.date.isBefore(endDate))) {
+            filtered.add(t);
+            if (t.type == TxType.INCOME || t.type == TxType.DEBT_COLLECTION) incomeSum += t.amount;
+            if (t.type == TxType.EXPENSE || t.type == TxType.LOAN_REPAYMENT) expenseSum += t.amount;
+        }
+    }
+
     long rawMax = 0;
-    for (CalendarSheet.Period p : periods) {
-        long income = 800_000 + Math.abs((p.label().hashCode() * 13L) % 1_500_000);
-        long expense = 400_000 + Math.abs((p.label().hashCode() * 7L) % 1_200_000);
+    List<LocalDate> months = new ArrayList<>();
+    String fromStr = String.format("%04d-%02d", fromMonth.getYear(), fromMonth.getMonthValue());
+    String toStr = String.format("%04d-%02d", toMonth.getYear(), toMonth.getMonthValue());
+    if (fromStr.equals(toStr)) {
+        months.add(fromMonth);
+    } else {
+        LocalDate iter = fromMonth;
+        while (!iter.isAfter(toMonth)) {
+            months.add(iter);
+            iter = iter.plusMonths(1);
+        }
+    }
+    List<Long> incomeByMonth = new ArrayList<>();
+    List<Long> expenseByMonth = new ArrayList<>();
+    Log.d("StatsActivity", "months.size = " + months.size());
+    if (months.size() == 1) {
+        LocalDate m = months.get(0);
+        long income = 0, expense = 0;
+        for (Transaction t : filtered) {
+            if (t.date.getYear() == m.getYear() && t.date.getMonthValue() == m.getMonthValue()) {
+                if (t.type == TxType.INCOME || t.type == TxType.DEBT_COLLECTION) income += t.amount;
+                if (t.type == TxType.EXPENSE || t.type == TxType.LOAN_REPAYMENT) expense += t.amount;
+            }
+        }
+        incomeByMonth.add(income);
+        expenseByMonth.add(expense);
         rawMax = Math.max(rawMax, Math.max(income, expense));
+    } else {
+        for (LocalDate m : months) {
+            long income = 0, expense = 0;
+            for (Transaction t : filtered) {
+                if (t.date.getYear() == m.getYear() && t.date.getMonthValue() == m.getMonthValue()) {
+                    if (t.type == TxType.INCOME || t.type == TxType.DEBT_COLLECTION) income += t.amount;
+                    if (t.type == TxType.EXPENSE || t.type == TxType.LOAN_REPAYMENT) expense += t.amount;
+                }
+            }
+            incomeByMonth.add(income);
+            expenseByMonth.add(expense);
+            rawMax = Math.max(rawMax, Math.max(income, expense));
+        }
     }
     final long niceMax = niceTopByHalfSteps(rawMax);
     final int ticks = 4;
     final float plotHeightPx = dp(160);
 
-    for (CalendarSheet.Period p : periods) {
-        long income = 800_000 + Math.abs((p.label().hashCode() * 13L) % 1_500_000);
-        long expense = 400_000 + Math.abs((p.label().hashCode() * 7L) % 1_200_000);
-        incomeSum += income; expenseSum += expense;
+    for (int i = 0; i < months.size(); i++) {
+        LocalDate m = months.get(i);
+        long income = incomeByMonth.get(i);
+        long expense = expenseByMonth.get(i);
+        if (income == 0 && expense == 0) continue;
 
         View group = getLayoutInflater().inflate(R.layout.view_bar_group, chartContainer, false);
         TextView tvLabel = group.findViewById(R.id.tvLabel);
         View incomeBar = group.findViewById(R.id.vIncome);
         View expenseBar = group.findViewById(R.id.vExpense);
 
-        tvLabel.setText(p.label());
+        tvLabel.setText(String.format(Locale.getDefault(), "%02d/%d", m.getMonthValue(), m.getYear()));
 
-        int hIncome = Math.max(dp(8), Math.round(plotHeightPx * (income / (float) niceMax)));
-        int hExpense = Math.max(dp(8), Math.round(plotHeightPx * (expense / (float) niceMax)));
+        int hIncome = (income == 0) ? 0 : Math.max(dp(8), Math.round(plotHeightPx * (income / (float) niceMax)));
+        int hExpense = (expense == 0) ? 0 : Math.max(dp(8), Math.round(plotHeightPx * (expense / (float) niceMax)));
         incomeBar.getLayoutParams().height = hIncome;
         expenseBar.getLayoutParams().height = hExpense;
         incomeBar.requestLayout();
@@ -252,6 +345,7 @@ private void renderChartAndSummary() {
             });
         }
     });
+
 
     tvIncomeTotal.setText(formatThousand(incomeSum) + " đ");
     tvExpenseTotal.setText(formatThousand(expenseSum) + " đ");
@@ -326,15 +420,5 @@ private List<CalendarSheet.Period> sortedPeriodsAsc(List<CalendarSheet.Period> i
     return out;
 }
 
-@Override
-public void onApply(List<CalendarSheet.Period> periods) {
-    if (periods == null || periods.isEmpty()) return;
-    CalendarSheet.Mode t = periods.get(0).type;
-    ArrayList<CalendarSheet.Period> clean = new ArrayList<>();
-    for (CalendarSheet.Period p : periods) if (p.type == t) clean.add(p);
 
-    selectedPeriods.clear();
-    selectedPeriods.addAll(clean);
-    renderChartAndSummary();
-}
 }

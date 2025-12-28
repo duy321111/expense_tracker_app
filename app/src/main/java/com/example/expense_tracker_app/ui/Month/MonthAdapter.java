@@ -11,11 +11,17 @@ import com.example.expense_tracker_app.R;
 import com.google.android.material.chip.Chip;
 import java.util.List;
 
+
 public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.VH> {
     private final List<MonthItem> items;
     public int selected = -1;
+    public interface OnMonthSelectedListener {
+        void onMonthSelected(int position, MonthItem item);
+    }
+    private OnMonthSelectedListener listener;
 
     public MonthAdapter(List<MonthItem> items){ this.items = items; }
+    public void setOnMonthSelectedListener(OnMonthSelectedListener l) { this.listener = l; }
 
     @NonNull @Override public VH onCreateViewHolder(@NonNull ViewGroup p, int vt){
         View v = LayoutInflater.from(p.getContext()).inflate(R.layout.item_month, p, false);
@@ -42,6 +48,7 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.VH> {
             selected = pos;
             if (prev != -1 && prev != pos) notifyItemChanged(prev);
             notifyItemChanged(pos);
+            if (listener != null) listener.onMonthSelected(pos, it);
         });
 
         // click cả item cũng chọn chip
