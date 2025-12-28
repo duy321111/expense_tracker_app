@@ -20,8 +20,11 @@ import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.expense_tracker_app.R;
+import com.example.expense_tracker_app.data.model.TxType; 
 import com.example.expense_tracker_app.ui.Month.MonthAdapter;
 import com.example.expense_tracker_app.ui.Month.MonthItem;
+import com.example.expense_tracker_app.ui.TransactionListActivity; 
+import com.google.android.material.card.MaterialCardView; 
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -35,6 +38,8 @@ public class StatsActivity extends Fragment implements CalendarSheet.OnApplySele
     private RecyclerView rvMonths;
     private LinearLayout chartContainer;
     private TextView tvIncomeTotal, tvExpenseTotal;
+
+    private MaterialCardView cardIncome, cardExpense;
 
     private LinearLayout yAxis;
     private FrameLayout gridLayer;
@@ -60,6 +65,9 @@ public View onCreateView(@NonNull LayoutInflater inflater,
 
     yAxis = root.findViewById(R.id.yAxis);
     gridLayer = root.findViewById(R.id.gridLayer);
+
+    cardIncome = root.findViewById(R.id.cardIncome);
+    cardExpense = root.findViewById(R.id.cardExpense);
 
     initCalendarDefaults();
     setupMonthStrip();
@@ -136,6 +144,20 @@ private void setupClicks() {
     ivCalendar.setOnClickListener(v -> {
         CalendarSheet sheet = CalendarSheet.newInstance(selectedPeriods);
         sheet.show(getParentFragmentManager(), "CalendarSheet");
+    });
+    cardIncome.setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), TransactionListActivity.class);
+            intent.putExtra("tx_type", TxType.INCOME.name());
+            intent.putExtra("month", selectedMonth);
+            intent.putExtra("year", selectedYear);
+            startActivity(intent);
+        });
+    cardExpense.setOnClickListener(v -> {
+        Intent intent = new Intent(requireContext(), TransactionListActivity.class);
+        intent.putExtra("tx_type", TxType.EXPENSE.name());
+        intent.putExtra("month", selectedMonth);
+        intent.putExtra("year", selectedYear);
+        startActivity(intent);
     });
 }
 
