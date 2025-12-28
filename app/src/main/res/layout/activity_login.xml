@@ -100,15 +100,7 @@
                 android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <TextView
-            android:id="@+id/tvForgotPassword"
-            style="@style/Body2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:paddingTop="8dp"
-            android:text="Quên mật khẩu?"
-            android:textColor="@color/primary_1" />
+
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLogin"
@@ -132,76 +124,8 @@
             android:textColor="@color/primary_1"
             app:cornerRadius="12dp" />
 
-        <!-- Separator -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:gravity="center"
-            android:orientation="horizontal">
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"
-                android:background="#BDBDBD" />
 
-            <TextView
-                style="@style/Body2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:text="Hoặc đăng nhập với"
-                android:textColor="@color/neutral_700" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"
-                android:background="#BDBDBD" />
-        </LinearLayout>
-
-        <!-- Social Login -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnGoogle"
-                android:layout_width="50dp"
-                android:layout_height="58dp"
-                android:layout_marginLeft="20dp"
-                android:backgroundTint="@color/white"
-                app:cornerRadius="30dp"
-                app:icon="@drawable/google_logo"
-                app:iconGravity="textStart"
-                app:iconPadding="0dp"
-                app:iconSize="24dp"
-                app:iconTint="@null"
-                app:strokeWidth="1dp" />
-
-            <Space
-                android:layout_width="100dp"
-                android:layout_height="wrap_content" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnFacebook"
-                android:layout_width="50dp"
-                android:layout_height="58dp"
-                android:layout_marginRight="20dp"
-                android:backgroundTint="@color/white"
-                app:cornerRadius="30dp"
-                app:icon="@drawable/facebook_logo"
-                app:iconGravity="textStart"
-                app:iconPadding="0dp"
-                app:iconSize="24dp"
-                app:iconTint="@null"
-                app:strokeWidth="1dp" />
-        </LinearLayout>
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
