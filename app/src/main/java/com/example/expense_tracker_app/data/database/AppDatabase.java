@@ -18,8 +18,8 @@ import com.example.expense_tracker_app.data.model.Wallet;
 import com.example.expense_tracker_app.data.model.converter.Converters;
 import com.example.expense_tracker_app.data.model.converter.StringListConverter;
 
-// --- SỬA: Tăng version lên 9 ---
-@Database(entities = {User.class, Budget.class, Transaction.class, Category.class, Subcategory.class, Wallet.class}, version = 9)
+// --- SỬA: Tăng version lên 10 ---
+@Database(entities = {User.class, Budget.class, Transaction.class, Category.class, Subcategory.class, Wallet.class}, version = 10)
 @TypeConverters({StringListConverter.class, Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -32,12 +32,20 @@ public abstract class AppDatabase extends RoomDatabase {
 
     private static volatile AppDatabase INSTANCE;
 
-    // --- MIGRATION: Thêm cột type vào bảng wallets ---
+    // Migration cũ (giữ nguyên)
     static final Migration MIGRATION_8_9 = new Migration(8, 9) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
-            // Thêm cột type, mặc định là 'BANK' cho các ví cũ để an toàn
             database.execSQL("ALTER TABLE wallets ADD COLUMN type TEXT DEFAULT 'BANK'");
+        }
+    };
+
+    // --- MỚI: Migration thêm cột excludeFromReport ---
+    static final Migration MIGRATION_9_10 = new Migration(9, 10) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            // Thêm cột excludeFromReport (INTEGER 0 hoặc 1), mặc định là 0 (tính vào báo cáo)
+            database.execSQL("ALTER TABLE transactions ADD COLUMN excludeFromReport INTEGER NOT NULL DEFAULT 0");
         }
     };
 
@@ -48,7 +56,7 @@ public abstract class AppDatabase extends RoomDatabase {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                                     AppDatabase.class, DATABASE_NAME)
                             .allowMainThreadQueries()
-                            .addMigrations(MIGRATION_8_9) // Đăng ký migration
+                            .addMigrations(MIGRATION_8_9, MIGRATION_9_10) // Đăng ký thêm migration mới
                             .fallbackToDestructiveMigration()
                             .build();
                 }

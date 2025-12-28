@@ -70,6 +70,10 @@ public class AddTransactionFragment extends Fragment {
     private TextView tvReportHint;
     private TextView tvImageStatus;
 
+    // --- BIẾN QUẢN LÝ DIALOG DANH MỤC ---
+    private BottomSheetDialog categoryDialog;
+    private LinearLayout categoryContainer;
+
     // --- BIẾN XỬ LÝ ẢNH ---
     private ActivityResultLauncher<String> pickImageLauncher;
     private ActivityResultLauncher<Uri> takePhotoLauncher;
@@ -83,9 +87,10 @@ public class AddTransactionFragment extends Fragment {
             "ic_cat_health", "ic_cat_car_service", "ic_cat_insurance",
             "ic_cat_sport", "ic_cat_music", "ic_cat_travel", "ic_cat_gamepad"
     );
-    private String selectedIconName = "ic_cat_food";
     private String tempSelectedIconName = "ic_cat_food";
-    private String newCategoryIcon = "ic_cat_food"; // Dùng cho dialog tạo nhóm
+
+    // Biến này không còn dùng cho Group nữa, nhưng giữ lại cho Subcategory
+    private String newCategoryIcon = "ic_cat_food";
 
     @Nullable
     @Override
@@ -100,7 +105,6 @@ public class AddTransactionFragment extends Fragment {
         return view;
     }
 
-    // --- 1. XỬ LÝ ẢNH (CAMERA & THƯ VIỆN) ---
     private void registerImageLaunchers() {
         pickImageLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
             if (uri != null) {
@@ -174,7 +178,6 @@ public class AddTransactionFragment extends Fragment {
         } catch (Exception e) { return null; }
     }
 
-    // --- 2. KHỞI TẠO VIEW ---
     private void initViews(View view) {
         toolbar = view.findViewById(R.id.toolbar);
         etAmount = view.findViewById(R.id.etAmount);
@@ -195,7 +198,6 @@ public class AddTransactionFragment extends Fragment {
         switchReport = view.findViewById(R.id.switchReport);
         tvReportHint = view.findViewById(R.id.tv_report_hint);
 
-        // Tìm view hiển thị trạng thái ảnh
         if (rowImage != null && rowImage.getChildCount() > 0) {
             for (int i = 0; i < rowImage.getChildCount(); i++) {
                 View child = rowImage.getChildAt(i);
@@ -208,8 +210,9 @@ public class AddTransactionFragment extends Fragment {
                 }
             }
         }
+
         btnSave.setAlpha(0.5f);
-        btnSave.setEnabled(true);
+        btnSave.setEnabled(false);
     }
 
     private void setupEvents() {
@@ -221,6 +224,7 @@ public class AddTransactionFragment extends Fragment {
                 viewModel.amount.setValue(s.toString());
                 boolean hasMoney = s.length() > 0;
                 btnSave.setAlpha(hasMoney ? 1.0f : 0.5f);
+                btnSave.setEnabled(hasMoney);
             }
             @Override public void afterTextChanged(Editable s) {}
         });
@@ -229,7 +233,6 @@ public class AddTransactionFragment extends Fragment {
         rowCategory.setOnClickListener(v -> showCategoryPickerDialog());
         rowDate.setOnClickListener(v -> showDatePicker());
 
-        // --- ĐÃ SỬA LỖI LOGIC: Thêm kiểm tra ví ---
         optCash.setOnClickListener(v -> {
             if (Boolean.TRUE.equals(viewModel.hasCashWallet.getValue())) {
                 viewModel.method.setValue("Tiền mặt");
@@ -247,7 +250,6 @@ public class AddTransactionFragment extends Fragment {
                 Toast.makeText(getContext(), "Bạn chưa tạo Ví chuyển khoản!", Toast.LENGTH_SHORT).show();
             }
         });
-        // ------------------------------------------
 
         btnToggleDetail.setOnClickListener(v -> {
             if (layoutDetail.getVisibility() == View.VISIBLE) {
@@ -287,56 +289,61 @@ public class AddTransactionFragment extends Fragment {
         });
     }
 
-    // --- 3. HIỂN THỊ DANH MỤC ---
     private void showCategoryPickerDialog() {
-        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
+        categoryDialog = new BottomSheetDialog(requireContext());
         View view = getLayoutInflater().inflate(R.layout.sheet_pick_category, null);
-        dialog.setContentView(view);
+        categoryDialog.setContentView(view);
 
-        LinearLayout container = view.findViewById(R.id.ll_category_container);
+        categoryContainer = view.findViewById(R.id.ll_category_container);
 
         ImageView btnAddGroup = view.findViewById(R.id.btn_add_group);
         if (btnAddGroup != null) {
-            btnAddGroup.setOnClickListener(v -> showAddCategoryGroupDialog(dialog));
+            // SỬA: Gọi dialog nhập tên đơn giản
+            btnAddGroup.setOnClickListener(v -> showAddCategoryGroupDialog(categoryDialog));
         }
 
         List<CategoryWithSubcategories> data = viewModel.categories.getValue();
-
-        // --- ĐÃ SỬA: Không return khi danh sách rỗng, vẫn hiện Dialog ---
         if (data == null || data.isEmpty()) {
             viewModel.refreshCategories();
-            // Không return nữa!
         } else {
-            for (CategoryWithSubcategories cws : data) {
-                if (cws == null || cws.category == null) continue;
-
-                TextView title = new TextView(requireContext());
-                title.setText(cws.category.name);
-                title.setTextSize(16);
-                title.setTextColor(getResources().getColor(R.color.neutral_900, null));
-                title.setPadding(0, 30, 0, 20);
-                container.addView(title);
-
-                GridLayout grid = new GridLayout(requireContext());
-                grid.setColumnCount(4);
-                grid.setUseDefaultMargins(true);
-
-                if (cws.subcategories != null) {
-                    for (Subcategory sub : cws.subcategories) {
-                        addGridItem(grid, sub.name, sub.icon, v -> {
-                            viewModel.category.setValue(cws.category);
-                            viewModel.subcategory.setValue(sub);
-                            viewModel.subcategoryId.setValue(sub.id);
-                            dialog.dismiss();
-                        }, false);
-                    }
-                }
-
-                addGridItem(grid, "Thêm", "ic_add", v -> showAddSubcategoryDialog(cws, dialog), true);
-                container.addView(grid);
-            }
+            renderCategoryList(data);
         }
-        dialog.show();
+
+        categoryDialog.show();
+    }
+
+    private void renderCategoryList(List<CategoryWithSubcategories> data) {
+        if (categoryContainer == null) return;
+        categoryContainer.removeAllViews();
+
+        for (CategoryWithSubcategories cws : data) {
+            if (cws == null || cws.category == null) continue;
+
+            TextView title = new TextView(requireContext());
+            title.setText(cws.category.name);
+            title.setTextSize(16);
+            title.setTextColor(getResources().getColor(R.color.neutral_900, null));
+            title.setPadding(0, 30, 0, 20);
+            categoryContainer.addView(title);
+
+            GridLayout grid = new GridLayout(requireContext());
+            grid.setColumnCount(4);
+            grid.setUseDefaultMargins(true);
+
+            if (cws.subcategories != null) {
+                for (Subcategory sub : cws.subcategories) {
+                    addGridItem(grid, sub.name, sub.icon, v -> {
+                        viewModel.category.setValue(cws.category);
+                        viewModel.subcategory.setValue(sub);
+                        viewModel.subcategoryId.setValue(sub.id);
+                        if(categoryDialog != null) categoryDialog.dismiss();
+                    }, false);
+                }
+            }
+
+            addGridItem(grid, "Thêm", "ic_add", v -> showAddSubcategoryDialog(cws, categoryDialog), true);
+            categoryContainer.addView(grid);
+        }
     }
 
     private void addGridItem(GridLayout grid, String name, String iconResName, View.OnClickListener onClickListener, boolean isAddItem) {
@@ -416,49 +423,39 @@ public class AddTransactionFragment extends Fragment {
         dialog.show();
     }
 
+    // --- SỬA: Hàm này giờ chỉ hiện 1 ô nhập text ---
     private void showAddCategoryGroupDialog(BottomSheetDialog parentSheet) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        View view = getLayoutInflater().inflate(R.layout.sheet_new_category, null);
-        builder.setView(view);
-        AlertDialog dialog = builder.create();
-        if(dialog.getWindow() != null) dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        builder.setTitle("Tạo nhóm danh mục mới");
 
-        EditText etName = view.findViewById(R.id.etName);
-        Button btnCreate = view.findViewById(R.id.btnCreate);
+        // Tạo layout động chứa ô input
+        LinearLayout layout = new LinearLayout(requireContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(50, 40, 50, 20);
 
-        int[] iconIds = {R.id.i1, R.id.i2, R.id.i3, R.id.i4, R.id.i5, R.id.i6, R.id.i7, R.id.i8};
-        View.OnClickListener iconClick = v -> {
-            int id = v.getId();
-            if (id == R.id.i1) newCategoryIcon = "ic_cat_food";
-            else if (id == R.id.i2) newCategoryIcon = "ic_cat_coffee";
-            else if (id == R.id.i3) newCategoryIcon = "ic_cat_groceries";
-            else if (id == R.id.i4) newCategoryIcon = "ic_cat_health";
-            else if (id == R.id.i5) newCategoryIcon = "ic_cat_phone";
-            else if (id == R.id.i6) newCategoryIcon = "ic_cat_music";
-            else if (id == R.id.i7) newCategoryIcon = "ic_cat_travel";
-            else if (id == R.id.i8) newCategoryIcon = "ic_cat_sport";
-            Toast.makeText(getContext(), "Đã chọn icon", Toast.LENGTH_SHORT).show();
-        };
+        EditText input = new EditText(requireContext());
+        input.setHint("Nhập tên nhóm (VD: Đầu tư)");
+        layout.addView(input);
 
-        for (int id : iconIds) {
-            View iv = view.findViewById(id);
-            if (iv != null) iv.setOnClickListener(iconClick);
-        }
+        builder.setView(layout);
 
-        btnCreate.setOnClickListener(v -> {
-            String name = etName.getText().toString().trim();
-            if(!name.isEmpty()) {
-                viewModel.addNewCategory(name, newCategoryIcon, viewModel.type.getValue());
+        builder.setPositiveButton("Tạo", (dialog, which) -> {
+            String name = input.getText().toString().trim();
+            if (!name.isEmpty()) {
+                // Gọi hàm tạo nhóm mới trong ViewModel
+                viewModel.addNewGroup(name);
                 Toast.makeText(getContext(), "Đã tạo nhóm: " + name, Toast.LENGTH_SHORT).show();
-                dialog.dismiss();
-                parentSheet.dismiss();
+                // Không cần dismiss parentSheet, Observer sẽ tự update lại danh sách
             } else {
                 Toast.makeText(getContext(), "Vui lòng nhập tên", Toast.LENGTH_SHORT).show();
             }
         });
 
-        dialog.show();
+        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
+
+        builder.show();
     }
+    // ------------------------------------------------
 
     private void showTypePickerDialog() {
         BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
@@ -503,17 +500,27 @@ public class AddTransactionFragment extends Fragment {
         viewModel.subcategory.observe(getViewLifecycleOwner(), sub -> { if (sub != null) tvCategory.setText(sub.name); });
         viewModel.category.observe(getViewLifecycleOwner(), cat -> { if (cat != null && viewModel.subcategory.getValue() == null) tvCategory.setText(cat.name); });
         viewModel.method.observe(getViewLifecycleOwner(), m -> updateMethodUI("Tiền mặt".equals(m)));
+
+        // Tự động cập nhật Dialog khi dữ liệu thay đổi
+        viewModel.categories.observe(getViewLifecycleOwner(), data -> {
+            if (categoryDialog != null && categoryDialog.isShowing()) {
+                renderCategoryList(data);
+            }
+        });
+
         viewModel.imagePath.observe(getViewLifecycleOwner(), path -> {
             if (tvImageStatus != null) {
                 tvImageStatus.setText((path != null && !path.isEmpty()) ? "Đã có ảnh" : "Thêm hình ảnh");
                 tvImageStatus.setTextColor((path != null && !path.isEmpty()) ? getResources().getColor(R.color.primary_1, null) : getResources().getColor(R.color.neutral_700, null));
             }
         });
+
         viewModel.done.observe(getViewLifecycleOwner(), done -> {
             if (done) {
                 Toast.makeText(getContext(), "Lưu thành công", Toast.LENGTH_SHORT).show();
-                viewModel.done.setValue(false);
-                if (getActivity() != null) getActivity().getOnBackPressedDispatcher().onBackPressed();
+                etAmount.setText("");
+                if (switchReport != null) switchReport.setChecked(false);
+                viewModel.resetInput();
             }
         });
     }

@@ -34,7 +34,7 @@ public class AddTxViewModel extends AndroidViewModel {
     public final MutableLiveData<Category> category = new MutableLiveData<>();
     public final MutableLiveData<Subcategory> subcategory = new MutableLiveData<>();
     public final MutableLiveData<Integer> subcategoryId = new MutableLiveData<>(0);
-    public final MutableLiveData<String> method = new MutableLiveData<>("Tiền mặt"); // Mặc định hiển thị, sẽ check lại sau
+    public final MutableLiveData<String> method = new MutableLiveData<>("Tiền mặt");
     public final MutableLiveData<String> amount = new MutableLiveData<>("");
     public final MutableLiveData<LocalDate> date = new MutableLiveData<>(LocalDate.now());
     public final MutableLiveData<Boolean> done = new MutableLiveData<>(false);
@@ -44,11 +44,9 @@ public class AddTxViewModel extends AndroidViewModel {
     public final MutableLiveData<String> imagePath = new MutableLiveData<>("");
     public final MutableLiveData<List<CategoryWithSubcategories>> categories = new MutableLiveData<>();
 
-    // --- BIẾN CHECK VÍ ---
     public final MutableLiveData<Boolean> hasCashWallet = new MutableLiveData<>(false);
     public final MutableLiveData<Boolean> hasBankWallet = new MutableLiveData<>(false);
     private LiveData<List<Wallet>> walletListLiveData;
-    // --------------------
 
     private final ExecutorService ioExecutor = Executors.newSingleThreadExecutor();
 
@@ -60,26 +58,23 @@ public class AddTxViewModel extends AndroidViewModel {
 
         repo.ensureDefaultCategories(getUserId());
         refreshCategories();
-        checkWallets(); // Kiểm tra ví ngay khi khởi tạo
+        checkWallets();
     }
 
-    // --- HÀM KIỂM TRA VÍ ---
     private void checkWallets() {
         walletListLiveData = walletDao.getWalletsByUserId(getUserId());
-        // ObserveForever để luôn lắng nghe thay đổi (lưu ý remove khi destroy nếu cần, nhưng ViewModel tồn tại theo Lifecycle nên ok)
         walletListLiveData.observeForever(wallets -> {
             boolean cash = false;
             boolean bank = false;
             if (wallets != null) {
                 for (Wallet w : wallets) {
                     if ("CASH".equals(w.type)) cash = true;
-                    else bank = true; // "BANK" hoặc null (cũ) đều coi là bank
+                    else bank = true;
                 }
             }
             hasCashWallet.setValue(cash);
             hasBankWallet.setValue(bank);
 
-            // Logic tự động chọn phương thức khả dụng đầu tiên
             if (cash && !bank) method.setValue("Tiền mặt");
             else if (!cash && bank) method.setValue("Chuyển khoản");
         });
@@ -93,8 +88,17 @@ public class AddTxViewModel extends AndroidViewModel {
         });
     }
 
+    public void resetInput() {
+        amount.setValue("");
+        note.setValue("");
+        location.setValue("");
+        imagePath.setValue("");
+        excludeReport.setValue(false);
+        date.setValue(LocalDate.now());
+        done.setValue(false);
+    }
+
     public void submit() {
-        // ... (Logic submit giữ nguyên) ...
         long amountVal = 0;
         try {
             String cleanAmount = amount.getValue();
@@ -105,25 +109,27 @@ public class AddTxViewModel extends AndroidViewModel {
         Category finalCat = category.getValue();
         if (finalCat == null) finalCat = new Category(type.getValue().name(), "ic_category");
 
+        TxType finalType = type.getValue();
+        if (finalCat.type != null) {
+            finalType = finalCat.type;
+        }
+
         Subcategory pickedSub = subcategory.getValue();
         int pickedSubId = pickedSub != null ? pickedSub.id : 0;
         String pickedSubName = pickedSub != null ? pickedSub.name : "";
         String pickedSubIcon = pickedSub != null && pickedSub.icon != null ? pickedSub.icon : finalCat.icon;
 
         String finalNote = note.getValue();
-        if (Boolean.TRUE.equals(excludeReport.getValue())) {
-            finalNote += " [Không tính báo cáo]";
-        }
-
         String locationVal = location.getValue();
         String imagePathVal = imagePath.getValue();
         if (imagePathVal == null) imagePathVal = "";
+        boolean isExcluded = Boolean.TRUE.equals(excludeReport.getValue());
 
         int userId = getUserId();
 
         Transaction newTx = new Transaction(
                 0, userId,
-                type.getValue(),
+                finalType,
                 finalCat,
                 pickedSubId,
                 pickedSubName,
@@ -133,41 +139,60 @@ public class AddTxViewModel extends AndroidViewModel {
                 date.getValue(),
                 finalNote,
                 locationVal,
-                imagePathVal
+                imagePathVal,
+                isExcluded
         );
 
         final long finalAmount = amountVal;
+        final TxType currentType = finalType;
 
         Executors.newSingleThreadExecutor().execute(() -> {
             repo.insertTransaction(newTx);
             double changeAmount = 0;
-            TxType currentType = type.getValue();
-            if (currentType == TxType.EXPENSE) changeAmount = -finalAmount;
-            else if (currentType == TxType.INCOME) changeAmount = finalAmount;
-            else if (currentType == TxType.BORROW) changeAmount = finalAmount;
-            else if (currentType == TxType.LEND) changeAmount = -finalAmount;
+
+            if (currentType == TxType.EXPENSE) {
+                changeAmount = -finalAmount;
+            } else if (currentType == TxType.INCOME) {
+                changeAmount = finalAmount;
+            } else if (currentType == TxType.BORROW) {
+                changeAmount = finalAmount;
+            } else if (currentType == TxType.LEND) {
+                changeAmount = -finalAmount;
+            } else if (currentType == TxType.DEBT_COLLECTION) {
+                changeAmount = finalAmount;
+            } else if (currentType == TxType.LOAN_REPAYMENT) {
+                changeAmount = -finalAmount;
+            }
 
             if (changeAmount != 0) {
-                // Update balance (cần logic chọn đúng ví trong DB dựa trên type,
-                // nhưng hiện tại walletDao.updateBalance đang update theo tên ví.
-                // Tạm thời giữ nguyên logic update theo tên trong DAO nếu bạn chưa sửa DAO,
-                // nhưng đúng ra phải update ví có type tương ứng)
-                // Ở đây giả định bạn chỉ có 1 ví mỗi loại để đơn giản, hoặc update ví đầu tiên tìm thấy.
-                // Code cũ của bạn: walletDao.updateBalance(method.getValue(), ...); -> method là "Tiền mặt" hoặc "Chuyển khoản"
-                // Bạn cần đảm bảo tên ví trong DB khớp với chuỗi này hoặc sửa logic update.
-                // TUY NHIÊN, với yêu cầu hiện tại chỉ là "Chặn chọn", ta chưa sửa sâu logic trừ tiền này.
                 walletDao.updateBalance(method.getValue(), changeAmount);
             }
             done.postValue(true);
         });
     }
 
+    // --- HÀM MỚI: Thêm nhóm danh mục đơn giản ---
+    public void addNewGroup(String name) {
+        // Mặc định icon chung chung vì user không chọn
+        Category newCat = new Category(name, "ic_category");
+        newCat.userId = getUserId();
+        // Quan trọng: Gán đúng Type (Thu/Chi) đang chọn
+        newCat.type = type.getValue();
+
+        ioExecutor.execute(() -> {
+            // Dùng Sync để đảm bảo lưu xong mới Refresh
+            repo.insertCategorySync(newCat);
+            refreshCategories();
+        });
+    }
+    // --------------------------------------------
+
     public void addNewCategory(String name, String icon, TxType txType) {
         Category newCat = new Category(name, icon);
         newCat.userId = getUserId();
         newCat.type = txType;
         ioExecutor.execute(() -> {
-            repo.insertCategory(newCat);
+            repo.insertCategorySync(newCat);
             refreshCategories();
         });
     }
@@ -180,12 +205,11 @@ public class AddTxViewModel extends AndroidViewModel {
         Subcategory sub = new Subcategory(categoryId, name, icon);
         sub.userId = getUserId();
         ioExecutor.execute(() -> {
-            repo.insertSubcategory(sub);
+            repo.insertSubcategorySync(sub);
             refreshCategories();
         });
     }
 
-    // Hàm thêm nhóm (bổ sung từ code trước)
     public void addNewSubcategoryToGroup(String groupName, String subName, String icon) {
         ioExecutor.execute(() -> {
             List<Category> cats = repo.getCustomCategories(getUserId());
@@ -200,12 +224,12 @@ public class AddTxViewModel extends AndroidViewModel {
                 Category newGroup = new Category(groupName, "ic_category");
                 newGroup.userId = getUserId();
                 newGroup.type = type.getValue();
-                repo.insertCategory(newGroup);
+                repo.insertCategorySync(newGroup);
                 parentId = newGroup.id;
             }
             Subcategory sub = new Subcategory(parentId, subName, icon);
             sub.userId = getUserId();
-            repo.insertSubcategory(sub);
+            repo.insertSubcategorySync(sub);
             refreshCategories();
         });
     }

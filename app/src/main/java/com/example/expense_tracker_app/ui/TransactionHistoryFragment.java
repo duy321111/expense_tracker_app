@@ -1,6 +1,6 @@
 package com.example.expense_tracker_app.ui;
 
-import android.app.AlertDialog; // Import AlertDialog
+import android.app.AlertDialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -13,6 +13,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData; // Import thêm cái này
+import androidx.lifecycle.Observer; // Import thêm cái này
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,6 +27,7 @@ import com.example.expense_tracker_app.ui.adapter.TransactionAdapter;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class TransactionHistoryFragment extends AppCompatActivity {
 
@@ -38,7 +41,10 @@ public class TransactionHistoryFragment extends AppCompatActivity {
     private UserRepository userRepository;
 
     private LocalDate selectedDate = LocalDate.now();
-    private int currentUserId = 1;
+    private int currentUserId = 1; // Mặc định là 1
+
+    // --- BIẾN QUẢN LÝ OBSERVER ĐỂ TRÁNH LỖI CHỒNG CHÉO ---
+    private LiveData<List<Transaction>> currentLiveData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,23 +58,21 @@ public class TransactionHistoryFragment extends AppCompatActivity {
 
         rvTransactions.setLayoutManager(new LinearLayoutManager(this));
 
-        // Cập nhật Adapter với sự kiện click xóa
         adapter = new TransactionAdapter(this, this::showDeleteDialog);
         rvTransactions.setAdapter(adapter);
 
         repository = new TransactionRepository(getApplication());
         userRepository = new UserRepository(getApplication());
 
-        loadCurrentUser();
-
         btnBack.setOnClickListener(v -> finish());
         layoutDatePicker.setOnClickListener(v -> showMonthPicker());
 
         updateMonthDisplay();
-        loadDataForSelectedMonth();
+
+        // SỬA: Không gọi loadData ở đây nữa, mà đợi loadUser xong mới gọi
+        loadCurrentUser();
     }
 
-    // --- HÀM HIỂN THỊ POPUP XÓA ---
     private void showDeleteDialog(Transaction transaction) {
         new AlertDialog.Builder(this)
                 .setTitle("Xóa giao dịch")
@@ -76,20 +80,19 @@ public class TransactionHistoryFragment extends AppCompatActivity {
                 .setPositiveButton("Xóa", (dialog, which) -> {
                     repository.deleteTransaction(transaction);
                     Toast.makeText(this, "Đã xóa giao dịch", Toast.LENGTH_SHORT).show();
-                    // Dữ liệu sẽ tự động cập nhật nhờ LiveData, không cần gọi loadData lại
                 })
                 .setNegativeButton("Hủy", null)
                 .show();
     }
-    // -----------------------------
 
     private void loadCurrentUser() {
         new Thread(() -> {
             User user = userRepository.getLoggedInUser();
             if (user != null) {
                 currentUserId = user.id;
-                runOnUiThread(this::loadDataForSelectedMonth);
             }
+            // Dù có user hay không cũng phải load dữ liệu (trên UI Thread)
+            runOnUiThread(this::loadDataForSelectedMonth);
         }).start();
     }
 
@@ -98,13 +101,26 @@ public class TransactionHistoryFragment extends AppCompatActivity {
         tvCurrentMonthDisplay.setText(formattedDate);
     }
 
+    // --- SỬA: Hàm load dữ liệu xử lý thông minh hơn ---
     private void loadDataForSelectedMonth() {
-        repository.getTransactionsByMonth(currentUserId, selectedDate).observe(this, transactions -> {
+        // 1. Hủy theo dõi (Observer) cũ nếu có, để tránh bị double dữ liệu
+        if (currentLiveData != null) {
+            currentLiveData.removeObservers(this);
+        }
+
+        // 2. Lấy LiveData mới theo userId và ngày đã chọn
+        currentLiveData = repository.getTransactionsByMonth(currentUserId, selectedDate);
+
+        // 3. Đăng ký theo dõi mới
+        currentLiveData.observe(this, transactions -> {
             if (transactions != null) {
                 adapter.setData(transactions);
+                // Nếu muốn hiện thông báo khi trống:
+                // if (transactions.isEmpty()) { ... hiển thị text trống ... }
             }
         });
     }
+    // --------------------------------------------------
 
     private void showMonthPicker() {
         BottomSheetDialog dialog = new BottomSheetDialog(this);
@@ -165,7 +181,7 @@ public class TransactionHistoryFragment extends AppCompatActivity {
             tv.setOnClickListener(v -> {
                 selectedDate = LocalDate.of(year, finalMonth, 1);
                 updateMonthDisplay();
-                loadDataForSelectedMonth();
+                loadDataForSelectedMonth(); // Gọi lại hàm load đã sửa
                 dialog.dismiss();
             });
             grid.addView(tv);

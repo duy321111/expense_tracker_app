@@ -29,6 +29,9 @@ public class Transaction {
     public String location;
     public String imagePath;
 
+    // --- MỚI: Thêm cột này ---
+    public boolean excludeFromReport;
+
     public Transaction(int id,
                        int userId,
                        TxType type,
@@ -41,7 +44,8 @@ public class Transaction {
                        LocalDate date,
                        String note,
                        String location,
-                       String imagePath) {
+                       String imagePath,
+                       boolean excludeFromReport) { // Cập nhật constructor
         this.id = id;
         this.userId = userId;
         this.type = type;
@@ -55,16 +59,17 @@ public class Transaction {
         this.note = note;
         this.location = location;
         this.imagePath = imagePath;
+        this.excludeFromReport = excludeFromReport;
     }
 
     @Ignore
     public Transaction(int id, TxType type, Category category, long amount, String method, LocalDate date, String note, int userId) {
-        this(id, userId, type, category, 0, "", "", amount, method, date, note, "", "");
+        this(id, userId, type, category, 0, "", "", amount, method, date, note, "", "", false);
     }
 
     @Ignore
     public Transaction() {
-        this(0, 1, TxType.EXPENSE, new Category("Khác"), 0, "", "", 0L, "Tiền mặt", LocalDate.now(), "", "", "");
+        this(0, 1, TxType.EXPENSE, new Category("Khác"), 0, "", "", 0L, "Tiền mặt", LocalDate.now(), "", "", "", false);
     }
 
     public static Transaction fake(String name, long amount, TxType type, String method){
@@ -82,7 +87,8 @@ public class Transaction {
                 LocalDate.now(),
                 "",
                 "",
-                ""
+                "",
+                false
         );
     }
 }

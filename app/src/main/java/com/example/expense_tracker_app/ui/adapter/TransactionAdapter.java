@@ -29,18 +29,25 @@ import java.util.List;
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.TxViewHolder> {
     private final List<Transaction> data = new ArrayList<>();
     private final Context context;
-    private final OnTransactionClickListener listener; // Thêm listener
+    private final OnTransactionClickListener listener;
 
     // Interface cho sự kiện click
     public interface OnTransactionClickListener {
         void onClick(Transaction transaction);
     }
 
-    // Constructor nhận thêm listener
+    // Constructor nhận thêm listener (Dùng cho màn hình Lịch sử để xóa)
     public TransactionAdapter(Context context, OnTransactionClickListener listener) {
         this.context = context;
         this.listener = listener;
     }
+
+    // --- THÊM LẠI CONSTRUCTOR NÀY ---
+    // Để tránh lỗi "Expected 2 arguments but found 1" ở các màn hình khác (như BudgetDetail)
+    public TransactionAdapter(Context context) {
+        this(context, null);
+    }
+    // --------------------------------
 
     public void setData(List<Transaction> newData) {
         data.clear();
@@ -75,7 +82,12 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         h.tvCat.setText(catName);
         h.tvMethod.setText(tx.method);
 
-        boolean isPositive = (tx.type == TxType.INCOME || tx.type == TxType.BORROW);
+        // --- SỬA LOGIC HIỂN THỊ DẤU VÀ MÀU ---
+        // Thêm DEBT_COLLECTION (Thu hồi nợ) vào nhóm Dương (+)
+        boolean isPositive = (tx.type == TxType.INCOME
+                || tx.type == TxType.BORROW
+                || tx.type == TxType.DEBT_COLLECTION);
+
         String prefix = isPositive ? "+" : "-";
         int colorRes = isPositive ? R.color.success_1 : R.color.accent_1;
 
@@ -85,6 +97,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             h.tvAmount.setText(prefix + Math.abs(tx.amount));
         }
         h.tvAmount.setTextColor(context.getResources().getColor(colorRes, null));
+        // -------------------------------------
 
         String iconName = (tx.subcategoryIcon != null && !tx.subcategoryIcon.isEmpty())
                 ? tx.subcategoryIcon

@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData;
 
 import com.example.expense_tracker_app.data.database.AppDatabase;
 import com.example.expense_tracker_app.data.database.TransactionDao;
-import com.example.expense_tracker_app.data.database.WalletDao; // Import WalletDao
+import com.example.expense_tracker_app.data.database.WalletDao;
 import com.example.expense_tracker_app.data.model.Category;
 import com.example.expense_tracker_app.data.model.CategoryWithSubcategories;
 import com.example.expense_tracker_app.data.model.Subcategory;
@@ -20,13 +20,13 @@ import java.time.LocalDate;
 
 public class TransactionRepository {
     private final TransactionDao transactionDao;
-    private final WalletDao walletDao; // Khai báo WalletDao
+    private final WalletDao walletDao;
     private final ExecutorService executor;
 
     public TransactionRepository(Application application) {
         AppDatabase db = AppDatabase.getInstance(application);
         transactionDao = db.transactionDao();
-        walletDao = db.walletDao(); // Khởi tạo WalletDao
+        walletDao = db.walletDao();
         executor = Executors.newSingleThreadExecutor();
     }
 
@@ -34,38 +34,29 @@ public class TransactionRepository {
         executor.execute(() -> transactionDao.insertTransaction(transaction));
     }
 
-    // --- THÊM HÀM XÓA GIAO DỊCH & HOÀN TIỀN ---
     public void deleteTransaction(Transaction transaction) {
         executor.execute(() -> {
-            // 1. Tính toán số tiền cần hoàn lại vào ví
             double refundAmount = 0;
-            // Nếu là Chi tiêu -> Xóa đi thì ví được cộng lại tiền (+)
             if (transaction.type == TxType.EXPENSE) {
                 refundAmount = transaction.amount;
-            }
-            // Nếu là Thu nhập -> Xóa đi thì ví bị trừ tiền (-)
-            else if (transaction.type == TxType.INCOME) {
+            } else if (transaction.type == TxType.INCOME) {
                 refundAmount = -transaction.amount;
-            }
-            // Nếu là Đi vay -> Xóa đi thì ví bị trừ tiền (-) (coi như chưa nhận nợ)
-            else if (transaction.type == TxType.BORROW) {
+            } else if (transaction.type == TxType.BORROW) {
                 refundAmount = -transaction.amount;
-            }
-            // Nếu là Cho vay -> Xóa đi thì ví được cộng lại tiền (+) (coi như chưa đưa tiền)
-            else if (transaction.type == TxType.LEND) {
+            } else if (transaction.type == TxType.LEND) {
+                refundAmount = transaction.amount;
+            } else if (transaction.type == TxType.DEBT_COLLECTION) {
+                refundAmount = -transaction.amount;
+            } else if (transaction.type == TxType.LOAN_REPAYMENT) {
                 refundAmount = transaction.amount;
             }
 
-            // 2. Cập nhật số dư ví (nếu số tiền khác 0)
             if (refundAmount != 0) {
                 walletDao.updateBalance(transaction.method, refundAmount);
             }
-
-            // 3. Xóa giao dịch khỏi Database
             transactionDao.deleteTransaction(transaction);
         });
     }
-    // ------------------------------------------
 
     public LiveData<List<Transaction>> getAllTransactions(int userId) {
         return transactionDao.getAllTransactions(userId);
@@ -77,7 +68,6 @@ public class TransactionRepository {
         return transactionDao.getTransactionsByDateRange(userId, startDate, endDate);
     }
 
-    // ... (Giữ nguyên các hàm insertCategory, getCustomCategories, ensureDefaultCategories cũ) ...
     public void insertCategory(Category category) {
         executor.execute(() -> {
             try {
@@ -86,6 +76,22 @@ public class TransactionRepository {
             } catch (Exception e) { e.printStackTrace(); }
         });
     }
+
+    // --- MỚI: Hàm lưu đồng bộ (Bắt buộc chờ lưu xong) ---
+    public void insertCategorySync(Category category) {
+        try {
+            long id = transactionDao.insertCategory(category);
+            category.id = (int) id;
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    public void insertSubcategorySync(Subcategory subcategory) {
+        try {
+            long id = transactionDao.insertSubcategory(subcategory);
+            subcategory.id = (int) id;
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+    // ----------------------------------------------------
 
     public void insertSubcategory(Subcategory subcategory) {
         executor.execute(() -> {
@@ -106,7 +112,17 @@ public class TransactionRepository {
 
     public List<CategoryWithSubcategories> categoriesWithSubcategories(TxType type, int userId) {
         try {
-            return transactionDao.getCategoriesWithSubcategories(type, userId);
+            List<TxType> typesToFetch = new ArrayList<>();
+            typesToFetch.add(type);
+
+            if (type == TxType.INCOME) {
+                typesToFetch.add(TxType.DEBT_COLLECTION);
+            }
+            else if (type == TxType.EXPENSE) {
+                typesToFetch.add(TxType.LOAN_REPAYMENT);
+            }
+
+            return transactionDao.getCategoriesWithSubcategories(typesToFetch, userId);
         } catch (Exception e) {
             return new ArrayList<>();
         }
@@ -149,6 +165,16 @@ public class TransactionRepository {
                 income.type = TxType.INCOME; income.userId = userId;
                 income.id = (int) transactionDao.insertCategory(income);
 
+                Category debtCollection = new Category("Thu hồi nợ", "ic_cat_money_in");
+                debtCollection.type = TxType.DEBT_COLLECTION;
+                debtCollection.userId = userId;
+                debtCollection.id = (int) transactionDao.insertCategory(debtCollection);
+
+                Category loanRepayment = new Category("Vay - Mượn", "ic_cat_money_out");
+                loanRepayment.type = TxType.LOAN_REPAYMENT;
+                loanRepayment.userId = userId;
+                loanRepayment.id = (int) transactionDao.insertCategory(loanRepayment);
+
                 Category borrow = new Category("Đi vay", "ic_cat_money_in");
                 borrow.type = TxType.BORROW; borrow.userId = userId;
                 borrow.id = (int) transactionDao.insertCategory(borrow);
@@ -163,6 +189,10 @@ public class TransactionRepository {
                 insertDefaultsForCategory(health, userId, new String[][]{{"Khám sức khỏe", "ic_cat_health"}, {"Học tập", "ic_cat_study"}, {"Thể thao", "ic_cat_sport"}});
                 insertDefaultsForCategory(fun, userId, new String[][]{{"Nhạc", "ic_cat_music"}, {"Du lịch", "ic_cat_travel"}, {"Trò chơi", "ic_cat_gamepad"}});
                 insertDefaultsForCategory(income, userId, new String[][]{{"Lương", "ic_cat_income"}, {"Thưởng", "ic_cat_income"}, {"Bán đồ", "ic_cat_income"}, {"Khác", "ic_cat_income"}});
+
+                insertDefaultsForCategory(debtCollection, userId, new String[][]{{"Nhận tiền cho vay", "ic_cat_money_in"}});
+                insertDefaultsForCategory(loanRepayment, userId, new String[][]{{"Trả tiền đã vay", "ic_cat_money_out"}});
+
                 insertDefaultsForCategory(borrow, userId, new String[][]{{"Nhận tiền vay", "ic_cat_money_in"}});
                 insertDefaultsForCategory(lend, userId, new String[][]{{"Cho vay tiền", "ic_cat_money_out"}});
 

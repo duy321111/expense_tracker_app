@@ -2,7 +2,7 @@ package com.example.expense_tracker_app.data.database;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
-import androidx.room.Delete; // Import này
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
@@ -21,10 +21,8 @@ public interface TransactionDao {
     @Insert
     long insertTransaction(Transaction transaction);
 
-    // --- THÊM HÀM NÀY ĐỂ XÓA GIAO DỊCH ---
     @Delete
     void deleteTransaction(Transaction transaction);
-    // ------------------------------------
 
     @Insert
     long insertCategory(Category category);
@@ -32,9 +30,11 @@ public interface TransactionDao {
     @Insert
     long insertSubcategory(Subcategory subcategory);
 
+    // --- SỬA: Dùng IN (:types) để lấy được cả INCOME và DEBT_COLLECTION ---
     @androidx.room.Transaction
-    @Query("SELECT * FROM categories WHERE type = :type AND userId = :userId")
-    List<CategoryWithSubcategories> getCategoriesWithSubcategories(TxType type, int userId);
+    @Query("SELECT * FROM categories WHERE type IN (:types) AND userId = :userId")
+    List<CategoryWithSubcategories> getCategoriesWithSubcategories(List<TxType> types, int userId);
+    // ---------------------------------------------------------------------
 
     @Query("SELECT * FROM categories WHERE userId = :userId")
     List<Category> getAllCategories(int userId);
@@ -63,6 +63,6 @@ public interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE userId = :userId AND date >= :startDate AND date <= :endDate ORDER BY date DESC, id DESC")
     LiveData<List<Transaction>> getTransactionsByDateRange(int userId, LocalDate startDate, LocalDate endDate);
 
-    @Query("SELECT * FROM transactions WHERE userId = :userId AND subcategoryId IN (:subcategoryIds) AND type = 'EXPENSE' AND date >= :startEpochDay AND date <= :endEpochDay ORDER BY date DESC, id DESC")
+    @Query("SELECT * FROM transactions WHERE userId = :userId AND subcategoryId IN (:subcategoryIds) AND type = 'EXPENSE' AND date >= :startEpochDay AND date <= :endEpochDay AND excludeFromReport = 0 ORDER BY date DESC, id DESC")
     List<Transaction> getTransactionsBySubcategories(int userId, long startEpochDay, long endEpochDay, List<Integer> subcategoryIds);
 }
