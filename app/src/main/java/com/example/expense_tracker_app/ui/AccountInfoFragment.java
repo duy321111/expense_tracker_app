@@ -3,9 +3,7 @@ package com.example.expense_tracker_app.ui;
 import android.app.AlertDialog;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -14,24 +12,25 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity; // Sửa thành Activity
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.expense_tracker_app.R;
 import com.example.expense_tracker_app.data.model.User;
+import com.example.expense_tracker_app.data.repository.UserRepository;
 import com.example.expense_tracker_app.viewmodel.ProfileViewModel;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.concurrent.Executors;
 
 public class AccountInfoFragment extends AppCompatActivity {
 
     private ProfileViewModel viewModel;
-    private User currentUser;
-    private int userId = 1; // ID mặc định
+    private User currentUser; // Biến lưu user hiện tại để cập nhật
+    private int userId = 1; // ID mặc định nếu không tìm thấy user
 
     // Views
     private ImageView btnBack;
@@ -40,9 +39,8 @@ public class AccountInfoFragment extends AppCompatActivity {
     private EditText etName, etEmail;
     private Button btnChangePassword, btnSave;
 
-    private String tempImagePath = "";
+    private String tempImagePath = ""; // Đường dẫn ảnh tạm thời khi vừa chọn xong (chưa lưu)
 
-    // SỬA 1: Đổi thành String (dành cho GetContent) thay vì String[]
     private ActivityResultLauncher<String> pickImageLauncher;
 
     @Override
@@ -50,11 +48,9 @@ public class AccountInfoFragment extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_account_info);
 
-        viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
-
         initViews();
+        setupViewModel(); // Hàm load dữ liệu
         registerImagePicker();
-        observeUser();
         setupEvents();
     }
 
@@ -68,21 +64,37 @@ public class AccountInfoFragment extends AppCompatActivity {
         btnSave = findViewById(R.id.btn_save);
     }
 
-    private void observeUser() {
+    // --- 1. LOAD DỮ LIỆU USER TỪ DB ---
+    private void setupViewModel() {
+        viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+        UserRepository repository = new UserRepository(getApplication());
+
+        // Lấy User đang đăng nhập từ SharedPreferences (hoặc nguồn lưu trữ tạm)
+        // Lưu ý: repository.getLoggedInUser() chạy trên main thread nếu là SharedPreferences,
+        // nếu nó truy vấn DB thì cần đưa vào background thread.
+        // Ở đây giả định bạn lấy được ID user hiện tại.
+        User loggedInUser = repository.getLoggedInUser();
+        if (loggedInUser != null) {
+            userId = loggedInUser.id;
+        }
+
+        // Quan sát dữ liệu LiveData từ DB theo ID
         viewModel.getUser(userId).observe(this, user -> {
             if (user != null) {
-                currentUser = user;
+                currentUser = user; // Lưu lại object user gốc để update sau này
 
-                if (etName.getText().toString().isEmpty())
-                    etName.setText(user.fullName);
-                if (etEmail.getText().toString().isEmpty())
-                    etEmail.setText(user.email);
+                // Hiển thị thông tin lên giao diện
+                etName.setText(user.fullName);
+                etEmail.setText(user.email);
 
-                if (user.profileImagePath != null && !user.profileImagePath.isEmpty()) {
-                    imgAvatar.setImageURI(Uri.parse(user.profileImagePath));
-                    tempImagePath = user.profileImagePath;
-                } else {
-                    imgAvatar.setImageResource(R.drawable.ic_launcher_background);
+                // Chỉ load ảnh từ DB nếu người dùng chưa chọn ảnh mới (tempImagePath rỗng)
+                if (tempImagePath.isEmpty() && user.profileImagePath != null && !user.profileImagePath.isEmpty()) {
+                    try {
+                        imgAvatar.setImageURI(Uri.parse(user.profileImagePath));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        imgAvatar.setImageResource(R.drawable.user); // Ảnh mặc định nếu lỗi
+                    }
                 }
             }
         });
@@ -91,85 +103,69 @@ public class AccountInfoFragment extends AppCompatActivity {
     private void setupEvents() {
         btnBack.setOnClickListener(v -> finish());
 
-        // SỬA 2: Gọi launch với chuỗi "image/*" để mở Gallery
-        btnChangeAvatar.setOnClickListener(v -> pickImageLauncher.launch("image/*"));
-        imgAvatar.setOnClickListener(v -> pickImageLauncher.launch("image/*"));
+        // Đổi mật khẩu
+        btnChangePassword.setOnClickListener(v -> {
+            // Chuyển sang Fragment/Activity đổi mật khẩu
+            getSupportFragmentManager().beginTransaction()
+                    .replace(android.R.id.content, new ChangePasswordFragment())
+                    .addToBackStack(null)
+                    .commit();
+        });
 
+        // Click chọn ảnh
+        btnChangeAvatar.setOnClickListener(v -> showImagePickerDialog());
+        imgAvatar.setOnClickListener(v -> showImagePickerDialog());
+
+        // --- 2. XỬ LÝ NÚT LƯU ---
         btnSave.setOnClickListener(v -> {
-            if (currentUser != null) {
-                String newName = etName.getText().toString().trim();
-                String newEmail = etEmail.getText().toString().trim();
+            if (currentUser == null) return;
 
-                if (newName.isEmpty() || newEmail.isEmpty()) {
-                    Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+            String newName = etName.getText().toString().trim();
+            String newEmail = etEmail.getText().toString().trim();
 
-                currentUser.fullName = newName;
-                currentUser.email = newEmail;
+            if (newName.isEmpty()) {
+                Toast.makeText(this, "Họ tên không được để trống", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Cập nhật thông tin vào object currentUser
+            currentUser.fullName = newName;
+            currentUser.email = newEmail;
+
+            // Nếu có chọn ảnh mới thì cập nhật đường dẫn ảnh
+            if (!tempImagePath.isEmpty()) {
                 currentUser.profileImagePath = tempImagePath;
-
-                viewModel.updateUserInfo(currentUser);
-                Toast.makeText(this, "Đã lưu thông tin!", Toast.LENGTH_SHORT).show();
-                finish();
             }
-        });
 
-        btnChangePassword.setOnClickListener(v -> showChangePasswordDialog());
+            // Gọi ViewModel update xuống Database
+            viewModel.updateUserInfo(currentUser);
+
+            Toast.makeText(this, "Đã cập nhật thông tin!", Toast.LENGTH_SHORT).show();
+            finish(); // Đóng màn hình, quay về ProfileFragment
+        });
     }
 
-    private void showChangePasswordDialog() {
+    private void showImagePickerDialog() {
+        String[] options = {"Chọn từ thư viện"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        View view = LayoutInflater.from(this).inflate(R.layout.reset_password, null);
-        builder.setView(view);
-        AlertDialog dialog = builder.create();
-        if(dialog.getWindow() != null) dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-
-        View imgLogo = view.findViewById(R.id.imgLogo);
-        View imgLang = view.findViewById(R.id.imgLanguage);
-        View tvVN = view.findViewById(R.id.VN);
-        if(imgLogo != null) imgLogo.setVisibility(View.GONE);
-        if(imgLang != null) imgLang.setVisibility(View.GONE);
-        if(tvVN != null) tvVN.setVisibility(View.GONE);
-
-        EditText etNewPass = view.findViewById(R.id.edtNewPassword);
-        EditText etConfirmPass = view.findViewById(R.id.edtConfirmPassword);
-        Button btnConfirm = view.findViewById(R.id.btnResetPassword);
-        TextView tvBack = view.findViewById(R.id.tvLoginRedirect);
-
-        if (tvBack != null) tvBack.setText("Hủy bỏ");
-
-        btnConfirm.setOnClickListener(v -> {
-            String newPass = etNewPass.getText().toString();
-            String confirmPass = etConfirmPass.getText().toString();
-
-            if (newPass.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập mật khẩu mới", Toast.LENGTH_SHORT).show();
-            } else if (!newPass.equals(confirmPass)) {
-                Toast.makeText(this, "Mật khẩu xác nhận không khớp", Toast.LENGTH_SHORT).show();
-            } else {
-                viewModel.changePassword(userId, newPass);
-                Toast.makeText(this, "Đổi mật khẩu thành công!", Toast.LENGTH_SHORT).show();
-                dialog.dismiss();
+        builder.setTitle("Thay đổi ảnh đại diện");
+        builder.setItems(options, (dialog, which) -> {
+            if (which == 0) {
+                pickImageLauncher.launch("image/*");
             }
         });
-
-        if (tvBack != null) {
-            tvBack.setOnClickListener(v -> dialog.dismiss());
-        }
-
-        dialog.show();
+        builder.show();
     }
 
-    // SỬA 3: Dùng GetContent (Gallery) thay vì OpenDocument (File Manager)
     private void registerImagePicker() {
         pickImageLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
             if (uri != null) {
-                // Copy ảnh vào bộ nhớ riêng (Vẫn giữ logic này để an toàn)
                 String internalPath = saveImageToInternalStorage(uri);
                 if (internalPath != null) {
-                    tempImagePath = internalPath;
-                    imgAvatar.setImageURI(Uri.parse(internalPath));
+                    tempImagePath = internalPath; // Lưu đường dẫn ảnh mới vào biến tạm
+                    imgAvatar.setImageURI(Uri.parse(internalPath)); // Hiển thị ngay lên UI
+                } else {
+                    Toast.makeText(this, "Lỗi lưu ảnh", Toast.LENGTH_SHORT).show();
                 }
             }
         });

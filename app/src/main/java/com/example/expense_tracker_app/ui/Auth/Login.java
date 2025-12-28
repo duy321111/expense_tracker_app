@@ -32,7 +32,7 @@ public class Login extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         Button btnLogin = findViewById(R.id.btnLogin);
         Button btnRegister = findViewById(R.id.btnRegister);
-        TextView tvForgotPassword = findViewById(R.id.tvForgotPassword);
+
 
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
@@ -76,8 +76,6 @@ public class Login extends AppCompatActivity {
 
         btnRegister.setOnClickListener(v -> startActivity(new Intent(Login.this, Register.class)));
 
-        tvForgotPassword.setOnClickListener(v -> {
-            // TODO: handle forgot password
-        });
+
     }
 }

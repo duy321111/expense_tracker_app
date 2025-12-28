@@ -5,5 +5,8 @@ public enum TxType {
     EXPENSE,
     BORROW,
     LEND,
-    ADJUST
+    ADJUST,
+    // --- THÊM 2 LOẠI MỚI ---
+    DEBT_COLLECTION, // Thu hồi nợ (Tiền vào ví -> Giống Income)
+    LOAN_REPAYMENT   // Trả nợ (Tiền ra ví -> Giống Expense)
 }

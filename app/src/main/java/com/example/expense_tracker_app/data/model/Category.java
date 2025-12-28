@@ -13,6 +13,7 @@ public class Category {
     public String name;
     public TxType type;
     public String icon;
+    public int userId; // Thêm userId để lọc theo user
 
     // 3. Constructor mặc định (Bắt buộc cho Room)
     public Category() { }

@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.expense_tracker_app.data.database.AppDatabase;
 import com.example.expense_tracker_app.data.database.TransactionDao;
+import com.example.expense_tracker_app.data.database.WalletDao;
 import com.example.expense_tracker_app.data.model.Category;
 import com.example.expense_tracker_app.data.model.CategoryWithSubcategories;
 import com.example.expense_tracker_app.data.model.Subcategory;
@@ -22,18 +23,42 @@ import java.util.concurrent.Executors;
 public class TransactionRepository {
 
     private final TransactionDao transactionDao;
+    private final WalletDao walletDao;
     private final ExecutorService executor;
 
     public TransactionRepository(Application application) {
         AppDatabase db = AppDatabase.getInstance(application);
         transactionDao = db.transactionDao();
+        walletDao = db.walletDao();
         executor = Executors.newSingleThreadExecutor();
     }
 
-    // --- TRANSACTION ---
-
     public void insertTransaction(Transaction transaction) {
         executor.execute(() -> transactionDao.insertTransaction(transaction));
+    }
+
+    public void deleteTransaction(Transaction transaction) {
+        executor.execute(() -> {
+            double refundAmount = 0;
+            if (transaction.type == TxType.EXPENSE) {
+                refundAmount = transaction.amount;
+            } else if (transaction.type == TxType.INCOME) {
+                refundAmount = -transaction.amount;
+            } else if (transaction.type == TxType.BORROW) {
+                refundAmount = -transaction.amount;
+            } else if (transaction.type == TxType.LEND) {
+                refundAmount = transaction.amount;
+            } else if (transaction.type == TxType.DEBT_COLLECTION) {
+                refundAmount = -transaction.amount;
+            } else if (transaction.type == TxType.LOAN_REPAYMENT) {
+                refundAmount = transaction.amount;
+            }
+
+            if (refundAmount != 0) {
+                walletDao.updateBalance(transaction.method, refundAmount);
+            }
+            transactionDao.deleteTransaction(transaction);
+        });
     }
 
     public LiveData<List<Transaction>> getAllTransactions(int userId) {
@@ -68,34 +93,59 @@ public class TransactionRepository {
             try {
                 long id = transactionDao.insertCategory(category);
                 category.id = (int) id;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            } catch (Exception e) { e.printStackTrace(); }
         });
     }
+
+    // --- MỚI: Hàm lưu đồng bộ (Bắt buộc chờ lưu xong) ---
+    public void insertCategorySync(Category category) {
+        try {
+            long id = transactionDao.insertCategory(category);
+            category.id = (int) id;
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    public void insertSubcategorySync(Subcategory subcategory) {
+        try {
+            long id = transactionDao.insertSubcategory(subcategory);
+            subcategory.id = (int) id;
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+    // ----------------------------------------------------
 
     public void insertSubcategory(Subcategory subcategory) {
         executor.execute(() -> {
             try {
                 long id = transactionDao.insertSubcategory(subcategory);
                 subcategory.id = (int) id;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            } catch (Exception e) { e.printStackTrace(); }
         });
     }
 
     public List<Category> getCustomCategories() {
         try {
             return transactionDao.getAllCategories();
+    public List<Category> getCustomCategories(int userId) {
+        try {
+            return transactionDao.getAllCategories(userId);
         } catch (Exception e) {
             return new ArrayList<>();
         }
     }
 
-    public List<CategoryWithSubcategories> categoriesWithSubcategories(TxType type) {
+    public List<CategoryWithSubcategories> categoriesWithSubcategories(TxType type, int userId) {
         try {
-            return transactionDao.getCategoriesWithSubcategories(type);
+            List<TxType> typesToFetch = new ArrayList<>();
+            typesToFetch.add(type);
+
+            if (type == TxType.INCOME) {
+                typesToFetch.add(TxType.DEBT_COLLECTION);
+            }
+            else if (type == TxType.EXPENSE) {
+                typesToFetch.add(TxType.LOAN_REPAYMENT);
+            }
+
+            return transactionDao.getCategoriesWithSubcategories(typesToFetch, userId);
         } catch (Exception e) {
             return new ArrayList<>();
         }
@@ -109,103 +159,76 @@ public class TransactionRepository {
         }
     }
 
-    public void ensureDefaultCategories() {
+    public void ensureDefaultCategories(int userId) {
         executor.execute(() -> {
             try {
-                if (transactionDao.countCategories() > 0 && transactionDao.countSubcategories() > 0) return;
+                if (transactionDao.countCategoriesByUserId(userId) > 0) return;
 
                 Category daily = new Category("Chi tiêu hằng ngày", "ic_cat_food");
-                daily.type = TxType.EXPENSE;
+                daily.type = TxType.EXPENSE; daily.userId = userId;
                 daily.id = (int) transactionDao.insertCategory(daily);
 
                 Category bills = new Category("Hóa đơn & dịch vụ", "ic_cat_electric");
-                bills.type = TxType.EXPENSE;
+                bills.type = TxType.EXPENSE; bills.userId = userId;
                 bills.id = (int) transactionDao.insertCategory(bills);
 
                 Category home = new Category("Nhà cửa & xe", "ic_cat_home");
-                home.type = TxType.EXPENSE;
+                home.type = TxType.EXPENSE; home.userId = userId;
                 home.id = (int) transactionDao.insertCategory(home);
 
                 Category health = new Category("Sức khỏe & học tập", "ic_cat_health");
-                health.type = TxType.EXPENSE;
+                health.type = TxType.EXPENSE; health.userId = userId;
                 health.id = (int) transactionDao.insertCategory(health);
 
                 Category fun = new Category("Giải trí", "ic_cat_travel");
-                fun.type = TxType.EXPENSE;
+                fun.type = TxType.EXPENSE; fun.userId = userId;
                 fun.id = (int) transactionDao.insertCategory(fun);
 
                 Category income = new Category("Thu nhập", "ic_cat_income");
-                income.type = TxType.INCOME;
+                income.type = TxType.INCOME; income.userId = userId;
                 income.id = (int) transactionDao.insertCategory(income);
 
+                Category debtCollection = new Category("Thu hồi nợ", "ic_cat_money_in");
+                debtCollection.type = TxType.DEBT_COLLECTION;
+                debtCollection.userId = userId;
+                debtCollection.id = (int) transactionDao.insertCategory(debtCollection);
+
+                Category loanRepayment = new Category("Vay - Mượn", "ic_cat_money_out");
+                loanRepayment.type = TxType.LOAN_REPAYMENT;
+                loanRepayment.userId = userId;
+                loanRepayment.id = (int) transactionDao.insertCategory(loanRepayment);
+
                 Category borrow = new Category("Đi vay", "ic_cat_money_in");
-                borrow.type = TxType.BORROW;
+                borrow.type = TxType.BORROW; borrow.userId = userId;
                 borrow.id = (int) transactionDao.insertCategory(borrow);
 
                 Category lend = new Category("Cho vay", "ic_cat_money_out");
-                lend.type = TxType.LEND;
+                lend.type = TxType.LEND; lend.userId = userId;
                 lend.id = (int) transactionDao.insertCategory(lend);
 
-                insertDefaultsForCategory(daily, new String[][]{
-                        {"Ăn uống", "ic_cat_food"},
-                        {"Cà phê", "ic_cat_coffee"},
-                        {"Đi chợ/Siêu thị", "ic_cat_groceries"},
-                        {"Di chuyển", "ic_cat_transport"}
-                });
+                insertDefaultsForCategory(daily, userId, new String[][]{{"Ăn uống", "ic_cat_food"}, {"Cà phê", "ic_cat_coffee"}, {"Đi chợ/Siêu thị", "ic_cat_groceries"}, {"Di chuyển", "ic_cat_transport"}});
+                insertDefaultsForCategory(bills, userId, new String[][]{{"Điện", "ic_cat_electric"}, {"Nước", "ic_cat_water"}, {"Internet", "ic_cat_internet"}, {"Điện thoại", "ic_cat_phone"}, {"Gas", "ic_cat_gas"}, {"TV", "ic_cat_tv"}});
+                insertDefaultsForCategory(home, userId, new String[][]{{"Thuê nhà", "ic_cat_home"}, {"Bảo dưỡng xe", "ic_cat_car_service"}, {"Bảo hiểm", "ic_cat_insurance"}});
+                insertDefaultsForCategory(health, userId, new String[][]{{"Khám sức khỏe", "ic_cat_health"}, {"Học tập", "ic_cat_study"}, {"Thể thao", "ic_cat_sport"}});
+                insertDefaultsForCategory(fun, userId, new String[][]{{"Nhạc", "ic_cat_music"}, {"Du lịch", "ic_cat_travel"}, {"Trò chơi", "ic_cat_gamepad"}});
+                insertDefaultsForCategory(income, userId, new String[][]{{"Lương", "ic_cat_income"}, {"Thưởng", "ic_cat_income"}, {"Bán đồ", "ic_cat_income"}, {"Khác", "ic_cat_income"}});
 
-                insertDefaultsForCategory(bills, new String[][]{
-                        {"Điện", "ic_cat_electric"},
-                        {"Nước", "ic_cat_water"},
-                        {"Internet", "ic_cat_internet"},
-                        {"Điện thoại", "ic_cat_phone"},
-                        {"Gas", "ic_cat_gas"},
-                        {"TV", "ic_cat_tv"}
-                });
+                insertDefaultsForCategory(debtCollection, userId, new String[][]{{"Nhận tiền cho vay", "ic_cat_money_in"}});
+                insertDefaultsForCategory(loanRepayment, userId, new String[][]{{"Trả tiền đã vay", "ic_cat_money_out"}});
 
-                insertDefaultsForCategory(home, new String[][]{
-                        {"Thuê nhà", "ic_cat_home"},
-                        {"Bảo dưỡng xe", "ic_cat_car_service"},
-                        {"Bảo hiểm", "ic_cat_insurance"}
-                });
+                insertDefaultsForCategory(borrow, userId, new String[][]{{"Nhận tiền vay", "ic_cat_money_in"}});
+                insertDefaultsForCategory(lend, userId, new String[][]{{"Cho vay tiền", "ic_cat_money_out"}});
 
-                insertDefaultsForCategory(health, new String[][]{
-                        {"Khám sức khỏe", "ic_cat_health"},
-                        {"Học tập", "ic_cat_study"},
-                        {"Thể thao", "ic_cat_sport"}
-                });
-
-                insertDefaultsForCategory(fun, new String[][]{
-                        {"Nhạc", "ic_cat_music"},
-                        {"Du lịch", "ic_cat_travel"},
-                        {"Trò chơi", "ic_cat_gamepad"}
-                });
-
-                insertDefaultsForCategory(income, new String[][]{
-                        {"Lương", "ic_cat_income"},
-                        {"Thưởng", "ic_cat_income"},
-                        {"Bán đồ", "ic_cat_income"},
-                        {"Khác", "ic_cat_income"}
-                });
-
-                insertDefaultsForCategory(borrow, new String[][]{
-                        {"Nhận tiền vay", "ic_cat_money_in"}
-                });
-
-                insertDefaultsForCategory(lend, new String[][]{
-                        {"Cho vay tiền", "ic_cat_money_out"}
-                });
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            } catch (Exception e) { e.printStackTrace(); }
         });
     }
 
-    private void insertDefaultsForCategory(Category category, String[][] subs) {
+    private void insertDefaultsForCategory(Category category, int userId, String[][] subs) {
         if (category == null || subs == null) return;
         for (String[] s : subs) {
             if (s.length < 2) continue;
             Subcategory sub = new Subcategory(category.id, s[0], s[1]);
+            sub.userId = userId;
             transactionDao.insertSubcategory(sub);
         }
     }
@@ -243,4 +266,17 @@ public class TransactionRepository {
         return live;
     }
 
+}
+    public List<Transaction> getTransactionsBySubcategories(int userId, long startEpochDay, long endEpochDay, List<Integer> subcategoryIds) {
+        try {
+            return transactionDao.getTransactionsBySubcategories(userId, startEpochDay, endEpochDay, subcategoryIds);
+        } catch (Exception e) { return new ArrayList<>(); }
+    }
+
+    public double getTotalSpentBySubcategories(int userId, long startEpochDay, long endEpochDay, List<Integer> subcategoryIds) {
+        List<Transaction> transactions = getTransactionsBySubcategories(userId, startEpochDay, endEpochDay, subcategoryIds);
+        double total = 0;
+        for (Transaction t : transactions) total += t.amount;
+        return total;
+    }
 }

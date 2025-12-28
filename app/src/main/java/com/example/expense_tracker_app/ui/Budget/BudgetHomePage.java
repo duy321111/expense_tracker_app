@@ -19,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.expense_tracker_app.R;
 import com.example.expense_tracker_app.data.model.Budget;
 import com.example.expense_tracker_app.data.repository.BudgetRepository;
+import com.example.expense_tracker_app.ui.Budget.BudgetAdapter;
+import com.example.expense_tracker_app.data.repository.UserRepository;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
@@ -29,6 +31,8 @@ public class BudgetHomePage extends Fragment {
 
     private BudgetRepository budgetRepository;
     private BudgetAdapter adapter;
+    private UserRepository userRepository;
+    private int userId = 1;
 
     private final List<Budget> budgets = new ArrayList<>();
     private final List<Integer> availableYears = new ArrayList<>();
@@ -66,6 +70,11 @@ public class BudgetHomePage extends Fragment {
         RecyclerView rvBudgets = root.findViewById(R.id.rvBudgets);
 
         budgetRepository = new BudgetRepository(requireContext());
+        userRepository = new UserRepository(requireContext());
+        try {
+            com.example.expense_tracker_app.data.model.User u = userRepository.getLoggedInUser();
+            if (u != null) userId = u.id;
+        } catch (Exception e) { userId = 1; }
 
         Calendar now = Calendar.getInstance();
         currentMonth = now.get(Calendar.MONTH) + 1;
@@ -73,14 +82,29 @@ public class BudgetHomePage extends Fragment {
         selectedMonth = currentMonth;
         selectedYear = currentYear;
 
-        adapter = new BudgetAdapter(budgets);
+        adapter = new BudgetAdapter(budgets, userId);
         rvBudgets.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvBudgets.setAdapter(adapter);
+
+        // Sự kiện click vào item ngân sách để mở BudgetDetail và truyền subcategoryIds
+        adapter.setOnItemClickListener(budget -> {
+            Intent intent = new Intent(requireContext(), BudgetDetail.class);
+            intent.putExtra("budget_id", budget.getId());
+            intent.putExtra("budget_name", budget.getName());
+            intent.putExtra("budget_limit", budget.getAmount());
+            intent.putExtra("budget_spent", budget.getSpentAmount());
+            intent.putExtra("budget_month", budget.getMonth());
+            intent.putExtra("budget_year", budget.getYear());
+            if (budget.getSubcategoryIds() != null) {
+            intent.putIntegerArrayListExtra("subcategory_ids", new ArrayList<>(budget.getSubcategoryIds()));
+            }
+            startActivity(intent);
+        });
 
         setupSpinnerListeners();
         btnGoCurrentMonth.setOnClickListener(v -> jumpToCurrentMonth());
         btnAddBudget.setOnClickListener(v ->
-                startActivity(new Intent(requireContext(), AddBudget.class))
+            startActivity(new Intent(requireContext(), AddBudget.class))
         );
 
         refreshFiltersAndBudgets();

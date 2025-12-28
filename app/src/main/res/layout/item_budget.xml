@@ -49,14 +49,5 @@
             android:textAppearance="@style/Body2"
             android:textColor="@color/neutral_900" />
 
-        <ProgressBar
-            android:id="@+id/pbProgress"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="18dp"
-            android:layout_marginTop="6dp"
-            android:max="100"
-            android:progress="0"
-            android:progressDrawable="@drawable/progress_rounded" />
     </LinearLayout>
 </LinearLayout>
