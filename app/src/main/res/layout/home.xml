@@ -207,14 +207,7 @@
                         android:text="@string/title_chart"
                         android:textColor="@color/black"/>
 
-                    <Spinner
-                        android:id="@+id/spnMonth"
-                        android:layout_width="wrap_content"
-                        android:layout_height="48dp"
-                        android:paddingHorizontal="8dp"
-                        android:background="@drawable/bg_spinner_outline"
-                        android:popupTheme="@style/ThemeOverlay.Material3.MaterialAlertDialog"
-                        android:entries="@array/month_options"/>
+                    
                 </LinearLayout>
 
                 <!-- Biểu đồ 2 cột + trục Y -->
@@ -348,13 +341,13 @@
                                 android:layout_width="120dp"
                                 android:layout_height="0dp"
                                 android:layout_marginEnd="32dp"
-                                android:background="@drawable/bg_bar_orange"/>
+                                android:background="@drawable/bg_bar_purple"/>
 
                             <View
                                 android:id="@+id/barSpending"
                                 android:layout_width="120dp"
                                 android:layout_height="0dp"
-                                android:background="@drawable/bg_bar_purple"/>
+                                android:background="@drawable/bg_bar_orange"/>
                         </LinearLayout>
                     </FrameLayout>
                 </RelativeLayout>

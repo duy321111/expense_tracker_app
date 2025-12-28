@@ -123,39 +123,72 @@ public class Home extends Fragment {
                 startActivity(new Intent(getActivity(), LoanTrackingActivity.class))
         );
 
-        // --- chart (mock) ---
+
+        // --- chart (real data) ---
         View barIncome = view.findViewById(R.id.barIncome);
         View barSpending = view.findViewById(R.id.barSpending);
-
-        float income = 17_000_000f;
-        float spending = 7_945_000f;
-        float maxValue = Math.max(income, spending);
-        int chartMaxDp = 180;
-        float density = getResources().getDisplayMetrics().density;
-
-        int incomeHeight = Math.round(chartMaxDp * (income / maxValue) * density);
-        int spendingHeight = Math.round(chartMaxDp * (spending / maxValue) * density);
-
-        LinearLayout.LayoutParams lpIncome = (LinearLayout.LayoutParams) barIncome.getLayoutParams();
-        lpIncome.height = incomeHeight;
-        barIncome.setLayoutParams(lpIncome);
-
-        LinearLayout.LayoutParams lpSpending = (LinearLayout.LayoutParams) barSpending.getLayoutParams();
-        lpSpending.height = spendingHeight;
-        barSpending.setLayoutParams(lpSpending);
-
         TextView y0 = view.findViewById(R.id.tvY0);
         TextView y25 = view.findViewById(R.id.tvY25);
         TextView y50 = view.findViewById(R.id.tvY50);
         TextView y75 = view.findViewById(R.id.tvY75);
         TextView y100 = view.findViewById(R.id.tvY100);
+        TextView tvIncomeAmount = view.findViewById(R.id.tvIncomeAmount);
+        TextView tvSpendingAmount = view.findViewById(R.id.tvSpendingAmount);
 
-        float unit = 1_000_000f;
-        y0.setText("0");
-        y25.setText(Math.round(maxValue * 0.25f / unit) + "m");
-        y50.setText(Math.round(maxValue * 0.50f / unit) + "m");
-        y75.setText(Math.round(maxValue * 0.75f / unit) + "m");
-        y100.setText(Math.round(maxValue / unit) + "m");
+        int chartMaxDp = 180;
+        float density = getResources().getDisplayMetrics().density;
+
+        LocalDate now = LocalDate.now();
+        transactionRepository.getTransactionsByMonth(userId, now)
+                .observe(getViewLifecycleOwner(), list -> {
+                    float income = 0f;
+                    float spending = 0f;
+                    if (list != null) {
+                        for (com.example.expense_tracker_app.data.model.Transaction t : list) {
+                            if (t.type == com.example.expense_tracker_app.data.model.TxType.INCOME) {
+                                income += t.amount;
+                            } else if (t.type == com.example.expense_tracker_app.data.model.TxType.EXPENSE) {
+                                spending += t.amount;
+                            }
+                        }
+                    }
+                    float maxValue = Math.max(income, spending);
+                    if (maxValue == 0) maxValue = 1f;
+                    int incomeHeight = Math.round(chartMaxDp * (income / maxValue) * density);
+                    int spendingHeight = Math.round(chartMaxDp * (spending / maxValue) * density);
+
+                    LinearLayout.LayoutParams lpIncome = (LinearLayout.LayoutParams) barIncome.getLayoutParams();
+                    lpIncome.height = incomeHeight;
+                    barIncome.setLayoutParams(lpIncome);
+
+                    LinearLayout.LayoutParams lpSpending = (LinearLayout.LayoutParams) barSpending.getLayoutParams();
+                    lpSpending.height = spendingHeight;
+                    barSpending.setLayoutParams(lpSpending);
+
+                    if (maxValue < 1_000_000f) {
+                        // Đơn vị nghìn (k)
+                        y0.setText("0");
+                        y25.setText(String.format("%.0fk", (maxValue * 0.25f) / 1_000f));
+                        y50.setText(String.format("%.0fk", (maxValue * 0.50f) / 1_000f));
+                        y75.setText(String.format("%.0fk", (maxValue * 0.75f) / 1_000f));
+                        y100.setText(String.format("%.0fk", maxValue / 1_000f));
+                    } else {
+                        // Đơn vị triệu (m)
+                        y0.setText("0");
+                        y25.setText(String.format("%.1fm", (maxValue * 0.25f) / 1_000_000f));
+                        y50.setText(String.format("%.1fm", (maxValue * 0.50f) / 1_000_000f));
+                        y75.setText(String.format("%.1fm", (maxValue * 0.75f) / 1_000_000f));
+                        y100.setText(String.format("%.1fm", maxValue / 1_000_000f));
+                    }
+
+                    // Hiển thị số thu nhập/chi tiêu thực tế
+                    if (tvIncomeAmount != null) {
+                        tvIncomeAmount.setText(formatMoneyDouble(income) + " đ");
+                    }
+                    if (tvSpendingAmount != null) {
+                        tvSpendingAmount.setText(formatMoneyDouble(spending) + " đ");
+                    }
+                });
 
         // --- month range text ---
         Calendar c = Calendar.getInstance();

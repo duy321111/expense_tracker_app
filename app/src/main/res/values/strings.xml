@@ -87,7 +87,7 @@
     <string name="wallet_owner_placeholder">Nguyen Văn A</string>
     <string name="wallet_balance_placeholder">Số dư: 100.000.000 VND</string>
 
-    <string name="title_chart">Tình hình thu chi</string>
+    <string name="title_chart">Tình hình thu chi tháng này</string>
     <string name="label_income">Thu nhập</string>
     <string name="label_spending">Chi tiêu</string>
     <string name="amount_income_placeholder">17.000.000 đ</string>
