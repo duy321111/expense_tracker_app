@@ -15,8 +15,8 @@ import com.example.expense_tracker_app.data.model.Wallet; // Import Wallet
 import com.example.expense_tracker_app.data.model.converter.Converters;
 import com.example.expense_tracker_app.data.model.converter.StringListConverter;
 
-// NHỚ: Tăng version lên 7
-@Database(entities = {User.class, Budget.class, Transaction.class, Category.class, Subcategory.class, Wallet.class}, version = 7)
+// NHỚ: Tăng version lên 8
+@Database(entities = {User.class, Budget.class, Transaction.class, Category.class, Subcategory.class, Wallet.class}, version = 11)
 @TypeConverters({StringListConverter.class, Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -26,6 +26,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract BudgetDao budgetDao();
     public abstract TransactionDao transactionDao();
     public abstract WalletDao walletDao(); // Bắt buộc có dòng này
+
 
     private static volatile AppDatabase INSTANCE;
 

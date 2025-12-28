@@ -32,4 +32,5 @@ public interface UserDao {
     // Cập nhật mật khẩu riêng
     @Query("UPDATE users SET password = :newPassword WHERE id = :userId")
     void updatePassword(int userId, String newPassword);
+
 }

@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
+
 import com.example.expense_tracker_app.data.database.AppDatabase;
 import com.example.expense_tracker_app.data.database.UserDao;
 import com.example.expense_tracker_app.data.datasource.UserLocalDataSource;
@@ -59,5 +61,9 @@ public class UserRepository {
 
     public void logout() {
         localDataSource.logout();
+    }
+
+    public LiveData<User> getUserById(int userId) {
+        return userDao.getUserById(userId);
     }
 }

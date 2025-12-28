@@ -40,23 +40,28 @@
                 android:padding="16dp"
                 android:layout_marginTop="8dp">
 
-                <!-- Năm + Tháng (RecyclerView) -->
-                <FrameLayout
-                    android:id="@+id/monthSection"
-                    android:layout_width="match_parent"
-                    android:layout_height="72dp"
-                    android:background="@color/neutral_50"
-                    android:paddingHorizontal="0dp"
-                    android:paddingVertical="8dp">
+                <LinearLayout
+                    android:id="@+id/layout_date_picker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:paddingHorizontal="24dp"
+                    android:paddingVertical="10dp"
+                    android:background="@drawable/bg_icon_round_neutral_100">
+                    <TextView
+                        android:id="@+id/tv_current_month_display"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="12-2025"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/neutral_900"/>
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rvMonths"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:overScrollMode="never"
-                        android:clipToPadding="false"
-                        android:paddingHorizontal="0dp"/>
-                </FrameLayout>
+                </LinearLayout>
 
                 <!-- Tổng đã chi -->
                 <LinearLayout
@@ -132,243 +137,12 @@
                 </FrameLayout>
             </LinearLayout>
 
-            <!-- SECTION: Ngày 04 tháng 03 2023 -->
-            <LinearLayout
-                android:id="@+id/sectionDay_2023_03_04"
+            <!-- SECTION Ngày tháng:-->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvTransactions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@color/white"
-                android:padding="16dp"
-                android:layout_marginTop="8dp">
-
-                <TextView
-                    android:id="@+id/tvDayHeader_2023_03_04"
-                    style="@style/Body2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ngày 04 tháng 03 2023"
-                    android:textColor="@color/neutral_800" />
-
-                <!-- Item (1) -->
-                <LinearLayout
-                    android:id="@+id/item1_2023_03_04"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:background="@drawable/bg_card_neutral_50"
-                    android:padding="12dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <FrameLayout
-                        android:id="@+id/item1IconWrap"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:background="@drawable/bg_icon_round_accent_1">
-
-                        <ImageView
-                            android:id="@+id/item1Icon"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_food"
-                            app:tint="@color/white" />
-                    </FrameLayout>
-
-                    <LinearLayout
-                        android:id="@+id/item1Info"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:paddingStart="12dp">
-
-                        <TextView
-                            android:id="@+id/item1Title"
-                            style="@style/Body1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Ăn uống"
-                            android:textColor="@color/black" />
-
-                        <TextView
-                            android:id="@+id/item1Method"
-                            style="@style/Caption1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Tiền mặt"
-                            android:textColor="@color/neutral_800" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/item1Amount"
-                        style="@style/Body1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="- 99.000 đ"
-                        android:textColor="@color/black" />
-                </LinearLayout>
-
-                <!-- Item (2) -->
-                <LinearLayout
-                    android:id="@+id/item2_2023_03_04"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:background="@drawable/bg_card_neutral_50"
-                    android:padding="12dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <FrameLayout
-                        android:id="@+id/item2IconWrap"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:background="@drawable/bg_icon_round_primary_1">
-
-                        <ImageView
-                            android:id="@+id/item2Icon"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_home"
-                            app:tint="@color/white" />
-                    </FrameLayout>
-
-                    <LinearLayout
-                        android:id="@+id/item2Info"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:paddingStart="12dp">
-
-                        <TextView
-                            android:id="@+id/item2Title"
-                            style="@style/Body1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Cà phê"
-                            android:textColor="@color/black" />
-
-                        <TextView
-                            android:id="@+id/item2Method"
-                            style="@style/Caption1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Chuyển khoản"
-                            android:textColor="@color/neutral_800" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/item2Amount"
-                        style="@style/Body1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="- 150.000 đ"
-                        android:textColor="@color/black" />
-                </LinearLayout>
-
-                <!-- Item (3) -->
-                <LinearLayout
-                    android:id="@+id/item3_2023_03_04"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:background="@drawable/bg_card_neutral_50"
-                    android:padding="12dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <FrameLayout
-                        android:id="@+id/item3IconWrap"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:background="@drawable/bg_icon_round_primary_2">
-
-                        <ImageView
-                            android:id="@+id/item3Icon"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_money_bag"
-                            app:tint="@color/white" />
-                    </FrameLayout>
-
-                    <LinearLayout
-                        android:id="@+id/item3Info"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:paddingStart="12dp">
-
-                        <TextView
-                            android:id="@+id/item3Title"
-                            style="@style/Body1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Trả nợ"
-                            android:textColor="@color/black" />
-
-                        <TextView
-                            android:id="@+id/item3Method"
-                            style="@style/Caption1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Chuyển khoản"
-                            android:textColor="@color/neutral_800" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/item3Amount"
-                        style="@style/Body1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="- 420.000 đ"
-                        android:textColor="@color/black" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- SECTION: Ngày 03 tháng 03 2023 -->
-            <LinearLayout
-                android:id="@+id/sectionDay_2023_03_03"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@color/white"
-                android:padding="16dp"
-                android:layout_marginTop="8dp">
-
-                <TextView
-                    android:id="@+id/tvDayHeader_2023_03_03"
-                    style="@style/Body2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ngày 03 tháng 03 2023"
-                    android:textColor="@color/neutral_800"/>
-
-                <LinearLayout
-                    android:id="@+id/itemEmpty_2023_03_03"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:background="@drawable/bg_card_neutral_50"
-                    android:padding="12dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:id="@+id/tvEmpty_2023_03_03"
-                        style="@style/Caption1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="(Chưa có giao dịch)"
-                        android:textColor="@color/neutral_800"/>
-                </LinearLayout>
-            </LinearLayout>
-
+                android:nestedScrollingEnabled="false" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

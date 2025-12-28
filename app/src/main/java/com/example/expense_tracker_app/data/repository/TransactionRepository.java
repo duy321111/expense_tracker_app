@@ -1,7 +1,9 @@
 package com.example.expense_tracker_app.data.repository;
 
 import android.app.Application;
+
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.example.expense_tracker_app.data.database.AppDatabase;
 import com.example.expense_tracker_app.data.database.TransactionDao;
@@ -11,13 +13,14 @@ import com.example.expense_tracker_app.data.model.Subcategory;
 import com.example.expense_tracker_app.data.model.Transaction;
 import com.example.expense_tracker_app.data.model.TxType;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.time.LocalDate;
 
 public class TransactionRepository {
+
     private final TransactionDao transactionDao;
     private final ExecutorService executor;
 
@@ -27,7 +30,7 @@ public class TransactionRepository {
         executor = Executors.newSingleThreadExecutor();
     }
 
-    // --- CÁC HÀM XỬ LÝ TRANSACTION (GIAO DỊCH) ---
+    // --- TRANSACTION ---
 
     public void insertTransaction(Transaction transaction) {
         executor.execute(() -> transactionDao.insertTransaction(transaction));
@@ -43,9 +46,23 @@ public class TransactionRepository {
         return transactionDao.getTransactionsByDateRange(userId, startDate, endDate);
     }
 
-    // --- CÁC HÀM XỬ LÝ CATEGORY (DANH MỤC MỚI) ---
+    // ✅ CHỈ BORROW + LEND
+    public LiveData<List<Transaction>> getLoanTransactionsByMonth(int userId, LocalDate monthAnyDay) {
+        LocalDate start = monthAnyDay.withDayOfMonth(1);
+        LocalDate end = monthAnyDay.withDayOfMonth(monthAnyDay.lengthOfMonth());
 
-    // 1. Hàm lưu danh mục mới vào DB
+        // dùng transactionDao đã init sẵn
+        return transactionDao.getLoanTransactionsByDateRange(
+                userId,
+                start,
+                end,
+                TxType.BORROW,
+                TxType.LEND
+        );
+    }
+
+    // --- CATEGORY / SUBCATEGORY ---
+
     public void insertCategory(Category category) {
         executor.execute(() -> {
             try {
@@ -68,14 +85,11 @@ public class TransactionRepository {
         });
     }
 
-    // 2. Hàm lấy danh sách các danh mục tự tạo từ DB
     public List<Category> getCustomCategories() {
         try {
-            // Vì AppDatabase của bạn có allowMainThreadQueries() nên có thể gọi trực tiếp
-            // Nếu không, cần dùng LiveData hoặc chạy trong Thread khác
             return transactionDao.getAllCategories();
         } catch (Exception e) {
-            return new ArrayList<>(); // Trả về list rỗng nếu lỗi
+            return new ArrayList<>();
         }
     }
 
@@ -100,10 +114,6 @@ public class TransactionRepository {
             try {
                 if (transactionDao.countCategories() > 0 && transactionDao.countSubcategories() > 0) return;
 
-                // Clear existing to avoid duplicate when fallbackToDestructiveMigration disabled
-                // transactionDao is destructive on upgrade, but keep idempotent insert
-
-                // EXPENSE groups
                 Category daily = new Category("Chi tiêu hằng ngày", "ic_cat_food");
                 daily.type = TxType.EXPENSE;
                 daily.id = (int) transactionDao.insertCategory(daily);
@@ -124,12 +134,10 @@ public class TransactionRepository {
                 fun.type = TxType.EXPENSE;
                 fun.id = (int) transactionDao.insertCategory(fun);
 
-                // INCOME group
                 Category income = new Category("Thu nhập", "ic_cat_income");
                 income.type = TxType.INCOME;
                 income.id = (int) transactionDao.insertCategory(income);
 
-                // BORROW / LEND groups
                 Category borrow = new Category("Đi vay", "ic_cat_money_in");
                 borrow.type = TxType.BORROW;
                 borrow.id = (int) transactionDao.insertCategory(borrow);
@@ -138,7 +146,6 @@ public class TransactionRepository {
                 lend.type = TxType.LEND;
                 lend.id = (int) transactionDao.insertCategory(lend);
 
-                // Now insert subcategories
                 insertDefaultsForCategory(daily, new String[][]{
                         {"Ăn uống", "ic_cat_food"},
                         {"Cà phê", "ic_cat_coffee"},
@@ -187,6 +194,7 @@ public class TransactionRepository {
                 insertDefaultsForCategory(lend, new String[][]{
                         {"Cho vay tiền", "ic_cat_money_out"}
                 });
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -201,4 +209,38 @@ public class TransactionRepository {
             transactionDao.insertSubcategory(sub);
         }
     }
+
+    public class DebtSummary {
+        public long totalBorrow;
+        public long totalPaid;
+
+        public DebtSummary(long totalBorrow, long totalPaid) {
+            this.totalBorrow = totalBorrow;
+            this.totalPaid = totalPaid;
+        }
+    }
+
+
+    public LiveData<DebtSummary> getDebtSummaryByMonth(
+            int userId,
+            LocalDate anyDayInMonth
+    ) {
+        MutableLiveData<DebtSummary> live = new MutableLiveData<>();
+
+        executor.execute(() -> {
+            LocalDate start = anyDayInMonth.withDayOfMonth(1);
+            LocalDate end = anyDayInMonth.withDayOfMonth(anyDayInMonth.lengthOfMonth());
+
+            long borrow = transactionDao.getTotalBorrowInMonth(
+                    userId, TxType.BORROW, start, end);
+
+            long paid = transactionDao.getTotalDebtPaidInMonth(
+                    userId, TxType.EXPENSE, TxType.BORROW, start, end);
+
+            live.postValue(new DebtSummary(borrow, paid));
+        });
+
+        return live;
+    }
+
 }
