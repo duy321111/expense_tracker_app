@@ -71,20 +71,17 @@ public class TransactionRepository {
         return transactionDao.getTransactionsByDateRange(userId, startDate, endDate);
     }
 
-    // ✅ CHỈ BORROW + LEND
-    public LiveData<List<Transaction>> getLoanTransactionsByMonth(int userId, LocalDate monthAnyDay) {
-        LocalDate start = monthAnyDay.withDayOfMonth(1);
-        LocalDate end = monthAnyDay.withDayOfMonth(monthAnyDay.lengthOfMonth());
 
-        // dùng transactionDao đã init sẵn
-        return transactionDao.getLoanTransactionsByDateRange(
-                userId,
-                start,
-                end,
-                TxType.BORROW,
-                TxType.LEND
-        );
+    public LiveData<List<Transaction>> getLoanTransactions(int userId) {
+        List<TxType> types = new ArrayList<>();
+        types.add(TxType.BORROW);
+        types.add(TxType.LEND);
+        types.add(TxType.DEBT_COLLECTION);
+        types.add(TxType.LOAN_REPAYMENT);
+
+        return transactionDao.getLoanTransactions(userId, types);
     }
+
 
     // --- CATEGORY / SUBCATEGORY ---
 
@@ -277,4 +274,10 @@ public class TransactionRepository {
         for (Transaction t : transactions) total += t.amount;
         return total;
     }
+
+
+    public LiveData<List<Transaction>> getTransactionsByTypes(int userId, List<TxType> types) {
+        return transactionDao.getTransactionsByTypes(userId, types);
+    }
+
 }

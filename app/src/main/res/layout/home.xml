@@ -517,7 +517,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginTop="8dp"
                     android:divider="@drawable/divider_vertical"
                     android:showDividers="middle">
 
@@ -579,80 +578,31 @@
                         android:focusable="true"/>
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/tvDebtMeta"
-                    style="@style/Caption1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/debt_meta_placeholder"
-                    android:textColor="@color/accent_1"
-                    android:layout_marginTop="4dp"/>
-
                 <LinearLayout
+                    android:id="@+id/layout_debt_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="12dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@drawable/bg_card_primary_5">
+                    android:layout_marginTop="8dp">
 
-                    <LinearLayout
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_debt_cards"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:nestedScrollingEnabled="false"
+                        tools:listitem="@layout/item_budget"/>
 
-                        <TextView
-                            android:id="@+id/tvDebtLabel"
-                            style="@style/Caption1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/label_paid"
-                            android:textColor="@color/neutral_800"/>
 
-                        <TextView
-                            android:id="@+id/tvDebtRatio"
-                            style="@style/Body1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0/0"
-                            android:textColor="@color/black"
-                            android:textStyle="bold"/>
-                    </LinearLayout>
 
-                    <ProgressBar
-                        android:id="@+id/pbDebt"
-                        style="?android:attr/progressBarStyleHorizontal"
+                    <TextView
+                        android:id="@+id/tv_empty_debt"
+                        style="@style/Body2"
                         android:layout_width="match_parent"
-                        android:layout_height="20dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:indeterminate="false"
-                        android:progressDrawable="@drawable/progress_rounded"/>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="6dp">
-
-                        <TextView
-                            android:id="@+id/tvDebtStart"
-                            style="@style/Caption1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/date_0103"
-                            android:textColor="@color/neutral_800"/>
-
-                        <TextView
-                            android:id="@+id/tvDebtEnd"
-                            style="@style/Caption1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/date_3103"
-                            android:textColor="@color/neutral_800"/>
-                    </LinearLayout>
+                        android:gravity="center"
+                        android:text="Chưa có giao dịch vay/nợ"
+                        android:visibility="gone"/>
                 </LinearLayout>
             </LinearLayout>
 

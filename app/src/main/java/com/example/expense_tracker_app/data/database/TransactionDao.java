@@ -115,7 +115,26 @@ public interface TransactionDao {
     );
 
 
+    @Query("SELECT * FROM transactions " +
+            "WHERE userId = :userId " +
+            "AND type IN (:types) " +
+            "ORDER BY date DESC, id DESC")
+    LiveData<List<Transaction>> getLoanTransactions(
+            int userId,
+            List<TxType> types
+    );
+
+
+
+
 
     @Query("SELECT * FROM transactions WHERE userId = :userId AND subcategoryId IN (:subcategoryIds) AND type = 'EXPENSE' AND date >= :startEpochDay AND date <= :endEpochDay AND excludeFromReport = 0 ORDER BY date DESC, id DESC")
     List<Transaction> getTransactionsBySubcategories(int userId, long startEpochDay, long endEpochDay, List<Integer> subcategoryIds);
+
+    @Query("SELECT * FROM transactions " +
+            "WHERE userId = :userId " +
+            "AND type IN (:types) " +
+            "ORDER BY date DESC, id DESC")
+    LiveData<List<Transaction>> getTransactionsByTypes(int userId, List<TxType> types);
+
 }
